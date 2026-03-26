@@ -1,6 +1,6 @@
-package m
+package main 
 
 
 func main(){
-	
+
 }
