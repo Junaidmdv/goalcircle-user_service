@@ -1,7 +1,6 @@
 package redis
 
 import (
-	redisconfig "github.com/junaidmdv/goalcirlcle/authservice/internal/config"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -11,10 +10,9 @@ type RedisStore struct {
 
 func NewRedisStore() *RedisStore {
 	return &RedisStore{
-		client: redisconfig.NewRedisClient(),
+		client: NewRedisClient(),
 	}
 }
-
 func (rs *RedisStore) AddOtp() {
 
 }  

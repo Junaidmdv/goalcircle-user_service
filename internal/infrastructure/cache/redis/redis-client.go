@@ -1,4 +1,4 @@
-package config
+package redis
 
 import (
 	redis "github.com/redis/go-redis/v9"
