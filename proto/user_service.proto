@@ -1,0 +1,27 @@
+syntax = 'proto3';  
+
+package auth; 
+
+option go_package = "github.com/junaidmdv/goalcirlcle/user_service/proto/pb"; 
+
+
+message UserRegisterRequest { 
+    string full_name=1;   
+    string email =2; 
+    string password=3; 
+    string confirm_password=4;
+}   
+
+
+message RegisterResponse{
+  string user_id=1; 
+  string email=2; 
+  optional bool otp_status=3; 
+} 
+
+// authentication of users services
+service AuthService{
+  //registeration of user account
+  rpc Register(UserRegisterRequest)returns(RegisterResponse);   
+  
+}
