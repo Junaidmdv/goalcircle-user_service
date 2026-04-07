@@ -8,7 +8,7 @@ import (
 )
 
 type ZapLogger struct {
-	Logger *zap.Logger `json:"logger,omitempty"`
+	Logger *zap.Logger 
 }
 
 func NewLogger() (*ZapLogger, error) {
