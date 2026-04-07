@@ -21,7 +21,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type UserRegisterRequest struct {
+type RegisterRequest struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	FullName        string                 `protobuf:"bytes,1,opt,name=full_name,json=fullName,proto3" json:"full_name,omitempty"`
 	Email           string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
@@ -31,20 +31,20 @@ type UserRegisterRequest struct {
 	sizeCache       protoimpl.SizeCache
 }
 
-func (x *UserRegisterRequest) Reset() {
-	*x = UserRegisterRequest{}
+func (x *RegisterRequest) Reset() {
+	*x = RegisterRequest{}
 	mi := &file_user_service_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *UserRegisterRequest) String() string {
+func (x *RegisterRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*UserRegisterRequest) ProtoMessage() {}
+func (*RegisterRequest) ProtoMessage() {}
 
-func (x *UserRegisterRequest) ProtoReflect() protoreflect.Message {
+func (x *RegisterRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_user_service_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -56,33 +56,33 @@ func (x *UserRegisterRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UserRegisterRequest.ProtoReflect.Descriptor instead.
-func (*UserRegisterRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use RegisterRequest.ProtoReflect.Descriptor instead.
+func (*RegisterRequest) Descriptor() ([]byte, []int) {
 	return file_user_service_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *UserRegisterRequest) GetFullName() string {
+func (x *RegisterRequest) GetFullName() string {
 	if x != nil {
 		return x.FullName
 	}
 	return ""
 }
 
-func (x *UserRegisterRequest) GetEmail() string {
+func (x *RegisterRequest) GetEmail() string {
 	if x != nil {
 		return x.Email
 	}
 	return ""
 }
 
-func (x *UserRegisterRequest) GetPassword() string {
+func (x *RegisterRequest) GetPassword() string {
 	if x != nil {
 		return x.Password
 	}
 	return ""
 }
 
-func (x *UserRegisterRequest) GetConfirmPassword() string {
+func (x *RegisterRequest) GetConfirmPassword() string {
 	if x != nil {
 		return x.ConfirmPassword
 	}
@@ -91,7 +91,7 @@ func (x *UserRegisterRequest) GetConfirmPassword() string {
 
 type RegisterResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	SessionId     string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
 	Email         string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
 	OtpStatus     *bool                  `protobuf:"varint,3,opt,name=otp_status,json=otpStatus,proto3,oneof" json:"otp_status,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -128,9 +128,9 @@ func (*RegisterResponse) Descriptor() ([]byte, []int) {
 	return file_user_service_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *RegisterResponse) GetUserId() string {
+func (x *RegisterResponse) GetSessionId() string {
 	if x != nil {
-		return x.UserId
+		return x.SessionId
 	}
 	return ""
 }
@@ -153,20 +153,21 @@ var File_user_service_proto protoreflect.FileDescriptor
 
 const file_user_service_proto_rawDesc = "" +
 	"\n" +
-	"\x12user_service.proto\x12\x04auth\"\x8f\x01\n" +
-	"\x13UserRegisterRequest\x12\x1b\n" +
+	"\x12user_service.proto\x12\x04auth\"\x8b\x01\n" +
+	"\x0fRegisterRequest\x12\x1b\n" +
 	"\tfull_name\x18\x01 \x01(\tR\bfullName\x12\x14\n" +
 	"\x05email\x18\x02 \x01(\tR\x05email\x12\x1a\n" +
 	"\bpassword\x18\x03 \x01(\tR\bpassword\x12)\n" +
-	"\x10confirm_password\x18\x04 \x01(\tR\x0fconfirmPassword\"t\n" +
-	"\x10RegisterResponse\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x14\n" +
+	"\x10confirm_password\x18\x04 \x01(\tR\x0fconfirmPassword\"z\n" +
+	"\x10RegisterResponse\x12\x1d\n" +
+	"\n" +
+	"session_id\x18\x01 \x01(\tR\tsessionId\x12\x14\n" +
 	"\x05email\x18\x02 \x01(\tR\x05email\x12\"\n" +
 	"\n" +
 	"otp_status\x18\x03 \x01(\bH\x00R\totpStatus\x88\x01\x01B\r\n" +
-	"\v_otp_status2L\n" +
-	"\vAuthService\x12=\n" +
-	"\bRegister\x12\x19.auth.UserRegisterRequest\x1a\x16.auth.RegisterResponseB8Z6github.com/junaidmdv/goalcirlcle/user_service/proto/pbb\x06proto3"
+	"\v_otp_status2H\n" +
+	"\vAuthService\x129\n" +
+	"\bRegister\x12\x15.auth.RegisterRequest\x1a\x16.auth.RegisterResponseB8Z6github.com/junaidmdv/goalcirlcle/user_service/proto/pbb\x06proto3"
 
 var (
 	file_user_service_proto_rawDescOnce sync.Once
@@ -182,11 +183,11 @@ func file_user_service_proto_rawDescGZIP() []byte {
 
 var file_user_service_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_user_service_proto_goTypes = []any{
-	(*UserRegisterRequest)(nil), // 0: auth.UserRegisterRequest
-	(*RegisterResponse)(nil),    // 1: auth.RegisterResponse
+	(*RegisterRequest)(nil),  // 0: auth.RegisterRequest
+	(*RegisterResponse)(nil), // 1: auth.RegisterResponse
 }
 var file_user_service_proto_depIdxs = []int32{
-	0, // 0: auth.AuthService.Register:input_type -> auth.UserRegisterRequest
+	0, // 0: auth.AuthService.Register:input_type -> auth.RegisterRequest
 	1, // 1: auth.AuthService.Register:output_type -> auth.RegisterResponse
 	1, // [1:2] is the sub-list for method output_type
 	0, // [0:1] is the sub-list for method input_type

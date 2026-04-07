@@ -5,7 +5,7 @@ package auth;
 option go_package = "github.com/junaidmdv/goalcirlcle/user_service/proto/pb"; 
 
 
-message UserRegisterRequest { 
+message RegisterRequest { 
     string full_name=1;   
     string email =2; 
     string password=3; 
@@ -14,7 +14,7 @@ message UserRegisterRequest {
 
 
 message RegisterResponse{
-  string user_id=1; 
+  string session_id=1; 
   string email=2; 
   optional bool otp_status=3; 
 } 
@@ -22,6 +22,6 @@ message RegisterResponse{
 // authentication of users services
 service AuthService{
   //registeration of user account
-  rpc Register(UserRegisterRequest)returns(RegisterResponse);   
+  rpc Register(RegisterRequest)returns(RegisterResponse);   
   
 }
