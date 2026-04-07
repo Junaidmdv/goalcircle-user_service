@@ -1,8 +1,6 @@
 package validater
 
 import (
-	"fmt"
-	"log"
 	"reflect"
 	"strings"
 
@@ -17,14 +15,14 @@ type Validater struct {
 	ut ut.Translator
 }
 
-func NewValidater() *Validater {
+func NewValidater() (*Validater, error) {
 
 	enlocal := en.New()
 	uni := ut.New(enlocal, enlocal)
 	engtrans, _ := uni.GetTranslator("en")
 	validater := validator.New()
 	if err := en_translations.RegisterDefaultTranslations(validater, engtrans); err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	validater.RegisterTagNameFunc(func(field reflect.StructField) string {
@@ -38,10 +36,10 @@ func NewValidater() *Validater {
 	return &Validater{
 		vn: validater,
 		ut: engtrans,
-	}
+	}, nil
 }
 
-func (v *Validater) Validation(input interface{}) error {
+func (v *Validater) Validation(input interface{}) validator.ValidationErrorsTranslations {
 
 	err := v.vn.Struct(input)
 	if err == nil {
@@ -50,15 +48,17 @@ func (v *Validater) Validation(input interface{}) error {
 
 	translated := err.(validator.ValidationErrors).Translate(v.ut)
 
-	messages := make([]string, 0, len(translated))
+	// messages := make([]string, 0, len(translated))
 
-	for field, msg := range translated {
-		parts := strings.SplitN(field, ".", 2)
-		if len(parts) == 2 {
-			messages = append(messages, parts[1]+": "+msg)
-		} else {
-			messages = append(messages, field+": "+msg)
-		}
-	}
-	return fmt.Errorf("%s", strings.Join(messages, "\n"))
+	// for field, msg := range translated {
+	// 	parts := strings.SplitN(field, ".", 2)
+	// 	if len(parts) == 2 {
+	// 		messages = append(messages, parts[1]+": "+msg)
+	// 	} else {
+	// 		messages = append(messages, field+": "+msg)
+	// 	}
+	// }
+	// return fmt.Errorf("%s", strings.Join(messages, "\n"))
+
+	return translated
 }
