@@ -6,7 +6,8 @@ import (
 
 
 type GRPCConfig struct {
-	Port string
+	Port string 
+	TimeOut string 
 }
 
 func (cb *configBuilder) WithGrpc() ConfigBuilder {

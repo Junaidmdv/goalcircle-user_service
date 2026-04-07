@@ -5,7 +5,7 @@ import "os"
 type PostgresConfig struct {
 	Host     string
 	Port     string
-	Name     string
+	DB_Name     string
 	User     string
 	Password string
 	SSLMode  string
@@ -15,7 +15,7 @@ func (cb *configBuilder) WithPostgress() ConfigBuilder {
 	pc := &PostgresConfig{
 		Host:     os.Getenv("DB_HOST"),
 		Port:     os.Getenv("DB_PORT"),
-		Name:     os.Getenv("DB_NAME"),
+		DB_Name:     os.Getenv("DB_NAME"),
 		User:     os.Getenv("DB_USER"),
 		Password: os.Getenv("DB_PASSWORD"),
 		SSLMode:  os.Getenv("DB_SSLMODE"),

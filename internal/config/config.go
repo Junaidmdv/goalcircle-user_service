@@ -5,7 +5,7 @@ package config
 type Config struct {
 	GRPC     *GRPCConfig
 	Postgres *PostgresConfig
-	JWT      *JWTConfig 
+	JWT      *JWTConfig
 	Redis    *RedisConfig
 }
 
@@ -17,9 +17,9 @@ type configBuilder struct {
 type ConfigBuilder interface {
 	WithGrpc() ConfigBuilder
 	WithPostgress() ConfigBuilder
-	WithJWT() ConfigBuilder  
-	WithRedis()ConfigBuilder
-	Build()(*configBuilder,[]error)
+	WithJWT() ConfigBuilder
+	WithRedis() ConfigBuilder
+	Build() (*Config, []error)
 }
 
 func LoadConfig() *configBuilder {
@@ -28,10 +28,11 @@ func LoadConfig() *configBuilder {
 	}
 }
 
-func (cb *configBuilder) Build() (*configBuilder, []error) {
+func (cb *configBuilder) Build() (*Config, []error) {
 	if len(cb.errors) > 0 {
 		return nil, cb.errors
 	}
 
-	return cb, nil
+	return cb.config, nil
 }
+
