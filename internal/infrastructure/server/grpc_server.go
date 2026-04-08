@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"net"
 
 	"google.golang.org/grpc"
@@ -17,8 +18,8 @@ func NewGrpcServer() *GRPCServer {
 	}
 }
 
-func (s *GRPCServer) Run(port string) error {
-	lis, err := net.Listen("tcp", port)
+func (s *GRPCServer) Run(port int) error {
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
 		return err
 	}

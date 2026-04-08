@@ -10,7 +10,7 @@ import (
 
 	cnfg "github.com/junaidmdv/goalcirlcle/user_service/internal/config"
 	authHandler "github.com/junaidmdv/goalcirlcle/user_service/internal/handler/grpc/auth"
-	"github.com/junaidmdv/goalcirlcle/user_service/internal/infrastructure/persistence/postgres"
+	psql "github.com/junaidmdv/goalcirlcle/user_service/internal/infrastructure/persistence/postgres"
 	sr "github.com/junaidmdv/goalcirlcle/user_service/internal/infrastructure/server"
 	at "github.com/junaidmdv/goalcirlcle/user_service/internal/usecase/auth"
 	logger "github.com/junaidmdv/goalcirlcle/user_service/pkg/logger"
@@ -23,9 +23,9 @@ func main() {
 
 	config, errs := cnfg.LoadConfig().
 		WithGrpc().
-		WithPostgress().
+		//WithPostgres().
 		//WithJWT().
-		WithRedis().
+		//WithRedis().
 		Build()
 
 	if errs != nil {
@@ -46,40 +46,33 @@ func main() {
 		return
 	}
 
-	//user authentication  
+	//user authentication
 
-
-    //postgres connection 
-	datbaseConnectin,err:=postgres.NewDatabase(config.Postgres) 
-	if err != nil{
-		 logger.Error("database initilisation error",zap.String("error",err.Error()))
+	//postgres connection
+	datbaseConnectin, err := psql.NewDatabase(config.Postgres)
+	if err != nil {
+		logger.Error("database initilisation error", zap.String("error", err.Error()))
 	}
-	userRepo:=postgres.NewUserRepository(datbaseConnectin) 
- 
+	userRepo := psql.NewUserRepository(datbaseConnectin)
 
-	
-
-
-   //redis connection 
-	authusecase := at.NewAuthUsecase(userRepo,)
+	//redis connection
+	authusecase := at.NewAuthUsecase(userRepo, logger.Logger)
 	auth_handler := authHandler.NewAuthHandler(authusecase, logger, validater)
 	server := sr.NewGrpcServer()
 	auth_pb.RegisterAuthServiceServer(server.Server, auth_handler)
 
-
 	go func() {
+		logger.Info(fmt.Sprintf("server running on %d", config.GRPC.Port))
 		if err := server.Run(config.GRPC.Port); err != nil {
 			logger.Error("server error", zap.String("message", err.Error()), zap.Time("time", time.Now()))
 		}
-		logger.Info(fmt.Sprintf("server running on %s", config.GRPC.Port))
 	}()
-
-
 
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
+	sig := <-signalChan
+	logger.Info("received signal, shutting down", zap.String("signal", sig.String()))
+
 	signal.Stop(signalChan)
-
+	server.Server.GracefulStop()
 }
-
-

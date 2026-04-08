@@ -1,6 +1,8 @@
 package config
 
-//created config using builder design pattern
+//created config using builder design pattern 
+
+
 
 type Config struct {
 	GRPC     *GRPCConfig
@@ -16,7 +18,7 @@ type configBuilder struct {
 
 type ConfigBuilder interface {
 	WithGrpc() ConfigBuilder
-	WithPostgress() ConfigBuilder
+	WithPostgres() ConfigBuilder
 	WithJWT() ConfigBuilder
 	WithRedis() ConfigBuilder
 	Build() (*Config, []error)
