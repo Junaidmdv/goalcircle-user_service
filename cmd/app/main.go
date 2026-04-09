@@ -21,28 +21,31 @@ import (
 
 func main() {
 
-	config, errs := cnfg.LoadConfig().
-		WithGrpc().
-		//WithPostgres().
-		//WithJWT().
-		//WithRedis().
-		Build()
-
-	if errs != nil {
-		log.Fatal(errs)
-		return
-	}
-
 	logger, err := logger.NewLogger()
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 
-	validater, err := vl.NewValidater()
+	config, errs := cnfg.LoadConfig().
+		WithGrpc().
+		WithPostgres().
+		//WithJWT().
+		//WithRedis().
+		Build()
 
+	if errs != nil {
+
+		for _, err := range errs {
+			logger.Error("configration error", zap.Error(err))
+			fmt.Println()
+		}
+		return
+	}
+
+	validater, err := vl.NewValidater()
 	if err != nil {
-		logger.Error("validation package initilisation error", zap.String("error", err.Error()))
+		logger.Error("validation package initilisation error", zap.Error(err))
 		return
 	}
 

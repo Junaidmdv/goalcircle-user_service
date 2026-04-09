@@ -1,8 +1,12 @@
 package config
 
-//created config using builder design pattern 
+import (
+	"log"
 
+	"github.com/joho/godotenv"
+)
 
+//created config using builder design pattern
 
 type Config struct {
 	GRPC     *GRPCConfig
@@ -25,6 +29,10 @@ type ConfigBuilder interface {
 }
 
 func LoadConfig() *configBuilder {
+	err := godotenv.Load()
+	if err != nil {
+		log.Println("no .env file found, reading from environment")
+	}
 	return &configBuilder{
 		config: &Config{},
 	}
@@ -37,4 +45,3 @@ func (cb *configBuilder) Build() (*Config, []error) {
 
 	return cb.config, nil
 }
-

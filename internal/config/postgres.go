@@ -51,7 +51,7 @@ func (cb *configBuilder) WithPostgres() ConfigBuilder {
 		DBName:   dbName,
 		User:     user,
 		Password: password,
-		SSLMode:  os.Getenv("DB_SSLMODE"), // optional, driver defaults to "disable"
+		SSLMode:  os.Getenv("DB_SSLMODE"), 
 	}
 
 	return cb
