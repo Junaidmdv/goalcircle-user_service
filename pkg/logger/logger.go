@@ -5,18 +5,44 @@ import (
 	"time"
 
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 type ZapLogger struct {
-	Logger *zap.Logger 
+	Logger *zap.Logger
 }
 
 func NewLogger() (*ZapLogger, error) {
-	z, err := zap.NewProduction()
+
+	encoderConfig := zapcore.EncoderConfig{
+		TimeKey:        "timestamp",
+		LevelKey:       "level",
+		NameKey:        "logger",
+		CallerKey:      "caller",
+		MessageKey:     "message",
+		StacktraceKey:  "stacktrace",
+		LineEnding:     zapcore.DefaultLineEnding,
+		EncodeLevel:    zapcore.CapitalLevelEncoder,
+		EncodeTime:     zapcore.ISO8601TimeEncoder,
+		EncodeDuration: zapcore.StringDurationEncoder,
+		EncodeCaller:   zapcore.ShortCallerEncoder,
+	}
+
+	config := zap.Config{
+		Level:            zap.NewAtomicLevelAt(zap.InfoLevel),
+		Development:      false,
+		Encoding:         "console",
+		EncoderConfig:    encoderConfig,
+		OutputPaths:      []string{"stdout"},
+		ErrorOutputPaths: []string{"stderr"},
+	}
+
+	logger, err := config.Build()
 	if err != nil {
 		return nil, err
 	}
-	return &ZapLogger{Logger: z}, nil
+	defer logger.Sync()
+	return &ZapLogger{Logger: logger}, nil
 }
 func (l *ZapLogger) Info(msg string, fields ...zap.Field) {
 	l.Logger.Info(msg, fields...)
