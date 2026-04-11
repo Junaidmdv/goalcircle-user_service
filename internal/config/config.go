@@ -12,7 +12,8 @@ type Config struct {
 	GRPC     *GRPCConfig
 	Postgres *PostgresConfig
 	JWT      *JWTConfig
-	Redis    *RedisConfig
+	Redis    *RedisConfig 
+	Twilio   *TwilioConfig
 }
 
 type configBuilder struct {
@@ -24,7 +25,8 @@ type ConfigBuilder interface {
 	WithGrpc() ConfigBuilder
 	WithPostgres() ConfigBuilder
 	WithJWT() ConfigBuilder
-	WithRedis() ConfigBuilder
+	WithRedis() ConfigBuilder 
+	WithTwilio()ConfigBuilder
 	Build() (*Config, []error)
 }
 

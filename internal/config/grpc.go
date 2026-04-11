@@ -3,13 +3,15 @@ package config
 import (
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"strconv"
+	"time"
 )
 
 type GRPCConfig struct {
 	Port    int
-	TimeOut string
+	TimeOut time.Duration
 }
 
 func (cb *configBuilder) WithGrpc() ConfigBuilder {
@@ -30,8 +32,28 @@ func (cb *configBuilder) WithGrpc() ConfigBuilder {
 
 	}
 
+	timeoutStr := os.Getenv("TIMEOUT")
+	timeout := time.Second * 5
+
+	// timeoutStr := os.Getenv("TIMEOUT")
+	// timeout := 5 * time.Second // default timeout
+
+	if timeoutStr == "" {
+		log.Print("TIMEOUT not set in env, using default: 5 seconds")
+	} else {
+		t, err := strconv.Atoi(timeoutStr)
+		if err != nil {
+			log.Printf("invalid TIMEOUT format %q: must be an integer", timeoutStr)
+		} else if t < 2 || t > 10 {
+			log.Printf("invalid TIMEOUT value %d: must be between 2 and 10", t)
+		} else {
+			timeout = time.Duration(t) * time.Second
+		}
+	}
+
 	cb.config.GRPC = &GRPCConfig{
-		Port: val,
+		Port:    val,
+		TimeOut: timeout,
 	}
 	return cb
 }
