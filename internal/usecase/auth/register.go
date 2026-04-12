@@ -8,6 +8,7 @@ import (
 	"github.com/junaidmdv/goalcirlcle/user_service/internal/domain"
 	"github.com/junaidmdv/goalcirlcle/user_service/internal/domain/entity"
 	"github.com/junaidmdv/goalcirlcle/user_service/internal/domain/repository"
+	"github.com/junaidmdv/goalcirlcle/user_service/internal/infrastructure/bycrypt"
 	"github.com/junaidmdv/goalcirlcle/user_service/internal/infrastructure/twilio"
 	"github.com/junaidmdv/goalcirlcle/user_service/internal/infrastructure/uid"
 	uc_dtos "github.com/junaidmdv/goalcirlcle/user_service/internal/usecase/dtos"
@@ -21,14 +22,16 @@ type authUsecase struct {
 	timeout      *time.Duration
 	uidGenerater uid.UuidGenerater
 	otp          twilio.OtpService
+	hash         bycrypt.PasswordHasher
 }
 
-func NewAuthUsecase(ur repository.UserRepository, logger logger.Logger, time *time.Duration, uidgen uid.UuidGenerater, otp twilio.OtpService) *authUsecase {
+func NewAuthUsecase(ur repository.UserRepository, logger logger.Logger, time *time.Duration, uidgen uid.UuidGenerater, otp twilio.OtpService, hash bycrypt.PasswordHasher) *authUsecase {
 	return &authUsecase{
 		userRepo:     ur,
 		logger:       logger,
 		timeout:      time,
 		uidGenerater: uidgen,
+		hash:         hash,
 	}
 }
 

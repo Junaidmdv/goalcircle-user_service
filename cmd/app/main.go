@@ -9,6 +9,7 @@ import (
 
 	cnfg "github.com/junaidmdv/goalcirlcle/user_service/internal/config"
 	authHandler "github.com/junaidmdv/goalcirlcle/user_service/internal/handler/grpc/auth"
+	"github.com/junaidmdv/goalcirlcle/user_service/internal/infrastructure/bycrypt"
 	psql "github.com/junaidmdv/goalcirlcle/user_service/internal/infrastructure/persistence/postgres"
 	sr "github.com/junaidmdv/goalcirlcle/user_service/internal/infrastructure/server"
 	"github.com/junaidmdv/goalcirlcle/user_service/internal/infrastructure/twilio"
@@ -69,11 +70,15 @@ func main() {
 
 	userRepo := psql.NewUserRepository(datbaseConnectin.DB)
 
+
+	
+
 	uidGenerater := uid.NewUUIDGenerater()
-
 	otpService := twilio.NewSMSOtpService(config.Twilio)
+	hashingCost := 14
+	passwordHashing := bycrypt.NewBycriptHasher(hashingCost)
 
-	authusecase := at.NewAuthUsecase(userRepo, logger, &config.GRPC.TimeOut, uidGenerater, otpService)
+	authusecase := at.NewAuthUsecase(userRepo, logger, &config.GRPC.TimeOut, uidGenerater, otpService, passwordHashing)
 	auth_handler := authHandler.NewAuthHandler(authusecase, logger, validater, &config.GRPC.TimeOut)
 	server := sr.NewGrpcServer()
 	auth_pb.RegisterAuthServiceServer(server.Server, auth_handler)
