@@ -15,9 +15,10 @@ type userRepository struct {
 	timeout *time.Duration
 }
 
-func NewUserRepository(db *gorm.DB) repository.UserRepository {
+func NewUserRepository(db *gorm.DB, timeout time.Duration) repository.UserRepository {
 	return &userRepository{
-		db: db,
+		db:      db,
+		timeout: &timeout,
 	}
 }
 
@@ -37,9 +38,16 @@ func (ur *userRepository) ExistByEmail(ctx context.Context, email string) (bool,
 	return count > 0, nil
 }
 
+
+
 func (ur *userRepository) CreateTempUser(ctx context.Context, tempUser *entity.TempUser) (*entity.TempUser, error) {
-	if err := ur.db.WithContext(ctx).Create(&tempUser).Error; err != nil {
+	context, cancel := context.WithTimeout(ctx, *ur.timeout)
+	defer cancel()
+
+	if err := ur.db.WithContext(context).Create(&tempUser).Error; err != nil {
 		return nil, err
 	}
 	return tempUser, nil
 }
+
+

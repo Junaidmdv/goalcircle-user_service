@@ -10,6 +10,7 @@ type RegisterRequest struct {
 
 type RegisterResponse struct {
 	UserId    string 
-	Email     string
+	Email     string 
+	PhoneNum  string 
 	OtpStatus bool
 }
