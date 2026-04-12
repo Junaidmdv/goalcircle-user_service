@@ -24,7 +24,7 @@ func NewValidater() (*Validater, error) {
 	if err := en_translations.RegisterDefaultTranslations(validater, engtrans); err != nil {
 		return nil, err
 	}
-
+	validater.RegisterValidation("phone", phoneValidation)
 	validater.RegisterTagNameFunc(func(field reflect.StructField) string {
 		name := strings.SplitN(field.Tag.Get("json"), ",", 2)[0]
 		if name != "-" {
