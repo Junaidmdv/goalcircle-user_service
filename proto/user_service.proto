@@ -7,16 +7,18 @@ option go_package = "github.com/junaidmdv/goalcirlcle/user_service/proto/pb";
 
 message RegisterRequest { 
     string full_name=1;   
-    string email =2; 
-    string password=3; 
-    string confirm_password=4;
+    string email =2;  
+    string phone_num=3;
+    string password=4; 
+    string confirm_password=5;
 }   
 
 
 message RegisterResponse{
-  string session_id=1; 
-  string email=2; 
-  optional bool otp_status=3; 
+  string user_id=1; 
+  string email=2;  
+  string phone_num=3;
+  optional bool otp_status=4; 
 } 
 
 // authentication of users services
