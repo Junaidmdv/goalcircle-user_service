@@ -8,7 +8,8 @@ const (
 	ErrTypeUnknown ErrorType = iota
 	ErroTypeNotFound
 	ErrorTypeInternal
-	ErrorTypeConflict
+	ErrorTypeConflict 
+	ErrorInvalidArguement
 )
 
 type DomainError struct {
@@ -39,4 +40,9 @@ func NewConflictError(msg string) *DomainError {
 	}
 }
 
-
+func NewValidationError(msg string)*DomainError{
+	return &DomainError{
+		Type: ErrorInvalidArguement,
+		Message: msg,
+	}
+}
