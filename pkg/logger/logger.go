@@ -2,17 +2,28 @@ package logger
 
 import (
 	"context"
-	"time"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
-type ZapLogger struct {
-	Logger *zap.Logger
+type contextKey string
+
+const traceIDKey contextKey = "trace_id"
+
+type Logger interface {
+	Info(msg string, keysAndValues ...interface{})
+	Warn(msg string, keysAndValues ...interface{})
+	Error(msg string, keysAndValues ...interface{})
+	WithTrace(ctx context.Context) Logger // returns Logger, not *zap.Logger
+	Sync() error
 }
 
-func NewLogger() (*ZapLogger, error) {
+type ZapLogger struct {
+	sugar *zap.SugaredLogger
+}
+
+func NewLogger() (Logger, error) {
 
 	encoderConfig := zapcore.EncoderConfig{
 		TimeKey:        "timestamp",
@@ -41,30 +52,62 @@ func NewLogger() (*ZapLogger, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer logger.Sync()
-	return &ZapLogger{Logger: logger}, nil
+	return &ZapLogger{sugar: logger.Sugar()}, nil
 }
-func (l *ZapLogger) Info(msg string, fields ...zap.Field) {
-	l.Logger.Info(msg, fields...)
+
+// func (l *ZapLogger) Info(msg string, fields ...zap.Field) {
+// 	l.sugar.Info(msg, fields...)
+// }
+// func (l *ZapLogger) Error(msg string, fields ...zap.Field) {
+// 	l.logger.Error(msg, fields...)
+// }
+// func Now() time.Time {
+// 	return time.Now()
+// }
+// func Since(t time.Time) time.Duration {
+// 	return time.Since(t)
+// }
+// func GetTraceID(ctx context.Context) string {
+// 	if v := ctx.Value(5); v != nil {
+// 		if tid, ok := v.(string); ok {
+// 			return tid
+// 		}
+// 	}
+// 	return ""
+// }
+// func (l *ZapLogger) WithTrace(ctx context.Context) *zap.Logger {
+// 	traceID := GetTraceID(ctx)
+// 	return l.logger.With(zap.String("trace_id", traceID))
+// }
+
+// func (l *ZapLogger) Warn(msg string, fields ...zap.Field) {
+// 	l.logger.Warn(msg, fields...)
+// }
+
+func (l *ZapLogger) Info(msg string, keysAndValues ...interface{}) {
+	l.sugar.Infow(msg, keysAndValues...)
 }
-func (l *ZapLogger) Error(msg string, fields ...zap.Field) {
-	l.Logger.Error(msg, fields...)
+func (l *ZapLogger) Warn(msg string, keysAndValues ...interface{}) {
+	l.sugar.Warnw(msg, keysAndValues...)
 }
-func Now() time.Time {
-	return time.Now()
+func (l *ZapLogger) Error(msg string, keysAndValues ...interface{}) {
+	l.sugar.Errorw(msg, keysAndValues...)
 }
-func Since(t time.Time) time.Duration {
-	return time.Since(t)
+func (l *ZapLogger) WithTrace(ctx context.Context) Logger {
+	traceID := GetTraceID(ctx)
+	return &ZapLogger{
+		sugar: l.sugar.With("trace_id", traceID),
+	}
 }
 func GetTraceID(ctx context.Context) string {
-	if v := ctx.Value(5); v != nil {
+	if v := ctx.Value(traceIDKey); v != nil {
 		if tid, ok := v.(string); ok {
 			return tid
 		}
 	}
-	return ""
+	return "unknown"
 }
-func (l *ZapLogger) WithTrace(ctx context.Context) *zap.Logger {
-	traceID := GetTraceID(ctx)
-	return l.Logger.With(zap.String("trace_id", traceID))
+
+func (l *ZapLogger) Sync() error {
+	return l.sugar.Sync()
 }
