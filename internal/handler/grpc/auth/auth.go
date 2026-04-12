@@ -17,20 +17,22 @@ import (
 type authHandler struct {
 	pb.UnimplementedAuthServiceServer
 	authUseCase uc.AuthUsecase
-	logger      *logger.ZapLogger
+	logger      logger.Logger
 	validater   *vl.Validater
+	timeout     *time.Duration
 }
 
-func NewAuthHandler(aus uc.AuthUsecase, logger *logger.ZapLogger, validate *vl.Validater) *authHandler {
+func NewAuthHandler(aus uc.AuthUsecase, logger logger.Logger, validate *vl.Validater, time *time.Duration) *authHandler {
 	return &authHandler{
 		authUseCase: aus,
 		logger:      logger,
 		validater:   validate,
+		timeout:     time,
 	}
 }
 
 func (uh *authHandler) RegisterUser(ctx context.Context, req *pb.RegisterRequest) (*pb.RegisterResponse, error) {
-	c, cancel := context.WithTimeout(ctx, time.Second*5)
+	context, cancel := context.WithTimeout(ctx, *uh.timeout)
 	defer cancel()
 
 	request := dt.ToRegisterReq(req)
@@ -38,14 +40,12 @@ func (uh *authHandler) RegisterUser(ctx context.Context, req *pb.RegisterRequest
 	if validationErrs := uh.validater.Validation(request); validationErrs != nil {
 		stWithDetails, err := ValidationError(validationErrs)
 		if err != nil {
-			return nil, status.Error(codes.Internal, "failed to attach details")
+			return nil, status.Error(codes.InvalidArgument, "failed to attach details")
 		}
-
 		return nil, stWithDetails.Err()
-
 	}
 
-	response, err := uh.authUseCase.InitiateUserRegistration(c, &ucdtos.RegisterRequest{
+	response, err := uh.authUseCase.InitiateUserRegistration(context, &ucdtos.RegisterRequest{
 		FullName:        request.FullName,
 		Email:           request.Email,
 		Password:        request.Password,

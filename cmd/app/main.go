@@ -6,12 +6,13 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	cnfg "github.com/junaidmdv/goalcirlcle/user_service/internal/config"
 	authHandler "github.com/junaidmdv/goalcirlcle/user_service/internal/handler/grpc/auth"
 	psql "github.com/junaidmdv/goalcirlcle/user_service/internal/infrastructure/persistence/postgres"
 	sr "github.com/junaidmdv/goalcirlcle/user_service/internal/infrastructure/server"
+	"github.com/junaidmdv/goalcirlcle/user_service/internal/infrastructure/twilio"
+	"github.com/junaidmdv/goalcirlcle/user_service/internal/infrastructure/uid"
 	at "github.com/junaidmdv/goalcirlcle/user_service/internal/usecase/auth"
 	logger "github.com/junaidmdv/goalcirlcle/user_service/pkg/logger"
 	vl "github.com/junaidmdv/goalcirlcle/user_service/pkg/validater"
@@ -24,18 +25,22 @@ func main() {
 	logger, err := logger.NewLogger()
 	if err != nil {
 		log.Fatal(err)
-		return
 	}
+	defer func() {
+		if err := logger.Sync(); err != nil {
+			fmt.Fprintf(os.Stderr, "logger sync error: %v\n", err)
+		}
+	}()
 
 	config, errs := cnfg.LoadConfig().
 		WithGrpc().
 		WithPostgres().
+		WithTwilio().
 		//WithJWT().
 		//WithRedis().
 		Build()
 
 	if errs != nil {
-
 		for _, err := range errs {
 			logger.Error("configration error", zap.Error(err))
 			fmt.Println()
@@ -54,20 +59,29 @@ func main() {
 	//postgres connection
 	datbaseConnectin, err := psql.NewDatabase(config.Postgres)
 	if err != nil {
-		logger.Error("database initilisation error", zap.String("error", err.Error()))
+		logger.Error("database initilisation error", zap.Error(err))
+		return
 	}
-	userRepo := psql.NewUserRepository(datbaseConnectin)
+	if err = datbaseConnectin.Migration(); err != nil {
+		logger.Error("database migration error", zap.Error(err))
+		return
+	}
 
-	//redis connection
-	authusecase := at.NewAuthUsecase(userRepo, logger.Logger)
-	auth_handler := authHandler.NewAuthHandler(authusecase, logger, validater)
+	userRepo := psql.NewUserRepository(datbaseConnectin.DB)
+
+	uidGenerater := uid.NewUUIDGenerater()
+
+	otpService := twilio.NewSMSOtpService(config.Twilio)
+
+	authusecase := at.NewAuthUsecase(userRepo, logger, &config.GRPC.TimeOut, uidGenerater, otpService)
+	auth_handler := authHandler.NewAuthHandler(authusecase, logger, validater, &config.GRPC.TimeOut)
 	server := sr.NewGrpcServer()
 	auth_pb.RegisterAuthServiceServer(server.Server, auth_handler)
 
 	go func() {
-		logger.Info(fmt.Sprintf("server running on %d", config.GRPC.Port))
+		logger.Info("server running", "port", config.GRPC.Port)
 		if err := server.Run(config.GRPC.Port); err != nil {
-			logger.Error("server error", zap.String("message", err.Error()), zap.Time("time", time.Now()))
+			logger.Error("server error", zap.Error(err))
 		}
 	}()
 

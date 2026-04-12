@@ -2,7 +2,8 @@ package dtos
 
 type RegisterRequest struct {
 	FullName        string `validate:"required,min=3,max=32"`
-	Email           string `validate:"required,email"`
+	Email           string `validate:"required,email"` 
+	PhoneNum        string `validate:"required,phone"`
 	Password        string `validate:"required"`
 	ConfirmPassword string `validate:"required"`
 }
