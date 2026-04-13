@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/junaidmdv/goalcircle/user_service/internal/config"
+	"github.com/Junaidmdv/goalcircle-user_service/internal/config"
 	"github.com/twilio/twilio-go"
 	openapi "github.com/twilio/twilio-go/rest/api/v2010"
 )

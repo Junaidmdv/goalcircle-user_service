@@ -4,12 +4,12 @@ import (
 	"context"
 	"time"
 
-	dt "github.com/junaidmdv/goalcircle/user_service/internal/handler/grpc/dtos"
-	uc "github.com/junaidmdv/goalcircle/user_service/internal/usecase"
-	ucdtos "github.com/junaidmdv/goalcircle/user_service/internal/usecase/dtos"
-	"github.com/junaidmdv/goalcircle/user_service/pkg/logger"
-	vl "github.com/junaidmdv/goalcircle/user_service/pkg/validater"
-	"github.com/junaidmdv/goalcircle/user_service/proto/pb"
+	dt "github.com/Junaidmdv/goalcircle-user_service/internal/handler/grpc/dtos"
+	uc "github.com/Junaidmdv/goalcircle-user_service/internal/usecase"
+	ucdtos "github.com/Junaidmdv/goalcircle-user_service/internal/usecase/dtos"
+	"github.com/Junaidmdv/goalcircle-user_service/pkg/logger"
+	vl "github.com/Junaidmdv/goalcircle-user_service/pkg/validater"
+	"github.com/Junaidmdv/goalcircle-user_service/proto/pb"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

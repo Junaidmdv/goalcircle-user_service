@@ -3,7 +3,7 @@ package postgres
 import (
 	"fmt"
 
-	"github.com/junaidmdv/goalcircle/user_service/internal/config"
+	"github.com/Junaidmdv/goalcircle-user_service/internal/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"

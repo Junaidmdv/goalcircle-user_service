@@ -3,7 +3,7 @@ package redis
 import (
 	"fmt"
 
-	"github.com/junaidmdv/goalcircle/user_service/internal/config"
+	"github.com/Junaidmdv/goalcircle-user_service/internal/config"
 	redis "github.com/redis/go-redis/v9"
 )
 

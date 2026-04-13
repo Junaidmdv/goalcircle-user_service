@@ -5,16 +5,15 @@ import (
 	"errors"
 	"time"
 
-	"github.com/junaidmdv/goalcircle/user_service/internal/domain"
-	"github.com/junaidmdv/goalcircle/user_service/internal/domain/entity"
-	"github.com/junaidmdv/goalcircle/user_service/internal/domain/repository"
-	"github.com/junaidmdv/goalcircle/user_service/internal/infrastructure/bycrypt"
-	"github.com/junaidmdv/goalcircle/user_service/internal/infrastructure/twilio"
-	"github.com/junaidmdv/goalcircle/user_service/internal/infrastructure/uid"
-	"github.com/junaidmdv/goalcircle/user_service/pkg/logger"
+	"github.com/Junaidmdv/goalcircle-user_service/internal/domain"
+	"github.com/Junaidmdv/goalcircle-user_service/internal/domain/entity"
+	"github.com/Junaidmdv/goalcircle-user_service/internal/domain/repository"
+	"github.com/Junaidmdv/goalcircle-user_service/internal/infrastructure/bycrypt"
+	"github.com/Junaidmdv/goalcircle-user_service/internal/infrastructure/twilio"
+	"github.com/Junaidmdv/goalcircle-user_service/internal/infrastructure/uid"
+	uc_dtos "github.com/Junaidmdv/goalcircle-user_service/internal/usecase/dtos"
+	"github.com/Junaidmdv/goalcircle-user_service/pkg/logger"
 	"go.uber.org/zap"
-	uc_dtos "github.com/junaidmdv/goalcircle/user_service/internal/usecase/dtos"
-
 )
 
 type authUsecase struct {
