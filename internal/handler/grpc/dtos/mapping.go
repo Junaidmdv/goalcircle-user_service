@@ -1,8 +1,8 @@
 package dtos
 
 import (
-	"github.com/junaidmdv/goalcircle/user_service/internal/usecase/dtos"
-	"github.com/junaidmdv/goalcircle/user_service/proto/pb"
+	"github.com/Junaidmdv/goalcircle-user_service/internal/usecase/dtos"
+	"github.com/Junaidmdv/goalcircle-user_service/proto/pb"
 )
 
 func ToRegisterReq(res *pb.RegisterRequest) *RegisterRequest {

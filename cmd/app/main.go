@@ -7,17 +7,17 @@ import (
 	"os/signal"
 	"syscall"
 
-	cnfg "github.com/junaidmdv/goalcircle/user_service/internal/config"
-	authHandler "github.com/junaidmdv/goalcircle/user_service/internal/handler/grpc/auth"
-	"github.com/junaidmdv/goalcircle/user_service/internal/infrastructure/bycrypt"
-	psql "github.com/junaidmdv/goalcircle/user_service/internal/infrastructure/persistence/postgres"
-	sr "github.com/junaidmdv/goalcircle/user_service/internal/infrastructure/server"
-	"github.com/junaidmdv/goalcircle/user_service/internal/infrastructure/twilio"
-	"github.com/junaidmdv/goalcircle/user_service/internal/infrastructure/uid"
-	at "github.com/junaidmdv/goalcircle/user_service/internal/usecase/auth"
-	logger "github.com/junaidmdv/goalcircle/user_service/pkg/logger"
-	vl "github.com/junaidmdv/goalcircle/user_service/pkg/validater"
-	auth_pb "github.com/junaidmdv/goalcircle/user_service/proto/pb"
+	cnfg "github.com/Junaidmdv/goalcircle-user_service/internal/config"
+	authHandler "github.com/Junaidmdv/goalcircle-user_service/internal/handler/grpc/auth"
+	"github.com/Junaidmdv/goalcircle-user_service/internal/infrastructure/bycrypt"
+	psql "github.com/Junaidmdv/goalcircle-user_service/internal/infrastructure/persistence/postgres"
+	sr "github.com/Junaidmdv/goalcircle-user_service/internal/infrastructure/server"
+	"github.com/Junaidmdv/goalcircle-user_service/internal/infrastructure/twilio"
+	"github.com/Junaidmdv/goalcircle-user_service/internal/infrastructure/uid"
+	at "github.com/Junaidmdv/goalcircle-user_service/internal/usecase/auth"
+	logger "github.com/Junaidmdv/goalcircle-user_service/pkg/logger"
+	vl "github.com/Junaidmdv/goalcircle-user_service/pkg/validater"
+	auth_pb "github.com/Junaidmdv/goalcircle-user_service/proto/pb"
 )
 
 func main() {

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/junaidmdv/goalcircle/user_service/internal/domain/entity"
-	"github.com/junaidmdv/goalcircle/user_service/internal/domain/repository"
+	"github.com/Junaidmdv/goalcircle-user_service/internal/domain/entity"
+	"github.com/Junaidmdv/goalcircle-user_service/internal/domain/repository"
 	"gorm.io/gorm"
 )
 
