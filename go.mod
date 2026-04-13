@@ -1,4 +1,4 @@
-module github.com/junaidmdv/goalcircle/user_service
+module github.com/junaidmdv/goalcirlcle/user_service
 
 go 1.25.1
 
