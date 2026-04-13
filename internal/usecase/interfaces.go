@@ -3,7 +3,7 @@ package usecase
 import (
 	"context"
 
-	"github.com/junaidmdv/goalcirlcle/user_service/internal/usecase/dtos"
+	"github.com/junaidmdv/goalcircle/user_service/internal/usecase/dtos"
 )
 
 type AuthUsecase interface {

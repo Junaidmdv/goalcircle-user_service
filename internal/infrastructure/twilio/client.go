@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/junaidmdv/goalcirlcle/user_service/internal/config"
+	"github.com/junaidmdv/goalcircle/user_service/internal/config"
 	"github.com/twilio/twilio-go"
 	openapi "github.com/twilio/twilio-go/rest/api/v2010"
 )
@@ -34,8 +34,8 @@ func NewSMSOtpService(config *config.TwilioConfig) OtpService {
 	})
 
 	p := &SMSParams{
-		FromNum:   config.FromNum,
-		ExpiresAt: time.Duration(config.OtpExpiryTime),
+		FromNum:    config.FromNum,
+		ExpireTime: time.Duration(config.OtpExpiryTime),
 	}
 
 	return &smsOtpService{
@@ -67,9 +67,7 @@ func (s *smsOtpService) SendOtp(num string) (*OtpRes, error) {
 
 	return &OtpRes{
 		Otp:       s.params.Otp,
-		ExpiresAt: time.Now().Add(s.params.ExpiresAt),
+		ExpiresAt: time.Now().Add(s.params.ExpireTime),
 	}, nil
 
 }
-
-

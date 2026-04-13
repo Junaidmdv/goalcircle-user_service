@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/junaidmdv/goalcirlcle/user_service/internal/domain"
+	"github.com/junaidmdv/goalcircle/user_service/internal/domain"
 	"github.com/twilio/twilio-go/client"
 )
 

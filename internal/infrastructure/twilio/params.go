@@ -11,7 +11,7 @@ type SMSParams struct {
 	FromNum   string
 	TONum     string
 	Otp       string
-	ExpiresAt time.Duration
+	ExpireTime time.Duration
 }
 
 func (s *SMSParams) GenerateOtp(maxdigit uint32) error {

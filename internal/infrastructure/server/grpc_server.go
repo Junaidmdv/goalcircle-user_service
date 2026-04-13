@@ -1,10 +1,13 @@
 package server
 
 import (
+	"context"
 	"fmt"
 	"net"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type GRPCServer struct {
@@ -12,7 +15,11 @@ type GRPCServer struct {
 }
 
 func NewGrpcServer() *GRPCServer {
-	server := grpc.NewServer()
+	server := grpc.NewServer(grpc.UnaryInterceptor(
+		func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
+			return nil, status.Error(codes.Unavailable, "something went wrong")
+		},
+	))
 	return &GRPCServer{
 		Server: server,
 	}

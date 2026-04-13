@@ -7,18 +7,17 @@ import (
 	"os/signal"
 	"syscall"
 
-	cnfg "github.com/junaidmdv/goalcirlcle/user_service/internal/config"
-	authHandler "github.com/junaidmdv/goalcirlcle/user_service/internal/handler/grpc/auth"
-	"github.com/junaidmdv/goalcirlcle/user_service/internal/infrastructure/bycrypt"
-	psql "github.com/junaidmdv/goalcirlcle/user_service/internal/infrastructure/persistence/postgres"
-	sr "github.com/junaidmdv/goalcirlcle/user_service/internal/infrastructure/server"
-	"github.com/junaidmdv/goalcirlcle/user_service/internal/infrastructure/twilio"
-	"github.com/junaidmdv/goalcirlcle/user_service/internal/infrastructure/uid"
-	at "github.com/junaidmdv/goalcirlcle/user_service/internal/usecase/auth"
-	logger "github.com/junaidmdv/goalcirlcle/user_service/pkg/logger"
-	vl "github.com/junaidmdv/goalcirlcle/user_service/pkg/validater"
-	auth_pb "github.com/junaidmdv/goalcirlcle/user_service/proto/pb"
-	"go.uber.org/zap"
+	cnfg "github.com/junaidmdv/goalcircle/user_service/internal/config"
+	authHandler "github.com/junaidmdv/goalcircle/user_service/internal/handler/grpc/auth"
+	"github.com/junaidmdv/goalcircle/user_service/internal/infrastructure/bycrypt"
+	psql "github.com/junaidmdv/goalcircle/user_service/internal/infrastructure/persistence/postgres"
+	sr "github.com/junaidmdv/goalcircle/user_service/internal/infrastructure/server"
+	"github.com/junaidmdv/goalcircle/user_service/internal/infrastructure/twilio"
+	"github.com/junaidmdv/goalcircle/user_service/internal/infrastructure/uid"
+	at "github.com/junaidmdv/goalcircle/user_service/internal/usecase/auth"
+	logger "github.com/junaidmdv/goalcircle/user_service/pkg/logger"
+	vl "github.com/junaidmdv/goalcircle/user_service/pkg/validater"
+	auth_pb "github.com/junaidmdv/goalcircle/user_service/proto/pb"
 )
 
 func main() {
@@ -43,7 +42,7 @@ func main() {
 
 	if errs != nil {
 		for _, err := range errs {
-			logger.Error("configration error", zap.Error(err))
+			logger.Error("configration error", "error", err)
 			fmt.Println()
 		}
 		return
@@ -51,7 +50,7 @@ func main() {
 
 	validater, err := vl.NewValidater()
 	if err != nil {
-		logger.Error("validation package initilisation error", zap.Error(err))
+		logger.Error("validation package initilisation error", "error", err)
 		return
 	}
 
@@ -60,27 +59,21 @@ func main() {
 	//postgres connection
 	datbaseConnectin, err := psql.NewDatabase(config.Postgres)
 	if err != nil {
-		logger.Error("database initilisation error", zap.Error(err))
+		logger.Error("database initilisation error", "error", err)
 		return
 	}
 	if err = datbaseConnectin.Migration(); err != nil {
-		logger.Error("database migration error", zap.Error(err))
+		logger.Error("database migration error", "error", err)
 		return
 	}
 
-	userRepo := psql.NewUserRepository(datbaseConnectin.DB,config.GRPC.TimeOut)
-
-
-
+	userRepo := psql.NewUserRepository(datbaseConnectin.DB, config.GRPC.TimeOut)
 
 	uidGenerater := uid.NewUUIDGenerater()
 	otpService := twilio.NewSMSOtpService(config.Twilio)
 	hashingCost := 14
 	passwordHashing := bycrypt.NewBycriptHasher(hashingCost)
-	authusecase := at.NewAuthUsecase(userRepo, logger, &config.GRPC.TimeOut, uidGenerater, otpService, passwordHashing)  
-
-
-
+	authusecase := at.NewAuthUsecase(userRepo, logger, &config.GRPC.TimeOut, uidGenerater, otpService, passwordHashing)
 
 	auth_handler := authHandler.NewAuthHandler(authusecase, logger, validater, &config.GRPC.TimeOut)
 	server := sr.NewGrpcServer()
@@ -89,14 +82,15 @@ func main() {
 	go func() {
 		logger.Info("server running", "port", config.GRPC.Port)
 		if err := server.Run(config.GRPC.Port); err != nil {
-			logger.Error("server error", zap.Error(err))
+			logger.Error("server error", "error", err)
+			os.Exit(1)
 		}
 	}()
 
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
 	sig := <-signalChan
-	logger.Info("received signal, shutting down", zap.String("signal", sig.String()))
+	logger.Info("received signal, shutting down", "signal", sig.String())
 
 	signal.Stop(signalChan)
 	server.Server.GracefulStop()

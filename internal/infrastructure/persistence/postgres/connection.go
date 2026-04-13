@@ -2,12 +2,12 @@ package postgres
 
 import (
 	"fmt"
-	"github.com/junaidmdv/goalcirlcle/user_service/internal/config"
+
+	"github.com/junaidmdv/goalcircle/user_service/internal/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
-
 
 type postgressDB struct {
 	DB *gorm.DB
@@ -26,8 +26,4 @@ func NewDatabase(db *config.PostgresConfig) (*postgressDB, error) {
 	return &postgressDB{
 		DB: psqlInstance,
 	}, nil
-}  
-
-
- 
-
+}

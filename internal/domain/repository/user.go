@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"github.com/junaidmdv/goalcirlcle/user_service/internal/domain/entity"
+	"github.com/junaidmdv/goalcircle/user_service/internal/domain/entity"
 )
 
 type UserRepository interface {

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/junaidmdv/goalcirlcle/user_service/internal/domain/entity"
-	"github.com/junaidmdv/goalcirlcle/user_service/internal/domain/repository"
+	"github.com/junaidmdv/goalcircle/user_service/internal/domain/entity"
+	"github.com/junaidmdv/goalcircle/user_service/internal/domain/repository"
 	"gorm.io/gorm"
 )
 
@@ -38,8 +38,6 @@ func (ur *userRepository) ExistByEmail(ctx context.Context, email string) (bool,
 	return count > 0, nil
 }
 
-
-
 func (ur *userRepository) CreateTempUser(ctx context.Context, tempUser *entity.TempUser) (*entity.TempUser, error) {
 	context, cancel := context.WithTimeout(ctx, *ur.timeout)
 	defer cancel()
@@ -49,5 +47,3 @@ func (ur *userRepository) CreateTempUser(ctx context.Context, tempUser *entity.T
 	}
 	return tempUser, nil
 }
-
-
