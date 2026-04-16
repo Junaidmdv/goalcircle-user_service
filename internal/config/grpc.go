@@ -35,8 +35,6 @@ func (cb *configBuilder) WithGrpc() ConfigBuilder {
 	timeoutStr := os.Getenv("TIMEOUT")
 	timeout := time.Second * 5
 
-	// timeoutStr := os.Getenv("TIMEOUT")
-	// timeout := 5 * time.Second // default timeout
 
 	if timeoutStr == "" {
 		log.Print("TIMEOUT not set in env, using default: 5 seconds")

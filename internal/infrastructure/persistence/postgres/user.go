@@ -23,11 +23,11 @@ func NewUserRepository(db *gorm.DB, timeout time.Duration) repository.UserReposi
 }
 
 func (ur *userRepository) ExistByEmail(ctx context.Context, email string) (bool, error) {
-	context, cancel := context.WithTimeout(ctx, *ur.timeout)
-	defer cancel()
+	// context, cancel := context.WithTimeout(ctx, *ur.timeout)
+	// defer cancel()
 
 	var count int64
-	err := ur.db.WithContext(context).
+	err := ur.db.WithContext(ctx).
 		Model(&entity.User{}).
 		Where("email = ?", email).
 		Count(&count).
