@@ -99,9 +99,10 @@ func (x *RegisterRequest) GetConfirmPassword() string {
 
 type RegisterResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	SessionId     string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	Email         string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
-	OtpStatus     *bool                  `protobuf:"varint,3,opt,name=otp_status,json=otpStatus,proto3,oneof" json:"otp_status,omitempty"`
+	PhoneNum      string                 `protobuf:"bytes,3,opt,name=phone_num,json=phoneNum,proto3" json:"phone_num,omitempty"`
+	OtpStatus     *bool                  `protobuf:"varint,4,opt,name=otp_status,json=otpStatus,proto3,oneof" json:"otp_status,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -136,9 +137,9 @@ func (*RegisterResponse) Descriptor() ([]byte, []int) {
 	return file_user_service_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *RegisterResponse) GetSessionId() string {
+func (x *RegisterResponse) GetUserId() string {
 	if x != nil {
-		return x.SessionId
+		return x.UserId
 	}
 	return ""
 }
@@ -146,6 +147,13 @@ func (x *RegisterResponse) GetSessionId() string {
 func (x *RegisterResponse) GetEmail() string {
 	if x != nil {
 		return x.Email
+	}
+	return ""
+}
+
+func (x *RegisterResponse) GetPhoneNum() string {
+	if x != nil {
+		return x.PhoneNum
 	}
 	return ""
 }
@@ -167,13 +175,13 @@ const file_user_service_proto_rawDesc = "" +
 	"\x05email\x18\x02 \x01(\tR\x05email\x12\x1b\n" +
 	"\tphone_num\x18\x03 \x01(\tR\bphoneNum\x12\x1a\n" +
 	"\bpassword\x18\x04 \x01(\tR\bpassword\x12)\n" +
-	"\x10confirm_password\x18\x05 \x01(\tR\x0fconfirmPassword\"z\n" +
-	"\x10RegisterResponse\x12\x1d\n" +
+	"\x10confirm_password\x18\x05 \x01(\tR\x0fconfirmPassword\"\x91\x01\n" +
+	"\x10RegisterResponse\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x14\n" +
+	"\x05email\x18\x02 \x01(\tR\x05email\x12\x1b\n" +
+	"\tphone_num\x18\x03 \x01(\tR\bphoneNum\x12\"\n" +
 	"\n" +
-	"session_id\x18\x01 \x01(\tR\tsessionId\x12\x14\n" +
-	"\x05email\x18\x02 \x01(\tR\x05email\x12\"\n" +
-	"\n" +
-	"otp_status\x18\x03 \x01(\bH\x00R\totpStatus\x88\x01\x01B\r\n" +
+	"otp_status\x18\x04 \x01(\bH\x00R\totpStatus\x88\x01\x01B\r\n" +
 	"\v_otp_status2H\n" +
 	"\vAuthService\x129\n" +
 	"\bRegister\x12\x15.auth.RegisterRequest\x1a\x16.auth.RegisterResponseB8Z6github.com/junaidmdv/goalcirlcle/user_service/proto/pbb\x06proto3"

@@ -16,7 +16,7 @@ func ToRegisterReq(res *pb.RegisterRequest) *RegisterRequest {
 
 func ToRegisterResponse(res *dtos.RegisterResponse) *pb.RegisterResponse {
 	return &pb.RegisterResponse{
-		SessionId: res.UserId,
+		UserId:    res.UserId,
 		Email:     res.Email,
 		OtpStatus: &res.OtpStatus,
 	}
