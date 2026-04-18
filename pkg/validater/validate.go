@@ -34,6 +34,16 @@ func NewValidater() (*Validater, error) {
 		return ""
 	})
 
+	validater.RegisterTranslation("eqfield", engtrans,
+		func(ut ut.Translator) error {
+			return ut.Add("eqfield", "{0} must match {1}", true)
+		},
+		func(ut ut.Translator, fe validator.FieldError) string {
+			t, _ := ut.T("eqfield", fe.Field(), fe.Param())
+			return t
+		},
+	)
+
 	validater.RegisterTranslation("phone", engtrans,
 		func(ut ut.Translator) error {
 			return ut.Add("phone", "{0} must be valid phone number", true)
@@ -43,7 +53,7 @@ func NewValidater() (*Validater, error) {
 			return t
 		},
 	)
-	
+
 	return &Validater{
 		vn: validater,
 		ut: engtrans,
