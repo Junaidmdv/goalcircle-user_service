@@ -1,7 +1,10 @@
 package twilio
 
 import (
+	"crypto/rand"
 	"fmt"
+	"log"
+	"math/big"
 	"time"
 
 	"github.com/Junaidmdv/goalcircle-user_service/internal/config"
@@ -22,9 +25,10 @@ const (
 	WhatsApp
 )
 
-type smsOtpService struct {
-	client *twilio.RestClient
-	params *SMSParams
+type SmsOtpService struct {
+	client     *twilio.RestClient
+	FromNum    string
+	ExpireTime time.Duration
 }
 
 func NewSMSOtpService(config *config.TwilioConfig) OtpService {
@@ -33,14 +37,10 @@ func NewSMSOtpService(config *config.TwilioConfig) OtpService {
 		Password: config.AuthToken,
 	})
 
-	p := &SMSParams{
+	return &SmsOtpService{
+		client:     cl,
 		FromNum:    config.FromNum,
 		ExpireTime: time.Duration(config.OtpExpiryTime),
-	}
-
-	return &smsOtpService{
-		client: cl,
-		params: p,
 	}
 }
 
@@ -49,25 +49,37 @@ type OtpRes struct {
 	ExpiresAt time.Time
 }
 
-func (s *smsOtpService) SendOtp(num string) (*OtpRes, error) {
-	s.params.TONum = num
-	if err := s.params.GenerateOtp(6); err != nil {
-		return nil, err
-	}
-	body := fmt.Sprintf("Your OTP is: %s. Valid for 5 minutes. Do not share it.", s.params.Otp)
+func (s *SmsOtpService) SendOtp(num string) (*OtpRes, error) { 
+	fmt.Println(num)
 
-	params := &openapi.CreateMessageParams{}
-	params.SetFrom(s.params.FromNum)
-	params.SetTo(s.params.TONum)
-	params.SetBody(body)
-	_, err := s.client.Api.CreateMessage(params)
+	otp, err := generateRandomOtp(6)
 	if err != nil {
 		return nil, err
 	}
+	body := fmt.Sprintf("Your OTP is: %s. Valid for 5 minutes. Do not share it.", otp)
+
+	params := &openapi.CreateMessageParams{}
+	params.SetFrom(s.FromNum)
+	params.SetTo(num)
+	params.SetBody(body)
+	res, err := s.client.Api.CreateMessage(params)
+	if err != nil {
+		return nil, err
+	}
+	log.Println(res)
 
 	return &OtpRes{
-		Otp:       s.params.Otp,
-		ExpiresAt: time.Now().Add(s.params.ExpireTime),
+		Otp:       otp,
+		ExpiresAt: time.Now().Add(s.ExpireTime),
 	}, nil
 
+}
+
+func generateRandomOtp(length int) (string, error) {
+	max := new(big.Int).Exp(big.NewInt(10), big.NewInt(int64(length)), nil)
+	n, err := rand.Int(rand.Reader, max)
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%0*d", length, n), nil
 }

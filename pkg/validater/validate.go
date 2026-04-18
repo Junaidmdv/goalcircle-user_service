@@ -33,6 +33,17 @@ func NewValidater() (*Validater, error) {
 
 		return ""
 	})
+
+	validater.RegisterTranslation("phone", engtrans,
+		func(ut ut.Translator) error {
+			return ut.Add("phone", "{0} must be valid phone number", true)
+		},
+		func(ut ut.Translator, fe validator.FieldError) string {
+			t, _ := ut.T("phone", fe.Field())
+			return t
+		},
+	)
+	
 	return &Validater{
 		vn: validater,
 		ut: engtrans,
@@ -47,18 +58,5 @@ func (v *Validater) Validation(input interface{}) validator.ValidationErrorsTran
 	}
 
 	translated := err.(validator.ValidationErrors).Translate(v.ut)
-
-	// messages := make([]string, 0, len(translated))
-
-	// for field, msg := range translated {
-	// 	parts := strings.SplitN(field, ".", 2)
-	// 	if len(parts) == 2 {
-	// 		messages = append(messages, parts[1]+": "+msg)
-	// 	} else {
-	// 		messages = append(messages, field+": "+msg)
-	// 	}
-	// }
-	// return fmt.Errorf("%s", strings.Join(messages, "\n"))
-
 	return translated
 }

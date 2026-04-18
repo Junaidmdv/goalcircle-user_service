@@ -32,15 +32,13 @@ func NewAuthUsecase(ur repository.UserRepository, logger logger.Logger, time *ti
 		timeout:      time,
 		uidGenerater: uidgen,
 		hash:         hash,
+		otp:          otp,
 	}
 }
 
 func (us *authUsecase) InitiateUserRegistration(ctx context.Context, input *uc_dtos.RegisterRequest) (*uc_dtos.RegisterResponse, error) {
 
-	context, cancel := context.WithTimeout(ctx, *us.timeout)
-	defer cancel()
-
-	exist, err := us.userRepo.ExistByEmail(context, input.Email)
+	exist, err := us.userRepo.ExistByEmail(ctx, input.Email)
 	if err != nil {
 		us.logger.Error("internal error", zap.Error(err))
 		return nil, domain.NewInternalError("something went wrong", err)
@@ -61,12 +59,13 @@ func (us *authUsecase) InitiateUserRegistration(ctx context.Context, input *uc_d
 	if err != nil {
 		return nil, us.otp.ParseTwilioError(err)
 	}
+	us.logger.Info("otp data", "data", otpres)
 
 	res, err := us.userRepo.CreateTempUser(ctx, &entity.TempUser{
 		ID:        us.uidGenerater.Generate(),
 		Email:     input.Email,
 		PhoneNum:  input.PhoneNum,
-		Password:  hashedPassword, //hashed password added
+		Password:  hashedPassword,
 		OTP:       otpres.Otp,
 		ExpiresAt: otpres.ExpiresAt,
 	})

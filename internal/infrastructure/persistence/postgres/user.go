@@ -3,7 +3,6 @@ package postgres
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/Junaidmdv/goalcircle-user_service/internal/domain/entity"
 	"github.com/Junaidmdv/goalcircle-user_service/internal/domain/repository"
@@ -11,38 +10,48 @@ import (
 )
 
 type userRepository struct {
-	db      *gorm.DB
-	timeout *time.Duration
+	db *gorm.DB
 }
 
-func NewUserRepository(db *gorm.DB, timeout time.Duration) repository.UserRepository {
+func NewUserRepository(db *gorm.DB) repository.UserRepository {
 	return &userRepository{
-		db:      db,
-		timeout: &timeout,
+		db: db,
 	}
 }
 
-func (ur *userRepository) ExistByEmail(ctx context.Context, email string) (bool, error) {
-	// context, cancel := context.WithTimeout(ctx, *ur.timeout)
-	// defer cancel()
+// func (ur *userRepository) ExistByEmail(ctx context.Context, email string) (bool, error) {
+// 	var count int64
+// 	err := ur.db.WithContext(ctx).
+// 		Model(&entity.User{}).
+// 		Where("email = ?", email).
+// 		Count(&count).
+// 		Error
+// 	if err != nil {
+// 		return false, fmt.Errorf("failed to check email existence: %w", err)
+// 	}
+// 	return count > 0, nil
+// }
 
-	var count int64
+func (ur *userRepository) ExistByEmail(ctx context.Context, email string) (bool, error) {
+	var exists bool
+
 	err := ur.db.WithContext(ctx).
 		Model(&entity.User{}).
+		Select("1").
 		Where("email = ?", email).
-		Count(&count).
+		Limit(1).
+		Scan(&exists).
 		Error
+
 	if err != nil {
 		return false, fmt.Errorf("failed to check email existence: %w", err)
 	}
-	return count > 0, nil
+
+	return exists, nil
 }
 
 func (ur *userRepository) CreateTempUser(ctx context.Context, tempUser *entity.TempUser) (*entity.TempUser, error) {
-	context, cancel := context.WithTimeout(ctx, *ur.timeout)
-	defer cancel()
-
-	if err := ur.db.WithContext(context).Create(&tempUser).Error; err != nil {
+	if err := ur.db.WithContext(ctx).Create(&tempUser).Error; err != nil {
 		return nil, err
 	}
 	return tempUser, nil

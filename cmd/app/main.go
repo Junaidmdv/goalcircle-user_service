@@ -39,7 +39,7 @@ func main() {
 		//WithJWT().
 		//WithRedis().
 		Build()
-
+	logger.Info("configration is done")
 	if errs != nil {
 		for _, err := range errs {
 			logger.Error("configration error", "error", err)
@@ -67,8 +67,7 @@ func main() {
 		return
 	}
 
-	userRepo := psql.NewUserRepository(datbaseConnectin.DB, config.GRPC.TimeOut)
-
+	userRepo := psql.NewUserRepository(datbaseConnectin.DB)
 	uidGenerater := uid.NewUUIDGenerater()
 	otpService := twilio.NewSMSOtpService(config.Twilio)
 	hashingCost := 14

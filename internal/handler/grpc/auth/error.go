@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func ValidationError(errs validator.ValidationErrorsTranslations)(*status.Status,error) {
+func ValidationError(errs validator.ValidationErrorsTranslations) (*status.Status, error) {
 	st := status.New(codes.InvalidArgument, "validation error")
 
 	var validationErrors []*errdetails.BadRequest_FieldViolation
@@ -29,16 +29,17 @@ func ValidationError(errs validator.ValidationErrorsTranslations)(*status.Status
 			})
 		}
 
+		
 	}
 	stWithDetails, err := st.WithDetails(
 		&errdetails.BadRequest{
 			FieldViolations: validationErrors,
 		},
-	) 
+	)
 
-	if err != nil{
-		return nil,nil
+	if err != nil {
+		return nil, nil
 	}
-	
-	return stWithDetails,nil
+
+	return stWithDetails, nil
 }

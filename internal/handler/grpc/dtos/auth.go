@@ -1,11 +1,11 @@
 package dtos
 
 type RegisterRequest struct {
-	FullName        string `validate:"required,min=3,max=32"`
-	Email           string `validate:"required,email"` 
-	PhoneNum        string `validate:"required,phone"`
-	Password        string `validate:"required"`
-	ConfirmPassword string `validate:"required"`
+	FullName        string `json:"full_name" validate:"required,min=3,max=32"`
+	Email           string `json:"email" validate:"required,email"` 
+	PhoneNum        string `json:"phone_num" validate:"required,phone"`
+	Password        string `json:"password" validate:"required"`
+	ConfirmPassword string `json:"confirm_password" validate:"required"`
 }
 
 type RegisterResponse struct {

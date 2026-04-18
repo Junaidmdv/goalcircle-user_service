@@ -8,7 +8,7 @@ import (
 	"github.com/twilio/twilio-go/client"
 )
 
-func (s *smsOtpService) ParseTwilioError(err error) error {
+func (s *SmsOtpService) ParseTwilioError(err error) error {
 	// cast to Twilio's error type
 	var twilioErr *client.TwilioRestError
 	if errors.As(err, &twilioErr) {

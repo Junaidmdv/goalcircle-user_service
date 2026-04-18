@@ -6,7 +6,7 @@ type ErrorType int
 
 const (
 	ErrTypeUnknown ErrorType = iota
-	ErroTypeNotFound
+	ErrorTypeNotFound
 	ErrorTypeInternal
 	ErrorTypeConflict 
 	ErrorInvalidArguement
@@ -26,7 +26,7 @@ func (e *DomainError) Error() string {
 }
 
 func NewNotFoundError(msg string) *DomainError {
-	return &DomainError{Type: ErroTypeNotFound, Message: msg}
+	return &DomainError{Type: ErrorTypeNotFound, Message: msg}
 }
 
 func NewInternalError(msg string, err error) *DomainError {

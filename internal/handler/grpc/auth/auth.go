@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/Junaidmdv/goalcircle-user_service/internal/domain"
 	dt "github.com/Junaidmdv/goalcircle-user_service/internal/handler/grpc/dtos"
 	uc "github.com/Junaidmdv/goalcircle-user_service/internal/usecase"
 	ucdtos "github.com/Junaidmdv/goalcircle-user_service/internal/usecase/dtos"
@@ -31,7 +32,7 @@ func NewAuthHandler(aus uc.AuthUsecase, logger logger.Logger, validate *vl.Valid
 	}
 }
 
-func (uh *authHandler) RegisterUser(ctx context.Context, req *pb.RegisterRequest) (*pb.RegisterResponse, error) {
+func (uh *authHandler) Register(ctx context.Context, req *pb.RegisterRequest) (*pb.RegisterResponse, error) {
 	context, cancel := context.WithTimeout(ctx, *uh.timeout)
 	defer cancel()
 
@@ -48,12 +49,13 @@ func (uh *authHandler) RegisterUser(ctx context.Context, req *pb.RegisterRequest
 	response, err := uh.authUseCase.InitiateUserRegistration(context, &ucdtos.RegisterRequest{
 		FullName:        request.FullName,
 		Email:           request.Email,
+		PhoneNum:        req.PhoneNum,
 		Password:        request.Password,
 		ConfirmPassword: request.ConfirmPassword,
 	})
 
 	if err != nil {
-		return nil, status.Error(codes.AlreadyExists, "already exist")
+		return nil, domain.GRPCStatus(err)
 	}
 
 	return dt.ToRegisterResponse(response), nil

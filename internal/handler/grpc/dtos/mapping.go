@@ -9,6 +9,7 @@ func ToRegisterReq(res *pb.RegisterRequest) *RegisterRequest {
 	return &RegisterRequest{
 		FullName:        res.FullName,
 		Email:           res.Email,
+		PhoneNum:        res.PhoneNum,
 		Password:        res.Password,
 		ConfirmPassword: res.ConfirmPassword,
 	}
