@@ -3,6 +3,7 @@ package dtos
 import (
 	"github.com/Junaidmdv/goalcircle-user_service/internal/usecase/dtos"
 	"github.com/Junaidmdv/goalcircle-user_service/proto/pb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func ToRegisterReq(res *pb.RegisterRequest) *RegisterRequest {
@@ -17,8 +18,23 @@ func ToRegisterReq(res *pb.RegisterRequest) *RegisterRequest {
 
 func ToRegisterResponse(res *dtos.RegisterResponse) *pb.RegisterResponse {
 	return &pb.RegisterResponse{
-		UserId:    res.UserId,
-		Email:     res.Email,
-		OtpStatus: &res.OtpStatus,
+		Email:        res.Email,
+		PhoneNum:     res.PhoneNum,
+		OtpStatus:    &res.OtpStatus,
+		OtpExpiresAt: timestamppb.New(res.OtpExpiry),
+	}
+}
+
+func ToOtpReq(res *pb.OtpReq) *VerifyOtpReq {
+	return &VerifyOtpReq{
+		Email:    res.Email,
+		PhoneNum: res.PhoneNum,
+		Otp:      res.Otp,
+	}
+}
+
+func ToOtpRes(res *pb.OtpRes) *pb.OtpRes {
+	return &pb.OtpRes{
+		Verified: res.Verified,
 	}
 }

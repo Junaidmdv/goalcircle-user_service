@@ -49,6 +49,18 @@ func (us *authUsecase) InitiateUserRegistration(ctx context.Context, input *uc_d
 		return nil, domain.NewConflictError("email already exist")
 	}
 
+	//phone number dublicate exist checking validation is added. But commented twilio is free tier only access verified number
+
+	// exist, err = us.userRepo.ExistByPhoneNum(ctx, input.PhoneNum)
+	// if err != nil {
+	// 	us.logger.Error("internal error", zap.Error(err))
+	// 	return nil, domain.NewInternalError("something went wrong", err)
+	// }
+	// if exist {
+	// 	us.logger.Warn("dublicate email", errors.New("phone number already exist"))
+	// 	return nil, domain.NewConflictError("phone number already exist")
+	// }
+
 	hashedPassword, err := us.hash.HashPassword(input.Password)
 	if err != nil {
 		us.logger.Error("failed to hash pasword", err)
@@ -61,8 +73,8 @@ func (us *authUsecase) InitiateUserRegistration(ctx context.Context, input *uc_d
 	}
 	us.logger.Info("otp data", "data", otpres)
 
-	res, err := us.userRepo.CreateTempUser(ctx, &entity.TempUser{
-		ID:        us.uidGenerater.Generate(),
+	res, err := us.userRepo.CreateTempUser(ctx, &entity.TempUser{ 
+		FullName: input.FullName,
 		Email:     input.Email,
 		PhoneNum:  input.PhoneNum,
 		Password:  hashedPassword,
@@ -77,6 +89,11 @@ func (us *authUsecase) InitiateUserRegistration(ctx context.Context, input *uc_d
 
 }
 
-func (us *authUsecase) VerifyOtp() {
+func (us *authUsecase) VerifyOtp(ctx context.Context, input *uc_dtos.OtpReq) (bool, error) {   
+
+	
+   
+
+	return false, nil
 
 }

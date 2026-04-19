@@ -1,5 +1,7 @@
 package dtos
 
+import "time"
+
 type RegisterRequest struct {
 	FullName        string
 	Email           string
@@ -9,8 +11,15 @@ type RegisterRequest struct {
 }
 
 type RegisterResponse struct {
-	UserId    string 
-	Email     string 
-	PhoneNum  string 
+	Email     string
+	PhoneNum  string
 	OtpStatus bool
+	OtpExpiry time.Time
 }
+
+type OtpReq struct {
+	Email    string
+	PhoneNum string
+	Otp      string
+}
+

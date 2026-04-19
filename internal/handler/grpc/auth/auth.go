@@ -60,3 +60,13 @@ func (uh *authHandler) Register(ctx context.Context, req *pb.RegisterRequest) (*
 
 	return dt.ToRegisterResponse(response), nil
 }
+
+func (uh *authHandler) VerifyOtp(ctx context.Context, req *pb.OtpReq) (*pb.OtpRes, error) { 
+    
+	return nil, nil
+} 
+
+
+// func(uh *authHandler)ResendOtp(ctx context.Context,res ){
+
+// }

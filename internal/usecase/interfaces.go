@@ -8,4 +8,5 @@ import (
 
 type AuthUsecase interface {
 	InitiateUserRegistration(context.Context, *dtos.RegisterRequest) (*dtos.RegisterResponse, error)
+	VerifyOtp(context.Context, *dtos.OtpReq) (bool, error)
 }
