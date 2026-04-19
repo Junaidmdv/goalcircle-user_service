@@ -19,7 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AuthService_Register_FullMethodName = "/auth.AuthService/Register"
+	AuthService_Register_FullMethodName  = "/auth.AuthService/Register"
+	AuthService_VerfiyOtp_FullMethodName = "/auth.AuthService/VerfiyOtp"
 )
 
 // AuthServiceClient is the client API for AuthService service.
@@ -30,6 +31,8 @@ const (
 type AuthServiceClient interface {
 	// registeration of user account
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
+	// verfiy otp
+	VerfiyOtp(ctx context.Context, in *OtpReq, opts ...grpc.CallOption) (*OtpRes, error)
 }
 
 type authServiceClient struct {
@@ -50,6 +53,16 @@ func (c *authServiceClient) Register(ctx context.Context, in *RegisterRequest, o
 	return out, nil
 }
 
+func (c *authServiceClient) VerfiyOtp(ctx context.Context, in *OtpReq, opts ...grpc.CallOption) (*OtpRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(OtpRes)
+	err := c.cc.Invoke(ctx, AuthService_VerfiyOtp_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServiceServer is the server API for AuthService service.
 // All implementations must embed UnimplementedAuthServiceServer
 // for forward compatibility.
@@ -58,6 +71,8 @@ func (c *authServiceClient) Register(ctx context.Context, in *RegisterRequest, o
 type AuthServiceServer interface {
 	// registeration of user account
 	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
+	// verfiy otp
+	VerfiyOtp(context.Context, *OtpReq) (*OtpRes, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
 
@@ -70,6 +85,9 @@ type UnimplementedAuthServiceServer struct{}
 
 func (UnimplementedAuthServiceServer) Register(context.Context, *RegisterRequest) (*RegisterResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
+}
+func (UnimplementedAuthServiceServer) VerfiyOtp(context.Context, *OtpReq) (*OtpRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method VerfiyOtp not implemented")
 }
 func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
 func (UnimplementedAuthServiceServer) testEmbeddedByValue()                     {}
@@ -110,6 +128,24 @@ func _AuthService_Register_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_VerfiyOtp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(OtpReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).VerfiyOtp(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_VerfiyOtp_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).VerfiyOtp(ctx, req.(*OtpReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AuthService_ServiceDesc is the grpc.ServiceDesc for AuthService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -120,6 +156,10 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Register",
 			Handler:    _AuthService_Register_Handler,
+		},
+		{
+			MethodName: "VerfiyOtp",
+			Handler:    _AuthService_VerfiyOtp_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

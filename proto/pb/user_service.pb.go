@@ -9,6 +9,7 @@ package pb
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -99,10 +100,10 @@ func (x *RegisterRequest) GetConfirmPassword() string {
 
 type RegisterResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	Email         string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
 	PhoneNum      string                 `protobuf:"bytes,3,opt,name=phone_num,json=phoneNum,proto3" json:"phone_num,omitempty"`
 	OtpStatus     *bool                  `protobuf:"varint,4,opt,name=otp_status,json=otpStatus,proto3,oneof" json:"otp_status,omitempty"`
+	OtpExpiresAt  *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=otp_expires_at,json=otpExpiresAt,proto3" json:"otp_expires_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -137,13 +138,6 @@ func (*RegisterResponse) Descriptor() ([]byte, []int) {
 	return file_user_service_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *RegisterResponse) GetUserId() string {
-	if x != nil {
-		return x.UserId
-	}
-	return ""
-}
-
 func (x *RegisterResponse) GetEmail() string {
 	if x != nil {
 		return x.Email
@@ -165,26 +159,144 @@ func (x *RegisterResponse) GetOtpStatus() bool {
 	return false
 }
 
+func (x *RegisterResponse) GetOtpExpiresAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.OtpExpiresAt
+	}
+	return nil
+}
+
+type OtpReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
+	PhoneNum      string                 `protobuf:"bytes,2,opt,name=phone_num,json=phoneNum,proto3" json:"phone_num,omitempty"`
+	Otp           string                 `protobuf:"bytes,3,opt,name=otp,proto3" json:"otp,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *OtpReq) Reset() {
+	*x = OtpReq{}
+	mi := &file_user_service_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OtpReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OtpReq) ProtoMessage() {}
+
+func (x *OtpReq) ProtoReflect() protoreflect.Message {
+	mi := &file_user_service_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OtpReq.ProtoReflect.Descriptor instead.
+func (*OtpReq) Descriptor() ([]byte, []int) {
+	return file_user_service_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *OtpReq) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+func (x *OtpReq) GetPhoneNum() string {
+	if x != nil {
+		return x.PhoneNum
+	}
+	return ""
+}
+
+func (x *OtpReq) GetOtp() string {
+	if x != nil {
+		return x.Otp
+	}
+	return ""
+}
+
+type OtpRes struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Verified      bool                   `protobuf:"varint,1,opt,name=verified,proto3" json:"verified,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *OtpRes) Reset() {
+	*x = OtpRes{}
+	mi := &file_user_service_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OtpRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OtpRes) ProtoMessage() {}
+
+func (x *OtpRes) ProtoReflect() protoreflect.Message {
+	mi := &file_user_service_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OtpRes.ProtoReflect.Descriptor instead.
+func (*OtpRes) Descriptor() ([]byte, []int) {
+	return file_user_service_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *OtpRes) GetVerified() bool {
+	if x != nil {
+		return x.Verified
+	}
+	return false
+}
+
 var File_user_service_proto protoreflect.FileDescriptor
 
 const file_user_service_proto_rawDesc = "" +
 	"\n" +
-	"\x12user_service.proto\x12\x04auth\"\xa8\x01\n" +
+	"\x12user_service.proto\x12\x04auth\x1a\x1fgoogle/protobuf/timestamp.proto\"\xa8\x01\n" +
 	"\x0fRegisterRequest\x12\x1b\n" +
 	"\tfull_name\x18\x01 \x01(\tR\bfullName\x12\x14\n" +
 	"\x05email\x18\x02 \x01(\tR\x05email\x12\x1b\n" +
 	"\tphone_num\x18\x03 \x01(\tR\bphoneNum\x12\x1a\n" +
 	"\bpassword\x18\x04 \x01(\tR\bpassword\x12)\n" +
-	"\x10confirm_password\x18\x05 \x01(\tR\x0fconfirmPassword\"\x91\x01\n" +
-	"\x10RegisterResponse\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x14\n" +
+	"\x10confirm_password\x18\x05 \x01(\tR\x0fconfirmPassword\"\xba\x01\n" +
+	"\x10RegisterResponse\x12\x14\n" +
 	"\x05email\x18\x02 \x01(\tR\x05email\x12\x1b\n" +
 	"\tphone_num\x18\x03 \x01(\tR\bphoneNum\x12\"\n" +
 	"\n" +
-	"otp_status\x18\x04 \x01(\bH\x00R\totpStatus\x88\x01\x01B\r\n" +
-	"\v_otp_status2H\n" +
+	"otp_status\x18\x04 \x01(\bH\x00R\totpStatus\x88\x01\x01\x12@\n" +
+	"\x0eotp_expires_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\fotpExpiresAtB\r\n" +
+	"\v_otp_status\"M\n" +
+	"\x06OtpReq\x12\x14\n" +
+	"\x05email\x18\x01 \x01(\tR\x05email\x12\x1b\n" +
+	"\tphone_num\x18\x02 \x01(\tR\bphoneNum\x12\x10\n" +
+	"\x03otp\x18\x03 \x01(\tR\x03otp\"$\n" +
+	"\x06OtpRes\x12\x1a\n" +
+	"\bverified\x18\x01 \x01(\bR\bverified2q\n" +
 	"\vAuthService\x129\n" +
-	"\bRegister\x12\x15.auth.RegisterRequest\x1a\x16.auth.RegisterResponseB8Z6github.com/junaidmdv/goalcirlcle/user_service/proto/pbb\x06proto3"
+	"\bRegister\x12\x15.auth.RegisterRequest\x1a\x16.auth.RegisterResponse\x12'\n" +
+	"\tVerfiyOtp\x12\f.auth.OtpReq\x1a\f.auth.OtpResB8Z6github.com/junaidmdv/goalcirlcle/user_service/proto/pbb\x06proto3"
 
 var (
 	file_user_service_proto_rawDescOnce sync.Once
@@ -198,19 +310,25 @@ func file_user_service_proto_rawDescGZIP() []byte {
 	return file_user_service_proto_rawDescData
 }
 
-var file_user_service_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_user_service_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_user_service_proto_goTypes = []any{
-	(*RegisterRequest)(nil),  // 0: auth.RegisterRequest
-	(*RegisterResponse)(nil), // 1: auth.RegisterResponse
+	(*RegisterRequest)(nil),       // 0: auth.RegisterRequest
+	(*RegisterResponse)(nil),      // 1: auth.RegisterResponse
+	(*OtpReq)(nil),                // 2: auth.OtpReq
+	(*OtpRes)(nil),                // 3: auth.OtpRes
+	(*timestamppb.Timestamp)(nil), // 4: google.protobuf.Timestamp
 }
 var file_user_service_proto_depIdxs = []int32{
-	0, // 0: auth.AuthService.Register:input_type -> auth.RegisterRequest
-	1, // 1: auth.AuthService.Register:output_type -> auth.RegisterResponse
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	4, // 0: auth.RegisterResponse.otp_expires_at:type_name -> google.protobuf.Timestamp
+	0, // 1: auth.AuthService.Register:input_type -> auth.RegisterRequest
+	2, // 2: auth.AuthService.VerfiyOtp:input_type -> auth.OtpReq
+	1, // 3: auth.AuthService.Register:output_type -> auth.RegisterResponse
+	3, // 4: auth.AuthService.VerfiyOtp:output_type -> auth.OtpRes
+	3, // [3:5] is the sub-list for method output_type
+	1, // [1:3] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_user_service_proto_init() }
@@ -225,7 +343,7 @@ func file_user_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_user_service_proto_rawDesc), len(file_user_service_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -2,7 +2,8 @@ syntax = 'proto3';
 
 package auth; 
 
-option go_package = "github.com/junaidmdv/goalcirlcle/user_service/proto/pb"; 
+option go_package = "github.com/junaidmdv/goalcirlcle/user_service/proto/pb";  
+import "google/protobuf/timestamp.proto";
 
 
 message RegisterRequest { 
@@ -15,15 +16,29 @@ message RegisterRequest {
 
 
 message RegisterResponse{
-  string user_id=1; 
   string email=2;  
   string phone_num=3;
   optional bool otp_status=4; 
+  google.protobuf.Timestamp otp_expires_at=5;
 } 
+
+message OtpReq {
+   string email=1;  
+   string phone_num=2;
+   string otp=3;
+
+} 
+
+message OtpRes{
+   bool verified=1;
+}
 
 // authentication of users services
 service AuthService{
   //registeration of user account
-  rpc Register(RegisterRequest)returns(RegisterResponse);   
-  
+  rpc Register(RegisterRequest)returns(RegisterResponse);     
+  //verfiy otp 
+  rpc VerfiyOtp(OtpReq)returns(OtpRes);  
 }
+
+
