@@ -11,6 +11,8 @@ var errTypeToGRPCCode = map[ErrorType]codes.Code{
 	ErrorTypeInternal:     codes.Internal,
 	ErrorTypeConflict:     codes.AlreadyExists,
 	ErrorInvalidArguement: codes.InvalidArgument,
+	ErrorDeadlineExceed:   codes.DeadlineExceeded,
+	ErrorUnAuthenticated:  codes.Unauthenticated,
 }
 
 func GRPCStatus(err error) error {

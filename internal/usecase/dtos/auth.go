@@ -17,9 +17,14 @@ type RegisterResponse struct {
 	OtpExpiry time.Time
 }
 
-type OtpReq struct {
+type OtpRequest struct {
 	Email    string
 	PhoneNum string
 	Otp      string
 }
 
+
+
+type OtpResponse struct{
+  
+}

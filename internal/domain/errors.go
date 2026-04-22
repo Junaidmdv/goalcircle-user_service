@@ -8,8 +8,10 @@ const (
 	ErrTypeUnknown ErrorType = iota
 	ErrorTypeNotFound
 	ErrorTypeInternal
-	ErrorTypeConflict 
+	ErrorTypeConflict
 	ErrorInvalidArguement
+	ErrorDeadlineExceed
+	ErrorUnAuthenticated
 )
 
 type DomainError struct {
@@ -40,9 +42,24 @@ func NewConflictError(msg string) *DomainError {
 	}
 }
 
-func NewValidationError(msg string)*DomainError{
+func NewValidationError(msg string) *DomainError {
 	return &DomainError{
-		Type: ErrorInvalidArguement,
+		Type:    ErrorInvalidArguement,
 		Message: msg,
 	}
+}
+
+func NewDeadlineExceedeError(msg string) *DomainError {
+	return &DomainError{
+		Type:    ErrorDeadlineExceed,
+		Message: msg,
+	}
+}
+
+func NewUnAuthenticatedError(msg string) *DomainError {
+	return &DomainError{
+		Type:    ErrorUnAuthenticated,
+		Message: msg,
+	}
+
 }

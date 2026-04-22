@@ -6,7 +6,7 @@ import (
 
 	"github.com/Junaidmdv/goalcircle-user_service/internal/domain"
 	dt "github.com/Junaidmdv/goalcircle-user_service/internal/handler/grpc/dtos"
-	uc "github.com/Junaidmdv/goalcircle-user_service/internal/usecase"
+	uc "github.com/Junaidmdv/goalcircle-user_service/internal/usecase/auth"
 	ucdtos "github.com/Junaidmdv/goalcircle-user_service/internal/usecase/dtos"
 	"github.com/Junaidmdv/goalcircle-user_service/pkg/logger"
 	vl "github.com/Junaidmdv/goalcircle-user_service/pkg/validater"
@@ -61,12 +61,28 @@ func (uh *authHandler) Register(ctx context.Context, req *pb.RegisterRequest) (*
 	return dt.ToRegisterResponse(response), nil
 }
 
-func (uh *authHandler) VerifyOtp(ctx context.Context, req *pb.OtpReq) (*pb.OtpRes, error) { 
-    
-	return nil, nil
-} 
+func (uh *authHandler) VerifyOtp(ctx context.Context, req *pb.OtpReq) (*pb.OtpRes, error) {
+	ctx, cancel := context.WithTimeout(ctx, *uh.timeout)
+	defer cancel()
 
+	request := dt.ToOtpReq(req)
+	if validationErrs := uh.validater.Validation(request); validationErrs != nil {
+		stWithDetails, err := ValidationError(validationErrs)
+		if err != nil {
+			return nil, status.Error(codes.InvalidArgument, "failed to attach details")
+		}
+		return nil, stWithDetails.Err()
+	}
 
-// func(uh *authHandler)ResendOtp(ctx context.Context,res ){
+	res, err := uh.authUseCase.VerifyOtp(ctx, &ucdtos.OtpRequest{
+		Email:    request.Email,
+		PhoneNum: request.PhoneNum,
+		Otp:      request.Otp,
+	})
 
-// }
+	if err != nil {
+		return nil, domain.GRPCStatus(err)
+	}
+
+	return dt.ToOtpRes(res),nil
+}

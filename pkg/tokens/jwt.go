@@ -4,16 +4,29 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/Junaidmdv/goalcircle-user_service/internal/config"
 	"github.com/golang-jwt/jwt/v5"
 )
 
+
+
+func NewTokenMaker(jwtcnfg *config.JWTConfig) *JwtMaker {
+	return &JwtMaker{
+		secreteKey:         jwtcnfg.SecretKey,
+		AccessTokenExpiry:  jwtcnfg.AccessTokenExp,
+		RefreshTokenExpiry: jwtcnfg.RefreshTokenExp,
+	}
+}
+
 type JwtMaker struct {
-	secreteKey string
+	secreteKey         string
+	AccessTokenExpiry  time.Duration
+	RefreshTokenExpiry time.Duration
 }
 
 const leeweetime = time.Second * 5
 
-func (j *JwtMaker) GenerateToken(id int, email string, role string, duration time.Duration) (string, error) {
+func (j *JwtMaker) GenerateToken(id string, email string, role string, duration time.Duration) (string, error) {
 
 	claims, err := NewTokenClaims(id, email, role, duration)
 	if err != nil {

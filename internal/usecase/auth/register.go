@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"github.com/Junaidmdv/goalcircle-user_service/internal/domain"
@@ -13,8 +12,13 @@ import (
 	"github.com/Junaidmdv/goalcircle-user_service/internal/infrastructure/uid"
 	uc_dtos "github.com/Junaidmdv/goalcircle-user_service/internal/usecase/dtos"
 	"github.com/Junaidmdv/goalcircle-user_service/pkg/logger"
-	"go.uber.org/zap"
+	"github.com/Junaidmdv/goalcircle-user_service/pkg/tokens"
 )
+
+type AuthUsecase interface {
+	InitiateUserRegistration(context.Context, *uc_dtos.RegisterRequest) (*uc_dtos.RegisterResponse, error)
+	VerifyOtp(context.Context, *uc_dtos.OtpRequest) (*uc_dtos.OtpResponse, error)
+}
 
 type authUsecase struct {
 	userRepo     repository.UserRepository
@@ -23,9 +27,11 @@ type authUsecase struct {
 	uidGenerater uid.UuidGenerater
 	otp          twilio.OtpService
 	hash         bycrypt.PasswordHasher
+	token        *tokens.JwtMaker
+	session      repository.SessionStorage
 }
 
-func NewAuthUsecase(ur repository.UserRepository, logger logger.Logger, time *time.Duration, uidgen uid.UuidGenerater, otp twilio.OtpService, hash bycrypt.PasswordHasher) *authUsecase {
+func NewAuthUsecase(ur repository.UserRepository, logger logger.Logger, time *time.Duration, uidgen uid.UuidGenerater, otp twilio.OtpService, hash bycrypt.PasswordHasher, token *tokens.JwtMaker, session repository.SessionStorage) AuthUsecase {
 	return &authUsecase{
 		userRepo:     ur,
 		logger:       logger,
@@ -33,20 +39,15 @@ func NewAuthUsecase(ur repository.UserRepository, logger logger.Logger, time *ti
 		uidGenerater: uidgen,
 		hash:         hash,
 		otp:          otp,
+		token:        token,
+		session:      session,
 	}
 }
 
 func (us *authUsecase) InitiateUserRegistration(ctx context.Context, input *uc_dtos.RegisterRequest) (*uc_dtos.RegisterResponse, error) {
 
-	exist, err := us.userRepo.ExistByEmail(ctx, input.Email)
-	if err != nil {
-		us.logger.Error("internal error", zap.Error(err))
-		return nil, domain.NewInternalError("something went wrong", err)
-	}
-
-	if exist {
-		us.logger.Warn("dublicate email", errors.New("email already exist"))
-		return nil, domain.NewConflictError("email already exist")
+	if err := us.userRepo.ExistByEmail(ctx, input.Email); err != nil {
+		return nil, err
 	}
 
 	//phone number dublicate exist checking validation is added. But commented twilio is free tier only access verified number
@@ -64,7 +65,18 @@ func (us *authUsecase) InitiateUserRegistration(ctx context.Context, input *uc_d
 	hashedPassword, err := us.hash.HashPassword(input.Password)
 	if err != nil {
 		us.logger.Error("failed to hash pasword", err)
-		return nil, domain.NewInternalError("failed hash password", err)
+		return nil, domain.NewInternalError("internal server error", err)
+	}
+
+	res, err := us.userRepo.CreateOrUpdateTempUser(ctx, &entity.TempUser{
+		FullName: input.FullName,
+		Email:    input.Email,
+		PhoneNum: input.PhoneNum,
+		Password: hashedPassword,
+	})
+
+	if err != nil {
+		return nil, err
 	}
 
 	otpres, err := us.otp.SendOtp(input.PhoneNum)
@@ -73,27 +85,70 @@ func (us *authUsecase) InitiateUserRegistration(ctx context.Context, input *uc_d
 	}
 	us.logger.Info("otp data", "data", otpres)
 
-	res, err := us.userRepo.CreateTempUser(ctx, &entity.TempUser{ 
-		FullName: input.FullName,
-		Email:     input.Email,
-		PhoneNum:  input.PhoneNum,
-		Password:  hashedPassword,
-		OTP:       otpres.Otp,
-		ExpiresAt: otpres.ExpiresAt,
+	otpdata, err := us.userRepo.AddOtpData(ctx, &entity.Otp{
+		TempUserID: res.ID,
+		Otp:        otpres.Otp,
+		Type:       string(entity.Register),
+		ExpiresAt:  otpres.ExpiresAt,
+	})
+	return uc_dtos.ToRegisterResponse(res, otpdata), nil
+}
+
+func (us *authUsecase) VerifyOtp(ctx context.Context, input *uc_dtos.OtpRequest) (*uc_dtos.OtpResponse, error) {
+
+	tempUser, err := us.userRepo.GetTempUserByEmail(ctx, input.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	otpRecord, err := us.userRepo.GetLatestOtpRecord(ctx, tempUser.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	if time.Now().After(otpRecord.ExpiresAt) {
+		return nil, domain.NewUnAuthenticatedError("OTP expired")
+	}
+
+	if otpRecord.Otp != input.Otp {
+		return nil, domain.NewUnAuthenticatedError("OTP has expired. Please request a new one")
+	}
+
+	if otpRecord.Attempts == 5 {
+		return nil, domain.NewUnAuthenticatedError("OTP has reached max attempt.Resend otp")
+	}
+
+	us.logger.Info("otp verified", "email", tempUser.Email)
+
+	user, err := us.userRepo.CreateUser(ctx, &entity.User{
+		Id:       us.uidGenerater.Generate(),
+		FullName: tempUser.FullName,
+		Email:    tempUser.Email,
+		Password: tempUser.Password,
 	})
 
 	if err != nil {
-		return nil, domain.NewInternalError("something went wrong", err)
+		return nil, err
 	}
-	return uc_dtos.ToRegisterResponse(res), nil
 
-}
+	us.logger.Info("user created", "id", user.Id)
 
-func (us *authUsecase) VerifyOtp(ctx context.Context, input *uc_dtos.OtpReq) (bool, error) {   
+	accessToken, err := us.token.GenerateToken(user.Id, user.Email, "user", us.token.AccessTokenExpiry)
+	if err != nil {
+		us.logger.Error("failed to generater token", "error", err)
+		return nil, domain.NewInternalError("Something went wrong.Please try again later.", err)
+	}
 
-	
-   
+	refreshToken, err := us.token.GenerateToken(user.Id, user.Email, "user", us.token.RefreshTokenExpiry)
+	if err != nil {
+		us.logger.Error("failed to generater token", "error", err)
+		return nil, domain.NewInternalError("Something went wrong.Please try again later.", err)
+	} 
 
-	return false, nil
+	us.session.SaveSession(ctx,&entity.Session{
+		ID: accessToken.,
+	})
+
+	return nil, nil
 
 }

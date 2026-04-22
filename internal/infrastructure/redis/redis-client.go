@@ -5,9 +5,14 @@ import (
 
 	"github.com/Junaidmdv/goalcircle-user_service/internal/config"
 	redis "github.com/redis/go-redis/v9"
-)
+) 
 
-func NewRedisClient(redisConfig *config.RedisConfig) *redis.Client {
+
+type Redis struct{
+	Client *redis.Client
+}
+
+func NewRedisClient(redisConfig *config.RedisConfig) *Redis {
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%s", redisConfig.Host, redisConfig.Port),
 		Password: redisConfig.Password,
@@ -15,6 +20,8 @@ func NewRedisClient(redisConfig *config.RedisConfig) *redis.Client {
 		PoolSize: 10,
 	})
 
-	return rdb
+	return &Redis{
+       Client: rdb,
+	}
 
 }

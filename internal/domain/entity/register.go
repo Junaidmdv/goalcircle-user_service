@@ -2,6 +2,7 @@ package entity
 
 import (
 	"time"
+
 	"gorm.io/gorm"
 )
 
@@ -11,7 +12,17 @@ type TempUser struct {
 	Email     string `gorm:"unique"`
 	PhoneNum  string
 	Password  string
-	OTP       string
-	ExpiresAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`
+}
+
+type Otp struct {
+	ID         uint `gorm:"primaryKey:autoIncrement"`
+	TempUserID uint `gorm:"not null"`
+	Otp        string
+	Type       string
+	Attempts   int
+	ExpiresAt  time.Time
+	CreatedAt  time.Time
+	DeletedAt  time.Time
+	TempUser   TempUser
 }

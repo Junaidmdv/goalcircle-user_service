@@ -33,8 +33,6 @@ func ToOtpReq(res *pb.OtpReq) *VerifyOtpReq {
 	}
 }
 
-func ToOtpRes(res *pb.OtpRes) *pb.OtpRes {
-	return &pb.OtpRes{
-		Verified: res.Verified,
-	}
+func ToOtpRes(res *dtos.OtpResponse) *pb.OtpRes {
+	return &pb.OtpRes{}
 }
