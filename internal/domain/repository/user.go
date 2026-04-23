@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/Junaidmdv/goalcircle-user_service/internal/domain"
 	"github.com/Junaidmdv/goalcircle-user_service/internal/domain/entity"
@@ -11,13 +12,14 @@ import (
 )
 
 type UserRepository interface {
-	ExistByEmail(context.Context, string) error
+	CheckEmailExist(context.Context, string) error
 	ExistByPhoneNum(context.Context, string) error
 	CreateOrUpdateTempUser(context.Context, *entity.TempUser) (*entity.TempUser, error)
 	GetTempUserByEmail(context.Context, string) (*entity.TempUser, error)
 	AddOtpData(context.Context, *entity.Otp) (*entity.Otp, error)
-	GetLatestOtpRecord(context.Context, uint) (*entity.Otp, error) 
-    CreateUser(context.Context,*entity.User)(*entity.User,error)
+	GetLatestOtpRecord(context.Context, uint) (*entity.Otp, error)
+	CreateUser(context.Context, *entity.User) (*entity.User, error)
+	GetUserByEmail(context.Context, string) (*entity.User, error)
 }
 
 type userRepository struct {
@@ -32,20 +34,7 @@ func NewUserRepository(db *gorm.DB, logger logger.Logger) UserRepository {
 	}
 }
 
-// func (ur *userRepository) ExistByEmail(ctx context.Context, email string) (bool, error) {
-// 	var count int64
-// 	err := ur.db.WithContext(ctx).
-// 		Model(&entity.User{}).
-// 		Where("email = ?", email).
-// 		Count(&count).
-// 		Error
-// 	if err != nil {
-// 		return false, fmt.Errorf("failed to check email existence: %w", err)
-// 	}
-// 	return count > 0, nil
-// }
-
-func (ur *userRepository) ExistByEmail(ctx context.Context, email string) error {
+func (ur *userRepository) CheckEmailExist(ctx context.Context, email string) error {
 	var exists bool
 
 	err := ur.db.WithContext(ctx).
@@ -125,7 +114,7 @@ func (ur *userRepository) GetTempUserByEmail(ctx context.Context, email string) 
 		First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			ur.logger.Info("record not found", "email", email, "error", err)
-			return nil, domain.NewNotFoundError("user accound not found")
+			return nil, domain.NewNotFoundError("No account register in this email.Please register first")
 		}
 		return nil, domain.NewInternalError("Something went wrong. Please try again later.", err)
 	}
@@ -145,9 +134,29 @@ func (ur *userRepository) GetLatestOtpRecord(ctx context.Context, id uint) (*ent
 	return &otpRec, nil
 }
 
+func (ur *userRepository) CreateUser(ctx context.Context, user *entity.User) (*entity.User, error) {
 
+	if err := ur.db.WithContext(ctx).Create(user).Error; err != nil {
+		ur.logger.Error("database error", "error", fmt.Errorf("falied to create user data:%v", err), "data", user)
+		return nil, domain.NewInternalError("Something went wrong.Please try again later.", fmt.Errorf("failed to add user data:%v", err))
+	}
 
-func(ur *userRepository)CreateUser(ctx context.Context,user *entity.User)(*entity.User,error){
- return nil,nil
+	return user, nil
 }
 
+func (ur *userRepository) GetUserByEmail(ctx context.Context, email string) (*entity.User, error) {
+
+	var user entity.User
+	if err := ur.db.WithContext(ctx).
+		Where("email=?", email).
+		First(&user).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			ur.logger.Warn("user email not found", "email", email)
+			return nil, domain.NewNotFoundError("No account found with this email. Please register first.")
+		}
+		ur.logger.Error("database error", "error", err)
+		return nil, domain.NewInternalError("Something went wrong. Please try again later.", err)
+
+	}
+	return &user, nil
+}

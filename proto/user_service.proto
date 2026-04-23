@@ -29,8 +29,23 @@ message OtpReq {
 
 } 
 
-message OtpRes{
-   bool verified=1;
+message OtpRes{  
+   string user_id=1;
+   string access_token=2; 
+   google.protobuf.Timestamp access_token_expiry=3;
+} 
+
+
+message LoginRequest{
+   string email=1; 
+   string password=2;
+} 
+
+
+message LoginResponse{
+   string user_id=1; 
+   string access_token=2; 
+   string access_token_expiry=3;
 }
 
 // authentication of users services
@@ -38,7 +53,9 @@ service AuthService{
   //registeration of user account
   rpc Register(RegisterRequest)returns(RegisterResponse);     
   //verfiy otp 
-  rpc VerfiyOtp(OtpReq)returns(OtpRes);  
+  rpc VerfiyOtp(OtpReq)returns(OtpRes);   
+  //user login
+  rpc Login(LoginRequest)returns(LoginResponse);
 }
 
 

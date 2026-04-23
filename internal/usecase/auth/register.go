@@ -17,7 +17,8 @@ import (
 
 type AuthUsecase interface {
 	InitiateUserRegistration(context.Context, *uc_dtos.RegisterRequest) (*uc_dtos.RegisterResponse, error)
-	VerifyOtp(context.Context, *uc_dtos.OtpRequest) (*uc_dtos.OtpResponse, error)
+	VerifyOtp(context.Context, *uc_dtos.VerifyOtpRequest) (*uc_dtos.VerifyOtpResponse, error)
+	Login(context.Context, *uc_dtos.LoginRequest) (*uc_dtos.LoginResponse, error)
 }
 
 type authUsecase struct {
@@ -46,7 +47,7 @@ func NewAuthUsecase(ur repository.UserRepository, logger logger.Logger, time *ti
 
 func (us *authUsecase) InitiateUserRegistration(ctx context.Context, input *uc_dtos.RegisterRequest) (*uc_dtos.RegisterResponse, error) {
 
-	if err := us.userRepo.ExistByEmail(ctx, input.Email); err != nil {
+	if err := us.userRepo.CheckEmailExist(ctx, input.Email); err != nil {
 		return nil, err
 	}
 
@@ -94,7 +95,7 @@ func (us *authUsecase) InitiateUserRegistration(ctx context.Context, input *uc_d
 	return uc_dtos.ToRegisterResponse(res, otpdata), nil
 }
 
-func (us *authUsecase) VerifyOtp(ctx context.Context, input *uc_dtos.OtpRequest) (*uc_dtos.OtpResponse, error) {
+func (us *authUsecase) VerifyOtp(ctx context.Context, input *uc_dtos.VerifyOtpRequest) (*uc_dtos.VerifyOtpResponse, error) {
 
 	tempUser, err := us.userRepo.GetTempUserByEmail(ctx, input.Email)
 	if err != nil {
@@ -131,24 +132,77 @@ func (us *authUsecase) VerifyOtp(ctx context.Context, input *uc_dtos.OtpRequest)
 		return nil, err
 	}
 
-	us.logger.Info("user created", "id", user.Id)
+	us.logger.Info("user created", "id", user.Id, "email", user.Email)
 
-	accessToken, err := us.token.GenerateToken(user.Id, user.Email, "user", us.token.AccessTokenExpiry)
+	accessToken, accessClaims, err := us.token.GenerateToken(user.Id, user.Email, "user", us.token.AccessTokenExpiry)
 	if err != nil {
 		us.logger.Error("failed to generater token", "error", err)
 		return nil, domain.NewInternalError("Something went wrong.Please try again later.", err)
 	}
 
-	refreshToken, err := us.token.GenerateToken(user.Id, user.Email, "user", us.token.RefreshTokenExpiry)
+	refreshToken, refreshClaims, err := us.token.GenerateToken(user.Id, user.Email, "user", us.token.RefreshTokenExpiry)
 	if err != nil {
 		us.logger.Error("failed to generater token", "error", err)
 		return nil, domain.NewInternalError("Something went wrong.Please try again later.", err)
-	} 
+	}
 
-	us.session.SaveSession(ctx,&entity.Session{
-		ID: accessToken.,
-	})
+	if err := us.session.SaveSession(ctx, "session:"+refreshClaims.ID, &entity.Session{
+		ID:           refreshClaims.ID,
+		UserEmail:    refreshClaims.Email,
+		RefreshToken: refreshToken,
+		IsRevoked:    false,
+		CreatedAt:    time.Now(),
+		ExpiresAt:    refreshClaims.ExpiresAt.Time,
+	}); err != nil {
+		return nil, err
+	}
 
-	return nil, nil
+	return &uc_dtos.VerifyOtpResponse{
+		UserId:            user.Id,
+		AccessToken:       accessToken,
+		AceessTokenExpiry: accessClaims.ExpiresAt.Time,
+	}, nil
 
 }
+
+func (us *authUsecase) Login(ctx context.Context, input *uc_dtos.LoginRequest) (*uc_dtos.LoginResponse, error) {
+	user, err := us.userRepo.GetUserByEmail(ctx, input.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := us.hash.ComparePassword(user.Password, input.Password); err != nil {
+		return nil, err
+	}
+
+	accessToken, accessClaims, err := us.token.GenerateToken(user.Id, user.Email, "user", us.token.AccessTokenExpiry)
+	if err != nil {
+		us.logger.Error("failed to generater token", "error", err)
+		return nil, domain.NewInternalError("Something went wrong.Please try again later.", err)
+	}
+
+	refreshToken, refreshClaims, err := us.token.GenerateToken(user.Id, user.Email, "user", us.token.RefreshTokenExpiry)
+	if err != nil {
+		us.logger.Error("failed to generater token", "error", err)
+		return nil, domain.NewInternalError("Something went wrong.Please try again later.", err)
+	}
+
+	if err := us.session.SaveSession(ctx, "session:"+refreshClaims.ID, &entity.Session{
+		ID:           refreshClaims.ID,
+		UserEmail:    refreshClaims.Email,
+		RefreshToken: refreshToken,
+		IsRevoked:    false,
+		CreatedAt:    time.Now(),
+		ExpiresAt:    refreshClaims.ExpiresAt.Time,
+	}); err != nil {
+		return nil, err
+	}
+	return &uc_dtos.LoginResponse{
+		UserId:            user.Id,
+		AccessToken:       accessToken,
+		AccessTokenExpiry: accessClaims.ExpiresAt.Time,
+	}, nil
+}
+
+
+

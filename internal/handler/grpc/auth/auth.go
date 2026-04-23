@@ -65,7 +65,7 @@ func (uh *authHandler) VerifyOtp(ctx context.Context, req *pb.OtpReq) (*pb.OtpRe
 	ctx, cancel := context.WithTimeout(ctx, *uh.timeout)
 	defer cancel()
 
-	request := dt.ToOtpReq(req)
+	request := dt.ToVerifyOtpReq(req)
 	if validationErrs := uh.validater.Validation(request); validationErrs != nil {
 		stWithDetails, err := ValidationError(validationErrs)
 		if err != nil {
@@ -74,7 +74,7 @@ func (uh *authHandler) VerifyOtp(ctx context.Context, req *pb.OtpReq) (*pb.OtpRe
 		return nil, stWithDetails.Err()
 	}
 
-	res, err := uh.authUseCase.VerifyOtp(ctx, &ucdtos.OtpRequest{
+	res, err := uh.authUseCase.VerifyOtp(ctx, &ucdtos.VerifyOtpRequest{
 		Email:    request.Email,
 		PhoneNum: request.PhoneNum,
 		Otp:      request.Otp,
@@ -84,5 +84,27 @@ func (uh *authHandler) VerifyOtp(ctx context.Context, req *pb.OtpReq) (*pb.OtpRe
 		return nil, domain.GRPCStatus(err)
 	}
 
-	return dt.ToOtpRes(res),nil
+	return dt.ToVerifyOtpRes(res), nil
 }
+
+func (uh *authHandler) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
+
+	ctx, cancel := context.WithTimeout(ctx, *uh.timeout)
+	defer cancel()
+
+	request := dt.ToLoginRequest(req)
+	if validationErrs := uh.validater.Validation(request); validationErrs != nil {
+		stWithDetails, err := ValidationError(validationErrs)
+		if err != nil {
+			return nil, status.Error(codes.InvalidArgument, "failed to attach details")
+		}
+		return nil, stWithDetails.Err()
+	} 
+ 
+	
+
+
+	return nil, nil
+}
+
+

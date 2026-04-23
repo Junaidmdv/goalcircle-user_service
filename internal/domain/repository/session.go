@@ -2,10 +2,10 @@ package repository
 
 import (
 	"context"
-	"fmt"
-	"reflect"
 
+	"github.com/Junaidmdv/goalcircle-user_service/internal/domain"
 	"github.com/Junaidmdv/goalcircle-user_service/internal/domain/entity"
+	"github.com/Junaidmdv/goalcircle-user_service/pkg/logger"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -14,7 +14,8 @@ type SessionStorage interface {
 }
 
 type sessionStorage struct {
-	redis *redis.Client
+	redis  *redis.Client
+	logger logger.Logger
 }
 
 func NewSessionStorage(redis_client *redis.Client) SessionStorage {
@@ -23,20 +24,14 @@ func NewSessionStorage(redis_client *redis.Client) SessionStorage {
 	}
 }
 
-func (rs *sessionStorage) SaveSession(ctx context.Context, sesionId string, sesion *entity.Session) error {
-	res, err := rs.redis.HSet(ctx, sesionId, &sesion).Result()
+func (rs *sessionStorage) SaveSession(ctx context.Context, key string, session *entity.Session) error {
 
+	_, err := rs.redis.HSet(ctx, key, session).Result()
 	if err != nil {
-		return err
-	}
-
-	t := reflect.TypeOf(sesion)
-
-	if t.Len() != int(res) {
-		return fmt.Errorf("some fields are missing")
+		rs.logger.Error("failed store session data", "error", err, "data", session)
+		return domain.NewInternalError("Something went wrong.Please try again later", err)
 	}
 
 	return nil
 
 }
- 

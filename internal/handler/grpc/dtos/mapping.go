@@ -25,7 +25,7 @@ func ToRegisterResponse(res *dtos.RegisterResponse) *pb.RegisterResponse {
 	}
 }
 
-func ToOtpReq(res *pb.OtpReq) *VerifyOtpReq {
+func ToVerifyOtpReq(res *pb.OtpReq) *VerifyOtpReq {
 	return &VerifyOtpReq{
 		Email:    res.Email,
 		PhoneNum: res.PhoneNum,
@@ -33,6 +33,17 @@ func ToOtpReq(res *pb.OtpReq) *VerifyOtpReq {
 	}
 }
 
-func ToOtpRes(res *dtos.OtpResponse) *pb.OtpRes {
-	return &pb.OtpRes{}
+func ToVerifyOtpRes(res *dtos.VerifyOtpResponse) *pb.OtpRes {
+	return &pb.OtpRes{
+		UserId:            res.UserId,
+		AccessToken:       res.AccessToken,
+		AccessTokenExpiry: timestamppb.New(res.AceessTokenExpiry),
+	}
+}
+
+func ToLoginRequest(req *pb.LoginRequest) *LoginRequest {
+	return &LoginRequest{
+		Email:    req.Email,
+		Password: req.Password,
+	}
 }

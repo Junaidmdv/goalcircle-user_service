@@ -8,8 +8,6 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-
-
 func NewTokenMaker(jwtcnfg *config.JWTConfig) *JwtMaker {
 	return &JwtMaker{
 		secreteKey:         jwtcnfg.SecretKey,
@@ -26,15 +24,21 @@ type JwtMaker struct {
 
 const leeweetime = time.Second * 5
 
-func (j *JwtMaker) GenerateToken(id string, email string, role string, duration time.Duration) (string, error) {
+func (j *JwtMaker) GenerateToken(id string, email string, role string, duration time.Duration) (string, *UserClaims, error) {
 
 	claims, err := NewTokenClaims(id, email, role, duration)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(j.secreteKey))
+
+	tokenstr, err := token.SignedString([]byte([]byte(j.secreteKey)))
+	if err != nil {
+		return "", nil, fmt.Errorf("failed generate token %v", err)
+	}
+	return tokenstr, claims, nil
 }
+
 
 func (j *JwtMaker) VerifyToken(tokenstr string) (*UserClaims, error) {
 

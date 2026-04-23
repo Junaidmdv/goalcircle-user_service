@@ -17,14 +17,26 @@ type RegisterResponse struct {
 	OtpExpiry time.Time
 }
 
-type OtpRequest struct {
+type VerifyOtpRequest struct {
 	Email    string
 	PhoneNum string
 	Otp      string
 }
 
+type VerifyOtpResponse struct {
+	UserId            string
+	AccessToken       string
+	AceessTokenExpiry time.Time
+}
 
+type LoginRequest struct {
+	Email    string
+	Password string
+}
 
-type OtpResponse struct{
-  
+type LoginResponse struct {
+	UserId            string
+	AccessToken       string
+	AccessTokenExpiry time.Time
+	
 }

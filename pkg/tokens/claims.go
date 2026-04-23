@@ -9,7 +9,7 @@ import (
 )
 
 type UserClaims struct {
-	Id    string    `json:"id"`
+	UserId    string    `json:"user_id"`
 	Email string `json:"email"`
 	Role  string `json:"role"`
 	jwt.RegisteredClaims
@@ -23,7 +23,7 @@ func NewTokenClaims(id string, email string, role string, duration time.Duration
 	}
 
 	return &UserClaims{
-		Id:    id,
+		UserId:    id,
 		Email: email,
 		Role:  role,
 		RegisteredClaims: jwt.RegisteredClaims{

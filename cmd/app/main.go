@@ -76,7 +76,7 @@ func main() {
 	redisClient := redis.NewRedisClient(config.Redis)
 	sessionStore := repository.NewSessionStorage(redisClient.Client)
 	hashingCost := 14
-	passwordHashing := bycrypt.NewBycriptHasher(hashingCost)
+	passwordHashing := bycrypt.NewBycriptHasher(hashingCost, logger)
 	token := tokens.NewTokenMaker(config.JWT)
 	authusecase := at.NewAuthUsecase(userRepo, logger, &config.GRPC.TimeOut, uidGenerater, otpService, passwordHashing, token, sessionStore)
 
