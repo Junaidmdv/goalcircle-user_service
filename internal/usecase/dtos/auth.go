@@ -38,5 +38,16 @@ type LoginResponse struct {
 	UserId            string
 	AccessToken       string
 	AccessTokenExpiry time.Time
-	
 }
+
+type ResendOtpReq struct {
+	Email    string
+	PhoneNum string
+}
+
+type ResendOtpResponse struct {
+	Success bool 
+	OtpExpiry time.Time 
+}
+
+

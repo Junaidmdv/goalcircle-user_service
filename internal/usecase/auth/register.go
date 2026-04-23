@@ -18,7 +18,8 @@ import (
 type AuthUsecase interface {
 	InitiateUserRegistration(context.Context, *uc_dtos.RegisterRequest) (*uc_dtos.RegisterResponse, error)
 	VerifyOtp(context.Context, *uc_dtos.VerifyOtpRequest) (*uc_dtos.VerifyOtpResponse, error)
-	Login(context.Context, *uc_dtos.LoginRequest) (*uc_dtos.LoginResponse, error)
+	Login(context.Context, *uc_dtos.LoginRequest) (*uc_dtos.LoginResponse, error) 
+	ResendOtp(context.Context,*uc_dtos.ResendOtpReq)(*uc_dtos.ResendOtpResponse,error)
 }
 
 type authUsecase struct {
@@ -203,6 +204,32 @@ func (us *authUsecase) Login(ctx context.Context, input *uc_dtos.LoginRequest) (
 		AccessTokenExpiry: accessClaims.ExpiresAt.Time,
 	}, nil
 }
+
+func (us *authUsecase) ResendOtp(ctx context.Context, input *uc_dtos.ResendOtpReq) (*uc_dtos.ResendOtpResponse, error) {
+	res,err := us.userRepo.GetTempUserByEmail(ctx, input.Email); 
+	if err != nil {
+		return nil, err
+	}
+
+	otpres, err := us.otp.SendOtp(input.PhoneNum)
+	if err != nil {
+		return nil, us.otp.ParseTwilioError(err)
+	}
+	us.logger.Info("otp data", "data", otpres)
+
+	otpdata, err := us.userRepo.AddOtpData(ctx, &entity.Otp{
+		TempUserID: res.ID,
+		Otp:        otpres.Otp,
+		Type:       string(entity.ResendOtp),
+		ExpiresAt:  otpres.ExpiresAt,
+	})
+
+	return &uc_dtos.ResendOtpResponse{
+		 Success:true,
+         OtpExpiry: otpdata.ExpiresAt,
+	},nil
+}
+
 
 
 

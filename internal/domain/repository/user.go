@@ -19,7 +19,8 @@ type UserRepository interface {
 	AddOtpData(context.Context, *entity.Otp) (*entity.Otp, error)
 	GetLatestOtpRecord(context.Context, uint) (*entity.Otp, error)
 	CreateUser(context.Context, *entity.User) (*entity.User, error)
-	GetUserByEmail(context.Context, string) (*entity.User, error)
+	GetUserByEmail(context.Context, string) (*entity.User, error) 
+	CheckEmailExistInTempUser(context.Context,string)error
 }
 
 type userRepository struct {
@@ -159,4 +160,22 @@ func (ur *userRepository) GetUserByEmail(ctx context.Context, email string) (*en
 
 	}
 	return &user, nil
+}
+
+func (ur *userRepository) CheckEmailExistInTempUser(ctx context.Context, email string) error {
+
+	var count int64
+	if err := ur.db.WithContext(ctx).
+		Where("email = ?", email).
+		Model(&entity.TempUser{}).
+		Count(&count).Error; err != nil {
+		ur.logger.Error("database error", "error", err)
+		return domain.NewInternalError("Something went wrong. Please try again later.", err)
+	}
+
+	if count == 0 {
+		ur.logger.Warn("user email not found", "email", email)
+		return domain.NewNotFoundError("Email not found. Please complete registration first.")
+	}
+	return nil
 }
