@@ -22,6 +22,7 @@ const (
 	AuthService_Register_FullMethodName  = "/auth.AuthService/Register"
 	AuthService_VerfiyOtp_FullMethodName = "/auth.AuthService/VerfiyOtp"
 	AuthService_Login_FullMethodName     = "/auth.AuthService/Login"
+	AuthService_ResendOtp_FullMethodName = "/auth.AuthService/ResendOtp"
 )
 
 // AuthServiceClient is the client API for AuthService service.
@@ -36,6 +37,8 @@ type AuthServiceClient interface {
 	VerfiyOtp(ctx context.Context, in *OtpReq, opts ...grpc.CallOption) (*OtpRes, error)
 	// user login
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
+	// resend otp
+	ResendOtp(ctx context.Context, in *ResendOtpReq, opts ...grpc.CallOption) (*ResendOtpRes, error)
 }
 
 type authServiceClient struct {
@@ -76,6 +79,16 @@ func (c *authServiceClient) Login(ctx context.Context, in *LoginRequest, opts ..
 	return out, nil
 }
 
+func (c *authServiceClient) ResendOtp(ctx context.Context, in *ResendOtpReq, opts ...grpc.CallOption) (*ResendOtpRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ResendOtpRes)
+	err := c.cc.Invoke(ctx, AuthService_ResendOtp_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServiceServer is the server API for AuthService service.
 // All implementations must embed UnimplementedAuthServiceServer
 // for forward compatibility.
@@ -88,6 +101,8 @@ type AuthServiceServer interface {
 	VerfiyOtp(context.Context, *OtpReq) (*OtpRes, error)
 	// user login
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
+	// resend otp
+	ResendOtp(context.Context, *ResendOtpReq) (*ResendOtpRes, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
 
@@ -106,6 +121,9 @@ func (UnimplementedAuthServiceServer) VerfiyOtp(context.Context, *OtpReq) (*OtpR
 }
 func (UnimplementedAuthServiceServer) Login(context.Context, *LoginRequest) (*LoginResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
+}
+func (UnimplementedAuthServiceServer) ResendOtp(context.Context, *ResendOtpReq) (*ResendOtpRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ResendOtp not implemented")
 }
 func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
 func (UnimplementedAuthServiceServer) testEmbeddedByValue()                     {}
@@ -182,6 +200,24 @@ func _AuthService_Login_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_ResendOtp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ResendOtpReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).ResendOtp(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_ResendOtp_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).ResendOtp(ctx, req.(*ResendOtpReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AuthService_ServiceDesc is the grpc.ServiceDesc for AuthService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -200,6 +236,10 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Login",
 			Handler:    _AuthService_Login_Handler,
+		},
+		{
+			MethodName: "ResendOtp",
+			Handler:    _AuthService_ResendOtp_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -46,7 +46,21 @@ message LoginResponse{
    string user_id=1; 
    string access_token=2; 
    string access_token_expiry=3;
+} 
+
+
+message ResendOtpReq{
+   string email=1; 
+   string phone_num=2; 
+} 
+
+message ResendOtpRes{
+   bool success=1; 
+   google.protobuf.Timestamp otp_expiry=2;
 }
+
+
+
 
 // authentication of users services
 service AuthService{
@@ -55,7 +69,11 @@ service AuthService{
   //verfiy otp 
   rpc VerfiyOtp(OtpReq)returns(OtpRes);   
   //user login
-  rpc Login(LoginRequest)returns(LoginResponse);
+  rpc Login(LoginRequest)returns(LoginResponse); 
+  //resend otp 
+  rpc ResendOtp(ResendOtpReq) returns(ResendOtpRes);
+  
+
 }
 
 

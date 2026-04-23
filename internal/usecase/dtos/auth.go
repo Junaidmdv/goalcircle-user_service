@@ -51,3 +51,8 @@ type ResendOtpResponse struct {
 }
 
 
+type ForgotPasswordReq struct{
+	Email string 
+	Phone string 
+} 
+

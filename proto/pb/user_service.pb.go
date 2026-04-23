@@ -398,6 +398,110 @@ func (x *LoginResponse) GetAccessTokenExpiry() string {
 	return ""
 }
 
+type ResendOtpReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
+	PhoneNum      string                 `protobuf:"bytes,2,opt,name=phone_num,json=phoneNum,proto3" json:"phone_num,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ResendOtpReq) Reset() {
+	*x = ResendOtpReq{}
+	mi := &file_user_service_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ResendOtpReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ResendOtpReq) ProtoMessage() {}
+
+func (x *ResendOtpReq) ProtoReflect() protoreflect.Message {
+	mi := &file_user_service_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ResendOtpReq.ProtoReflect.Descriptor instead.
+func (*ResendOtpReq) Descriptor() ([]byte, []int) {
+	return file_user_service_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *ResendOtpReq) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+func (x *ResendOtpReq) GetPhoneNum() string {
+	if x != nil {
+		return x.PhoneNum
+	}
+	return ""
+}
+
+type ResendOtpRes struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	OtpExpiry     *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=otp_expiry,json=otpExpiry,proto3" json:"otp_expiry,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ResendOtpRes) Reset() {
+	*x = ResendOtpRes{}
+	mi := &file_user_service_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ResendOtpRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ResendOtpRes) ProtoMessage() {}
+
+func (x *ResendOtpRes) ProtoReflect() protoreflect.Message {
+	mi := &file_user_service_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ResendOtpRes.ProtoReflect.Descriptor instead.
+func (*ResendOtpRes) Descriptor() ([]byte, []int) {
+	return file_user_service_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *ResendOtpRes) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *ResendOtpRes) GetOtpExpiry() *timestamppb.Timestamp {
+	if x != nil {
+		return x.OtpExpiry
+	}
+	return nil
+}
+
 var File_user_service_proto protoreflect.FileDescriptor
 
 const file_user_service_proto_rawDesc = "" +
@@ -430,11 +534,19 @@ const file_user_service_proto_rawDesc = "" +
 	"\rLoginResponse\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12!\n" +
 	"\faccess_token\x18\x02 \x01(\tR\vaccessToken\x12.\n" +
-	"\x13access_token_expiry\x18\x03 \x01(\tR\x11accessTokenExpiry2\xa3\x01\n" +
+	"\x13access_token_expiry\x18\x03 \x01(\tR\x11accessTokenExpiry\"A\n" +
+	"\fResendOtpReq\x12\x14\n" +
+	"\x05email\x18\x01 \x01(\tR\x05email\x12\x1b\n" +
+	"\tphone_num\x18\x02 \x01(\tR\bphoneNum\"c\n" +
+	"\fResendOtpRes\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x129\n" +
+	"\n" +
+	"otp_expiry\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\totpExpiry2\xd8\x01\n" +
 	"\vAuthService\x129\n" +
 	"\bRegister\x12\x15.auth.RegisterRequest\x1a\x16.auth.RegisterResponse\x12'\n" +
 	"\tVerfiyOtp\x12\f.auth.OtpReq\x1a\f.auth.OtpRes\x120\n" +
-	"\x05Login\x12\x12.auth.LoginRequest\x1a\x13.auth.LoginResponseB8Z6github.com/junaidmdv/goalcirlcle/user_service/proto/pbb\x06proto3"
+	"\x05Login\x12\x12.auth.LoginRequest\x1a\x13.auth.LoginResponse\x123\n" +
+	"\tResendOtp\x12\x12.auth.ResendOtpReq\x1a\x12.auth.ResendOtpResB8Z6github.com/junaidmdv/goalcirlcle/user_service/proto/pbb\x06proto3"
 
 var (
 	file_user_service_proto_rawDescOnce sync.Once
@@ -448,7 +560,7 @@ func file_user_service_proto_rawDescGZIP() []byte {
 	return file_user_service_proto_rawDescData
 }
 
-var file_user_service_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_user_service_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_user_service_proto_goTypes = []any{
 	(*RegisterRequest)(nil),       // 0: auth.RegisterRequest
 	(*RegisterResponse)(nil),      // 1: auth.RegisterResponse
@@ -456,22 +568,27 @@ var file_user_service_proto_goTypes = []any{
 	(*OtpRes)(nil),                // 3: auth.OtpRes
 	(*LoginRequest)(nil),          // 4: auth.LoginRequest
 	(*LoginResponse)(nil),         // 5: auth.LoginResponse
-	(*timestamppb.Timestamp)(nil), // 6: google.protobuf.Timestamp
+	(*ResendOtpReq)(nil),          // 6: auth.ResendOtpReq
+	(*ResendOtpRes)(nil),          // 7: auth.ResendOtpRes
+	(*timestamppb.Timestamp)(nil), // 8: google.protobuf.Timestamp
 }
 var file_user_service_proto_depIdxs = []int32{
-	6, // 0: auth.RegisterResponse.otp_expires_at:type_name -> google.protobuf.Timestamp
-	6, // 1: auth.OtpRes.access_token_expiry:type_name -> google.protobuf.Timestamp
-	0, // 2: auth.AuthService.Register:input_type -> auth.RegisterRequest
-	2, // 3: auth.AuthService.VerfiyOtp:input_type -> auth.OtpReq
-	4, // 4: auth.AuthService.Login:input_type -> auth.LoginRequest
-	1, // 5: auth.AuthService.Register:output_type -> auth.RegisterResponse
-	3, // 6: auth.AuthService.VerfiyOtp:output_type -> auth.OtpRes
-	5, // 7: auth.AuthService.Login:output_type -> auth.LoginResponse
-	5, // [5:8] is the sub-list for method output_type
-	2, // [2:5] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	8, // 0: auth.RegisterResponse.otp_expires_at:type_name -> google.protobuf.Timestamp
+	8, // 1: auth.OtpRes.access_token_expiry:type_name -> google.protobuf.Timestamp
+	8, // 2: auth.ResendOtpRes.otp_expiry:type_name -> google.protobuf.Timestamp
+	0, // 3: auth.AuthService.Register:input_type -> auth.RegisterRequest
+	2, // 4: auth.AuthService.VerfiyOtp:input_type -> auth.OtpReq
+	4, // 5: auth.AuthService.Login:input_type -> auth.LoginRequest
+	6, // 6: auth.AuthService.ResendOtp:input_type -> auth.ResendOtpReq
+	1, // 7: auth.AuthService.Register:output_type -> auth.RegisterResponse
+	3, // 8: auth.AuthService.VerfiyOtp:output_type -> auth.OtpRes
+	5, // 9: auth.AuthService.Login:output_type -> auth.LoginResponse
+	7, // 10: auth.AuthService.ResendOtp:output_type -> auth.ResendOtpRes
+	7, // [7:11] is the sub-list for method output_type
+	3, // [3:7] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_user_service_proto_init() }
@@ -486,7 +603,7 @@ func file_user_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_user_service_proto_rawDesc), len(file_user_service_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

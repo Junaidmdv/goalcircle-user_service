@@ -100,11 +100,13 @@ func (uh *authHandler) Login(ctx context.Context, req *pb.LoginRequest) (*pb.Log
 		}
 		return nil, stWithDetails.Err()
 	} 
- 
-	
-
 
 	return nil, nil
+}
+
+
+func(uh *authHandler)ResendOtp(ctx context.Context,pb *pb.ResendOtpReq)(*pb.ResendOtpRes,error){
+	return nil,nil
 }
 
 

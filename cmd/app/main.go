@@ -14,7 +14,7 @@ import (
 	psql "github.com/Junaidmdv/goalcircle-user_service/internal/infrastructure/persistence/postgres"
 	"github.com/Junaidmdv/goalcircle-user_service/internal/infrastructure/redis"
 	sr "github.com/Junaidmdv/goalcircle-user_service/internal/infrastructure/server"
-	"github.com/Junaidmdv/goalcircle-user_service/internal/infrastructure/twilio"
+	"github.com/Junaidmdv/goalcircle-user_service/internal/infrastructure/otp"
 	"github.com/Junaidmdv/goalcircle-user_service/internal/infrastructure/uid"
 	at "github.com/Junaidmdv/goalcircle-user_service/internal/usecase/auth"
 	logger "github.com/Junaidmdv/goalcircle-user_service/pkg/logger"
@@ -72,7 +72,7 @@ func main() {
 
 	userRepo := repository.NewUserRepository(datbaseConnectin.DB, logger)
 	uidGenerater := uid.NewUUIDGenerater()
-	otpService := twilio.NewSMSOtpService(config.Twilio)
+	otpService := otp.NewSMSOtpService(config.Twilio)
 	redisClient := redis.NewRedisClient(config.Redis)
 	sessionStore := repository.NewSessionStorage(redisClient.Client)
 	hashingCost := 14

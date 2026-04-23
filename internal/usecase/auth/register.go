@@ -8,7 +8,7 @@ import (
 	"github.com/Junaidmdv/goalcircle-user_service/internal/domain/entity"
 	"github.com/Junaidmdv/goalcircle-user_service/internal/domain/repository"
 	"github.com/Junaidmdv/goalcircle-user_service/internal/infrastructure/bycrypt"
-	"github.com/Junaidmdv/goalcircle-user_service/internal/infrastructure/twilio"
+	"github.com/Junaidmdv/goalcircle-user_service/internal/infrastructure/otp"
 	"github.com/Junaidmdv/goalcircle-user_service/internal/infrastructure/uid"
 	uc_dtos "github.com/Junaidmdv/goalcircle-user_service/internal/usecase/dtos"
 	"github.com/Junaidmdv/goalcircle-user_service/pkg/logger"
@@ -18,8 +18,8 @@ import (
 type AuthUsecase interface {
 	InitiateUserRegistration(context.Context, *uc_dtos.RegisterRequest) (*uc_dtos.RegisterResponse, error)
 	VerifyOtp(context.Context, *uc_dtos.VerifyOtpRequest) (*uc_dtos.VerifyOtpResponse, error)
-	Login(context.Context, *uc_dtos.LoginRequest) (*uc_dtos.LoginResponse, error) 
-	ResendOtp(context.Context,*uc_dtos.ResendOtpReq)(*uc_dtos.ResendOtpResponse,error)
+	Login(context.Context, *uc_dtos.LoginRequest) (*uc_dtos.LoginResponse, error)
+	ResendOtp(context.Context, *uc_dtos.ResendOtpReq) (*uc_dtos.ResendOtpResponse, error)
 }
 
 type authUsecase struct {
@@ -27,13 +27,13 @@ type authUsecase struct {
 	logger       logger.Logger
 	timeout      *time.Duration
 	uidGenerater uid.UuidGenerater
-	otp          twilio.OtpService
+	otp          otp.OtpService
 	hash         bycrypt.PasswordHasher
 	token        *tokens.JwtMaker
 	session      repository.SessionStorage
 }
 
-func NewAuthUsecase(ur repository.UserRepository, logger logger.Logger, time *time.Duration, uidgen uid.UuidGenerater, otp twilio.OtpService, hash bycrypt.PasswordHasher, token *tokens.JwtMaker, session repository.SessionStorage) AuthUsecase {
+func NewAuthUsecase(ur repository.UserRepository, logger logger.Logger, time *time.Duration, uidgen uid.UuidGenerater, otp otp.OtpService, hash bycrypt.PasswordHasher, token *tokens.JwtMaker, session repository.SessionStorage) AuthUsecase {
 	return &authUsecase{
 		userRepo:     ur,
 		logger:       logger,
@@ -206,7 +206,7 @@ func (us *authUsecase) Login(ctx context.Context, input *uc_dtos.LoginRequest) (
 }
 
 func (us *authUsecase) ResendOtp(ctx context.Context, input *uc_dtos.ResendOtpReq) (*uc_dtos.ResendOtpResponse, error) {
-	res,err := us.userRepo.GetTempUserByEmail(ctx, input.Email); 
+	res, err := us.userRepo.GetTempUserByEmail(ctx, input.Email)
 	if err != nil {
 		return nil, err
 	}
@@ -225,11 +225,15 @@ func (us *authUsecase) ResendOtp(ctx context.Context, input *uc_dtos.ResendOtpRe
 	})
 
 	return &uc_dtos.ResendOtpResponse{
-		 Success:true,
-         OtpExpiry: otpdata.ExpiresAt,
-	},nil
+		Success:   true,
+		OtpExpiry: otpdata.ExpiresAt,
+	}, nil
 }
 
+func (us *authUsecase) ForgotPassword(ctx context.Context) {
 
+}
 
+func (us *authUsecase) RevokeSession()
 
+// func(us *authUsecase)
