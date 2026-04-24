@@ -27,20 +27,19 @@ type authUsecase struct {
 	logger       logger.Logger
 	timeout      *time.Duration
 	uidGenerater uid.UuidGenerater
-	otp          otp.OtpService
 	hash         bycrypt.PasswordHasher
 	token        *tokens.JwtMaker
 	session      repository.SessionStorage
+	email        *otp.EmailService
 }
 
-func NewAuthUsecase(ur repository.UserRepository, logger logger.Logger, time *time.Duration, uidgen uid.UuidGenerater, otp otp.OtpService, hash bycrypt.PasswordHasher, token *tokens.JwtMaker, session repository.SessionStorage) AuthUsecase {
+func NewAuthUsecase(ur repository.UserRepository, logger logger.Logger, time *time.Duration, uidgen uid.UuidGenerater, hash bycrypt.PasswordHasher, token *tokens.JwtMaker, session repository.SessionStorage, email *otp.EmailService) AuthUsecase {
 	return &authUsecase{
 		userRepo:     ur,
 		logger:       logger,
 		timeout:      time,
 		uidGenerater: uidgen,
 		hash:         hash,
-		otp:          otp,
 		token:        token,
 		session:      session,
 	}
@@ -81,15 +80,15 @@ func (us *authUsecase) InitiateUserRegistration(ctx context.Context, input *uc_d
 		return nil, err
 	}
 
-	otpres, err := us.otp.SendOtp(input.PhoneNum)
+	otp, err := us.email.SendOTP(input.Email)
 	if err != nil {
-		return nil, us.otp.ParseTwilioError(err)
+		return nil, us.email.MapMailError(err)
 	}
-	us.logger.Info("otp data", "data", otpres)
+	us.logger.Info("otp sended to the user", "email", input.Email, "otp", otp)
 
 	otpdata, err := us.userRepo.AddOtpData(ctx, &entity.Otp{
 		TempUserID: res.ID,
-		Otp:        otpres.Otp,
+		Otp:        otp,
 		Type:       string(entity.Register),
 		ExpiresAt:  otpres.ExpiresAt,
 	})

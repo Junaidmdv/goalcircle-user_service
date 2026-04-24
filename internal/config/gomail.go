@@ -11,7 +11,7 @@ type SMTPConfig struct {
 	FromEmail string
 	Password  string //mail app password is used
 	ServerURL string
-	PORT      int
+	Port      int
 }
 
 func (cb *configBuilder) WithSMTP() ConfigBuilder {
@@ -39,14 +39,14 @@ func (cb *configBuilder) WithSMTP() ConfigBuilder {
 	portStr := os.Getenv("SMTP_PORT")
 	if portStr == "" {
 		log.Printf("SMTP_PORT not set, using default: 587")
-		sc.PORT = 587
+		sc.Port = 587
 	} else {
 		port, err := strconv.Atoi(portStr) // just validate it's a number
 		if err != nil {
 			log.Printf("SMTP_PORT invalid, using default: 587")
-			sc.PORT = 587
+			sc.Port = 587
 		} else {
-			sc.PORT = port
+			sc.Port = port
 		}
 	}
 
