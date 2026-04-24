@@ -12,15 +12,22 @@ import (
 
 type EmailService struct {
 	server gomail.Dialer
+	config *config.SMTPConfig
+}
+
+type OtpResponse struct {
+	Otp    string
+	Expiry time.Duration
 }
 
 // Constructor
-func NewEmailOtpService(cfg *config.SMTPConfig) (*EmailService, error) {
+func NewEmailService(cfg *config.SMTPConfig) (*EmailService, error) {
 
 	dialer := gomail.NewDialer(cfg.ServerURL, cfg.Port, cfg.FromEmail, cfg.Password)
 
 	return &EmailService{
 		server: *dialer,
+		config: cfg,
 	}, nil
 }
 
@@ -36,10 +43,10 @@ func (e *EmailService) GenerateOTP(length int) (string, error) {
 }
 
 // Send OTP email
-func (e *EmailService) SendOTP(toEmail string) (string, error) {
+func (e *EmailService) SendOTP(toEmail string) (*OtpResponse, error) {
 	otp, err := e.GenerateOTP(6)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	m := gomail.NewMessage()
@@ -142,10 +149,13 @@ func (e *EmailService) SendOTP(toEmail string) (string, error) {
 	`, otp))
 
 	if err := e.server.DialAndSend(m); err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return otp, nil
+	return &OtpResponse{
+     Otp: otp, 
+     Expiry: e.config.OtpExpiry,
+  },nil
 }
 
 // Verify OTP

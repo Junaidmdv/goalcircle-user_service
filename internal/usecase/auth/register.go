@@ -80,17 +80,17 @@ func (us *authUsecase) InitiateUserRegistration(ctx context.Context, input *uc_d
 		return nil, err
 	}
 
-	otp, err := us.email.SendOTP(input.Email)
+	otpres, err := us.email.SendOTP(input.Email)
 	if err != nil {
 		return nil, us.email.MapMailError(err)
 	}
-	us.logger.Info("otp sended to the user", "email", input.Email, "otp", otp)
+	us.logger.Info("otp sended to the user", "email", input.Email, "otp", otpres.Otp)
 
 	otpdata, err := us.userRepo.AddOtpData(ctx, &entity.Otp{
 		TempUserID: res.ID,
-		Otp:        otp,
+		Otp:        otpres.Otp,
 		Type:       string(entity.Register),
-		ExpiresAt:  otpres.ExpiresAt,
+		ExpiresAt:  time.Now().Add(otpres.Expiry),
 	})
 	return uc_dtos.ToRegisterResponse(res, otpdata), nil
 }
@@ -210,9 +210,9 @@ func (us *authUsecase) ResendOtp(ctx context.Context, input *uc_dtos.ResendOtpRe
 		return nil, err
 	}
 
-	otpres, err := us.otp.SendOtp(input.PhoneNum)
+	otpres, err := us.email.SendOTP(input.Email)
 	if err != nil {
-		return nil, us.otp.ParseTwilioError(err)
+		return nil, us.email.MapMailError(err)
 	}
 	us.logger.Info("otp data", "data", otpres)
 
@@ -220,7 +220,7 @@ func (us *authUsecase) ResendOtp(ctx context.Context, input *uc_dtos.ResendOtpRe
 		TempUserID: res.ID,
 		Otp:        otpres.Otp,
 		Type:       string(entity.ResendOtp),
-		ExpiresAt:  otpres.ExpiresAt,
+		ExpiresAt:  time.Now().Add(otpres.Expiry),
 	})
 
 	return &uc_dtos.ResendOtpResponse{
