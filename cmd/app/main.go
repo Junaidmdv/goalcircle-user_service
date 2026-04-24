@@ -41,6 +41,7 @@ func main() {
 		WithTwilio().
 		WithJWT().
 		WithRedis().
+		WithSMTP().
 		Build()
 	logger.Info("configration is done")
 	if errs != nil {

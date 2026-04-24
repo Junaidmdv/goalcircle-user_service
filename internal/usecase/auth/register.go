@@ -72,7 +72,6 @@ func (us *authUsecase) InitiateUserRegistration(ctx context.Context, input *uc_d
 	res, err := us.userRepo.CreateOrUpdateTempUser(ctx, &entity.TempUser{
 		FullName: input.FullName,
 		Email:    input.Email,
-		PhoneNum: input.PhoneNum,
 		Password: hashedPassword,
 	})
 
@@ -110,13 +109,12 @@ func (us *authUsecase) VerifyOtp(ctx context.Context, input *uc_dtos.VerifyOtpRe
 	if time.Now().After(otpRecord.ExpiresAt) {
 		return nil, domain.NewUnAuthenticatedError("OTP expired")
 	}
+	if otpRecord.Attempts == 5 {
+		return nil, domain.NewUnAuthenticatedError("OTP has reached max attempt.Resend otp")
+	}
 
 	if otpRecord.Otp != input.Otp {
 		return nil, domain.NewUnAuthenticatedError("OTP has expired. Please request a new one")
-	}
-
-	if otpRecord.Attempts == 5 {
-		return nil, domain.NewUnAuthenticatedError("OTP has reached max attempt.Resend otp")
 	}
 
 	us.logger.Info("otp verified", "email", tempUser.Email)
@@ -229,7 +227,8 @@ func (us *authUsecase) ResendOtp(ctx context.Context, input *uc_dtos.ResendOtpRe
 	}, nil
 }
 
-func (us *authUsecase) ForgotPassword(ctx context.Context) {
+func (us *authUsecase) ForgotPassword(ctx context.Context) {  
+      
 
 }
 

@@ -158,22 +158,3 @@ func (e *EmailService) SendOTP(toEmail string) (*OtpResponse, error) {
   },nil
 }
 
-// Verify OTP
-func (e *EmailService) VerifyOTP(storedOTP, storedExpiry, inputOTP string) error {
-	// Check expiry
-	expiry, err := time.Parse(time.RFC3339, storedExpiry)
-	if err != nil {
-		return fmt.Errorf("invalid expiry format: %w", err)
-	}
-
-	if time.Now().After(expiry) {
-		return fmt.Errorf("otp has expired")
-	}
-
-	// Check match
-	if storedOTP != inputOTP {
-		return fmt.Errorf("invalid otp")
-	}
-
-	return nil
-}

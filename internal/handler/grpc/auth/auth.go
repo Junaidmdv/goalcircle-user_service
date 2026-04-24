@@ -49,7 +49,6 @@ func (uh *authHandler) Register(ctx context.Context, req *pb.RegisterRequest) (*
 	response, err := uh.authUseCase.InitiateUserRegistration(context, &ucdtos.RegisterRequest{
 		FullName:        request.FullName,
 		Email:           request.Email,
-		PhoneNum:        req.PhoneNum,
 		Password:        request.Password,
 		ConfirmPassword: request.ConfirmPassword,
 	})
@@ -76,7 +75,6 @@ func (uh *authHandler) VerifyOtp(ctx context.Context, req *pb.OtpReq) (*pb.OtpRe
 
 	res, err := uh.authUseCase.VerifyOtp(ctx, &ucdtos.VerifyOtpRequest{
 		Email:    request.Email,
-		PhoneNum: request.PhoneNum,
 		Otp:      request.Otp,
 	})
 

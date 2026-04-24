@@ -8,23 +8,20 @@ import "google/protobuf/timestamp.proto";
 
 message RegisterRequest { 
     string full_name=1;   
-    string email =2;  
-    string phone_num=3;
-    string password=4; 
-    string confirm_password=5;
+    string email =2; 
+    string password=3; 
+    string confirm_password=4;
 }   
 
 
 message RegisterResponse{
-  string email=2;  
-  string phone_num=3;
-  optional bool otp_status=4; 
-  google.protobuf.Timestamp otp_expires_at=5;
+  string email=1;  
+  optional bool otp_status=2; 
+  google.protobuf.Timestamp otp_expires_at=3;
 } 
 
 message OtpReq {
    string email=1;  
-   string phone_num=2;
    string otp=3;
 
 } 
@@ -51,7 +48,6 @@ message LoginResponse{
 
 message ResendOtpReq{
    string email=1; 
-   string phone_num=2; 
 } 
 
 message ResendOtpRes{

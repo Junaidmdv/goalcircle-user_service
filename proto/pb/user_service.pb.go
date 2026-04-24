@@ -26,9 +26,8 @@ type RegisterRequest struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	FullName        string                 `protobuf:"bytes,1,opt,name=full_name,json=fullName,proto3" json:"full_name,omitempty"`
 	Email           string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
-	PhoneNum        string                 `protobuf:"bytes,3,opt,name=phone_num,json=phoneNum,proto3" json:"phone_num,omitempty"`
-	Password        string                 `protobuf:"bytes,4,opt,name=password,proto3" json:"password,omitempty"`
-	ConfirmPassword string                 `protobuf:"bytes,5,opt,name=confirm_password,json=confirmPassword,proto3" json:"confirm_password,omitempty"`
+	Password        string                 `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty"`
+	ConfirmPassword string                 `protobuf:"bytes,4,opt,name=confirm_password,json=confirmPassword,proto3" json:"confirm_password,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -77,13 +76,6 @@ func (x *RegisterRequest) GetEmail() string {
 	return ""
 }
 
-func (x *RegisterRequest) GetPhoneNum() string {
-	if x != nil {
-		return x.PhoneNum
-	}
-	return ""
-}
-
 func (x *RegisterRequest) GetPassword() string {
 	if x != nil {
 		return x.Password
@@ -100,10 +92,9 @@ func (x *RegisterRequest) GetConfirmPassword() string {
 
 type RegisterResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Email         string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
-	PhoneNum      string                 `protobuf:"bytes,3,opt,name=phone_num,json=phoneNum,proto3" json:"phone_num,omitempty"`
-	OtpStatus     *bool                  `protobuf:"varint,4,opt,name=otp_status,json=otpStatus,proto3,oneof" json:"otp_status,omitempty"`
-	OtpExpiresAt  *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=otp_expires_at,json=otpExpiresAt,proto3" json:"otp_expires_at,omitempty"`
+	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
+	OtpStatus     *bool                  `protobuf:"varint,2,opt,name=otp_status,json=otpStatus,proto3,oneof" json:"otp_status,omitempty"`
+	OtpExpiresAt  *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=otp_expires_at,json=otpExpiresAt,proto3" json:"otp_expires_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -145,13 +136,6 @@ func (x *RegisterResponse) GetEmail() string {
 	return ""
 }
 
-func (x *RegisterResponse) GetPhoneNum() string {
-	if x != nil {
-		return x.PhoneNum
-	}
-	return ""
-}
-
 func (x *RegisterResponse) GetOtpStatus() bool {
 	if x != nil && x.OtpStatus != nil {
 		return *x.OtpStatus
@@ -169,7 +153,6 @@ func (x *RegisterResponse) GetOtpExpiresAt() *timestamppb.Timestamp {
 type OtpReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
-	PhoneNum      string                 `protobuf:"bytes,2,opt,name=phone_num,json=phoneNum,proto3" json:"phone_num,omitempty"`
 	Otp           string                 `protobuf:"bytes,3,opt,name=otp,proto3" json:"otp,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -208,13 +191,6 @@ func (*OtpReq) Descriptor() ([]byte, []int) {
 func (x *OtpReq) GetEmail() string {
 	if x != nil {
 		return x.Email
-	}
-	return ""
-}
-
-func (x *OtpReq) GetPhoneNum() string {
-	if x != nil {
-		return x.PhoneNum
 	}
 	return ""
 }
@@ -401,7 +377,6 @@ func (x *LoginResponse) GetAccessTokenExpiry() string {
 type ResendOtpReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
-	PhoneNum      string                 `protobuf:"bytes,2,opt,name=phone_num,json=phoneNum,proto3" json:"phone_num,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -439,13 +414,6 @@ func (*ResendOtpReq) Descriptor() ([]byte, []int) {
 func (x *ResendOtpReq) GetEmail() string {
 	if x != nil {
 		return x.Email
-	}
-	return ""
-}
-
-func (x *ResendOtpReq) GetPhoneNum() string {
-	if x != nil {
-		return x.PhoneNum
 	}
 	return ""
 }
@@ -506,23 +474,20 @@ var File_user_service_proto protoreflect.FileDescriptor
 
 const file_user_service_proto_rawDesc = "" +
 	"\n" +
-	"\x12user_service.proto\x12\x04auth\x1a\x1fgoogle/protobuf/timestamp.proto\"\xa8\x01\n" +
+	"\x12user_service.proto\x12\x04auth\x1a\x1fgoogle/protobuf/timestamp.proto\"\x8b\x01\n" +
 	"\x0fRegisterRequest\x12\x1b\n" +
 	"\tfull_name\x18\x01 \x01(\tR\bfullName\x12\x14\n" +
-	"\x05email\x18\x02 \x01(\tR\x05email\x12\x1b\n" +
-	"\tphone_num\x18\x03 \x01(\tR\bphoneNum\x12\x1a\n" +
-	"\bpassword\x18\x04 \x01(\tR\bpassword\x12)\n" +
-	"\x10confirm_password\x18\x05 \x01(\tR\x0fconfirmPassword\"\xba\x01\n" +
+	"\x05email\x18\x02 \x01(\tR\x05email\x12\x1a\n" +
+	"\bpassword\x18\x03 \x01(\tR\bpassword\x12)\n" +
+	"\x10confirm_password\x18\x04 \x01(\tR\x0fconfirmPassword\"\x9d\x01\n" +
 	"\x10RegisterResponse\x12\x14\n" +
-	"\x05email\x18\x02 \x01(\tR\x05email\x12\x1b\n" +
-	"\tphone_num\x18\x03 \x01(\tR\bphoneNum\x12\"\n" +
+	"\x05email\x18\x01 \x01(\tR\x05email\x12\"\n" +
 	"\n" +
-	"otp_status\x18\x04 \x01(\bH\x00R\totpStatus\x88\x01\x01\x12@\n" +
-	"\x0eotp_expires_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\fotpExpiresAtB\r\n" +
-	"\v_otp_status\"M\n" +
+	"otp_status\x18\x02 \x01(\bH\x00R\totpStatus\x88\x01\x01\x12@\n" +
+	"\x0eotp_expires_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\fotpExpiresAtB\r\n" +
+	"\v_otp_status\"0\n" +
 	"\x06OtpReq\x12\x14\n" +
-	"\x05email\x18\x01 \x01(\tR\x05email\x12\x1b\n" +
-	"\tphone_num\x18\x02 \x01(\tR\bphoneNum\x12\x10\n" +
+	"\x05email\x18\x01 \x01(\tR\x05email\x12\x10\n" +
 	"\x03otp\x18\x03 \x01(\tR\x03otp\"\x90\x01\n" +
 	"\x06OtpRes\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12!\n" +
@@ -534,10 +499,9 @@ const file_user_service_proto_rawDesc = "" +
 	"\rLoginResponse\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12!\n" +
 	"\faccess_token\x18\x02 \x01(\tR\vaccessToken\x12.\n" +
-	"\x13access_token_expiry\x18\x03 \x01(\tR\x11accessTokenExpiry\"A\n" +
+	"\x13access_token_expiry\x18\x03 \x01(\tR\x11accessTokenExpiry\"$\n" +
 	"\fResendOtpReq\x12\x14\n" +
-	"\x05email\x18\x01 \x01(\tR\x05email\x12\x1b\n" +
-	"\tphone_num\x18\x02 \x01(\tR\bphoneNum\"c\n" +
+	"\x05email\x18\x01 \x01(\tR\x05email\"c\n" +
 	"\fResendOtpRes\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x129\n" +
 	"\n" +

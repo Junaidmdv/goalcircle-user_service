@@ -13,14 +13,13 @@ import (
 
 type UserRepository interface {
 	CheckEmailExist(context.Context, string) error
-	ExistByPhoneNum(context.Context, string) error
 	CreateOrUpdateTempUser(context.Context, *entity.TempUser) (*entity.TempUser, error)
 	GetTempUserByEmail(context.Context, string) (*entity.TempUser, error)
 	AddOtpData(context.Context, *entity.Otp) (*entity.Otp, error)
 	GetLatestOtpRecord(context.Context, uint) (*entity.Otp, error)
 	CreateUser(context.Context, *entity.User) (*entity.User, error)
-	GetUserByEmail(context.Context, string) (*entity.User, error) 
-	CheckEmailExistInTempUser(context.Context,string)error
+	GetUserByEmail(context.Context, string) (*entity.User, error)
+	CheckEmailExistInTempUser(context.Context, string) error
 }
 
 type userRepository struct {
@@ -65,11 +64,10 @@ func (ur *userRepository) CreateOrUpdateTempUser(ctx context.Context, tempUser *
 		   ON CONFLICT(email) 
 		   DO UPDATE SET 
 		   full_name=EXCLUDED.full_name,
-		   phone_num=EXCLUDED.phone_num, 
 		   password=EXCLUDED.password, 
            deleted_at=null 
 		   RETURNING *
-		   `, tempUser.FullName, tempUser.Email, tempUser.PhoneNum, tempUser.Password).Scan(&tempUser).Error; err != nil {
+		   `, tempUser.FullName, tempUser.Email, tempUser.Password).Scan(&tempUser).Error; err != nil {
 		return nil, domain.NewInternalError("Something went wrong. Please try again later.", err)
 	}
 	return tempUser, nil
@@ -84,26 +82,6 @@ func (ur *userRepository) AddOtpData(ctx context.Context, otp *entity.Otp) (*ent
 	}
 	return otp, nil
 
-}
-
-func (ur *userRepository) ExistByPhoneNum(ctx context.Context, phone_num string) error {
-	var count int64
-	err := ur.db.WithContext(ctx).
-		Model(&entity.User{}).
-		Where("phone_num = ?", phone_num).
-		Count(&count).
-		Error
-	if err != nil {
-		ur.logger.Error("databse error", "error", err)
-		return domain.NewInternalError("Something went wrong. Please try again later. ", err)
-	}
-
-	if count > 0 {
-		ur.logger.Error("dublicate account", "error", err)
-		return domain.NewConflictError("phone number is already exist")
-	}
-
-	return nil
 }
 
 func (ur *userRepository) GetTempUserByEmail(ctx context.Context, email string) (*entity.TempUser, error) {

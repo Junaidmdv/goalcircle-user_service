@@ -10,7 +10,6 @@ func ToRegisterReq(res *pb.RegisterRequest) *RegisterRequest {
 	return &RegisterRequest{
 		FullName:        res.FullName,
 		Email:           res.Email,
-		PhoneNum:        res.PhoneNum,
 		Password:        res.Password,
 		ConfirmPassword: res.ConfirmPassword,
 	}
@@ -19,7 +18,6 @@ func ToRegisterReq(res *pb.RegisterRequest) *RegisterRequest {
 func ToRegisterResponse(res *dtos.RegisterResponse) *pb.RegisterResponse {
 	return &pb.RegisterResponse{
 		Email:        res.Email,
-		PhoneNum:     res.PhoneNum,
 		OtpStatus:    &res.OtpStatus,
 		OtpExpiresAt: timestamppb.New(res.OtpExpiry),
 	}
@@ -28,7 +26,6 @@ func ToRegisterResponse(res *dtos.RegisterResponse) *pb.RegisterResponse {
 func ToVerifyOtpReq(res *pb.OtpReq) *VerifyOtpReq {
 	return &VerifyOtpReq{
 		Email:    res.Email,
-		PhoneNum: res.PhoneNum,
 		Otp:      res.Otp,
 	}
 }
