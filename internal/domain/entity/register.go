@@ -15,13 +15,12 @@ type TempUser struct {
 }
 
 type Otp struct {
-	ID         uint `gorm:"primaryKey:autoIncrement"`
-	TempUserID uint `gorm:"not null"`
-	Otp        string
-	Type       string
-	Attempts   int
-	ExpiresAt  time.Time
-	CreatedAt  time.Time
-	DeletedAt  time.Time
-	TempUser   TempUser
+	ID        uint   `gorm:"primaryKey:autoIncrement"`
+	Email     string `gorm:"not null;uniqueIndex:uq_otp_email_type"`
+	Otp       string
+	Type      string `gorm:"not null;uniqueIndex:uq_otp_email_type"`
+	Attempts  int
+	ExpiresAt time.Time
+	CreatedAt time.Time
+	DeletedAt time.Time
 }

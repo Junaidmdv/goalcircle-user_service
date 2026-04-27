@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"github.com/Junaidmdv/goalcircle-user_service/internal/domain"
 	"github.com/Junaidmdv/goalcircle-user_service/internal/domain/entity"
@@ -11,6 +12,7 @@ import (
 
 type SessionStorage interface {
 	SaveSession(context.Context, string, *entity.Session) error
+	GetSession(context.Context, string) (*entity.Session, error)
 }
 
 type sessionStorage struct {
@@ -26,12 +28,26 @@ func NewSessionStorage(redis_client *redis.Client) SessionStorage {
 
 func (rs *sessionStorage) SaveSession(ctx context.Context, key string, session *entity.Session) error {
 
-	_, err := rs.redis.HSet(ctx, key, session).Result()
+	pipe := rs.redis.Pipeline()
+	pipe.HSet(ctx, key, *session)
+	expiresAt, _ := time.Parse(time.RFC3339, session.ExpiresAt)
+	pipe.ExpireAt(ctx, key, expiresAt)
+
+	_, err := pipe.Exec(ctx)
 	if err != nil {
 		rs.logger.Error("failed store session data", "error", err, "data", session)
-		return domain.NewInternalError("Something went wrong.Please try again later", err)
+		return domain.NewInternalError("Something went wrong. Please try again later", err)
 	}
 
 	return nil
+}
 
+func (rs *sessionStorage) GetSession(ctx context.Context, key string) (*entity.Session, error) {
+	var session entity.Session
+	err := rs.redis.HGetAll(ctx, key).Scan(&session)
+	if err != nil {
+		rs.logger.Error("redis error", "error", err, "method", "GetSession")
+		return nil, domain.NewInternalError("Something went wrong. Please try again later", err)
+	}
+	return &session, nil
 }

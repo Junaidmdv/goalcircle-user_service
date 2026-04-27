@@ -12,6 +12,7 @@ type JWTConfig struct {
 	SecretKey       string
 	AccessTokenExp  time.Duration
 	RefreshTokenExp time.Duration
+	ResetTokenExp   time.Duration
 }
 
 func (cb *configBuilder) WithJWT() ConfigBuilder {
@@ -46,6 +47,18 @@ func (cb *configBuilder) WithJWT() ConfigBuilder {
 		return cb
 	}
 	jc.RefreshTokenExp = refreshDuration
+
+	resetPasswordTokenExpStr := os.Getenv("REFRESH_TOKEN_EXPIRYTIME")
+	if refreshTokenExpStr == "" {
+		log.Printf("REFRESH_TOKEN_EXPIRYTIME not set, using default: 5m")
+		resetPasswordTokenExpStr = "5m"
+	}
+	resetPasswordTokenDuration, err := time.ParseDuration(resetPasswordTokenExpStr)
+	if err != nil {
+		cb.errors = append(cb.errors, fmt.Errorf("invalid REFRESH_TOKEN_EXPIRYTIME: %w", err))
+		return cb
+	}
+	jc.ResetTokenExp = resetPasswordTokenDuration
 
 	cb.config.JWT = jc
 	return cb

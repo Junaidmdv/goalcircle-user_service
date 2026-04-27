@@ -12,6 +12,7 @@ const (
 	ErrorInvalidArguement
 	ErrorDeadlineExceed
 	ErrorUnAuthenticated
+	ErrorBadRequest
 )
 
 type DomainError struct {
@@ -62,4 +63,11 @@ func NewUnAuthenticatedError(msg string) *DomainError {
 		Message: msg,
 	}
 
+}
+
+func NewBadRequestError(msg string) *DomainError {
+	return &DomainError{
+		Type:    ErrorBadRequest,
+		Message: msg,
+	}
 }

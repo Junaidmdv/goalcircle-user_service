@@ -1,6 +1,10 @@
 package dtos
 
-import "time"
+import (
+	"time"
+
+	"github.com/Junaidmdv/goalcircle-user_service/internal/domain/entity"
+)
 
 type RegisterRequest struct {
 	FullName        string
@@ -16,14 +20,20 @@ type RegisterResponse struct {
 }
 
 type VerifyOtpRequest struct {
-	Email    string
-	Otp      string
+	Email string
+	Otp   string
 }
 
 type VerifyOtpResponse struct {
-	UserId            string
-	AccessToken       string
-	AceessTokenExpiry time.Time
+	Success            bool
+	SessionId          string
+	UserId             string
+	FullName           string
+	Email              string
+	AccessToken        string
+	AceessTokenExpiry  time.Time
+	RefreshToken       string
+	RefreshTokenExpiry time.Time
 }
 
 type LoginRequest struct {
@@ -32,22 +42,72 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	UserId            string
-	AccessToken       string
-	AccessTokenExpiry time.Time
+	SessionId          string
+	UserId             string
+	Email              string
+	FullName           string
+	AccessToken        string
+	AccessTokenExpiry  time.Time
+	RefreshToken       string
+	RefreshTokenExpiry time.Time
 }
 
 type ResendOtpReq struct {
-	Email    string
+	Email   string
+	OtpType entity.OtpType
 }
 
 type ResendOtpResponse struct {
-	Success bool 
-	OtpExpiry time.Time 
+	Success   bool
+	OtpExpiry time.Time
 }
 
+type ForgotPasswordReq struct {
+	Email string
+}
 
-type ForgotPasswordReq struct{
-	Email string 
+type ForgotPasswordRes struct {
+	Success   bool
+	ExpiresAt time.Time
+}
+
+type VerifyForgotPasswordOtpReq struct {
+	Email string
+	Otp   string
+}
+
+type VerifyForgotPasswordOtpRes struct {
+	Success    bool
+	ResetToken string
+	ExpiresAt  time.Time
+}
+
+type ResetPasswordRes struct {
+	Success bool
+}
+
+type ResetPasswordReq struct {
+	Email      string
+	Password   string
+	ResetToken string
+}
+
+type RenewAcccessTokenReq struct {
+	RefreshToken string
+}
+
+type RenewAccessTokenRes struct {
+	AccessToken       string
+	AccessTokenExpiry time.Time
+}
+ 
+
+
+type LogOutReq struct{
+    RefreshToken string 
 } 
 
+
+type LogOutRes struct{
+
+}

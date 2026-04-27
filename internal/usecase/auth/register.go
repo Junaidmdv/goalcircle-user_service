@@ -2,6 +2,8 @@ package usecase
 
 import (
 	"context"
+	"errors"
+	"strconv"
 	"time"
 
 	"github.com/Junaidmdv/goalcircle-user_service/internal/domain"
@@ -20,6 +22,9 @@ type AuthUsecase interface {
 	VerifyOtp(context.Context, *uc_dtos.VerifyOtpRequest) (*uc_dtos.VerifyOtpResponse, error)
 	Login(context.Context, *uc_dtos.LoginRequest) (*uc_dtos.LoginResponse, error)
 	ResendOtp(context.Context, *uc_dtos.ResendOtpReq) (*uc_dtos.ResendOtpResponse, error)
+	VerifyForgotPasswordOtp(context.Context, *uc_dtos.VerifyForgotPasswordOtpReq) (*uc_dtos.VerifyForgotPasswordOtpRes, error)
+	ForgotPassword(context.Context, *uc_dtos.ForgotPasswordReq) (*uc_dtos.ForgotPasswordRes, error)
+	ResetPassword(context.Context, *uc_dtos.ResetPasswordReq) (*uc_dtos.ResetPasswordRes, error)
 }
 
 type authUsecase struct {
@@ -47,21 +52,14 @@ func NewAuthUsecase(ur repository.UserRepository, logger logger.Logger, time *ti
 
 func (us *authUsecase) InitiateUserRegistration(ctx context.Context, input *uc_dtos.RegisterRequest) (*uc_dtos.RegisterResponse, error) {
 
-	if err := us.userRepo.CheckEmailExist(ctx, input.Email); err != nil {
+	exist, err := us.userRepo.CheckEmailExist(ctx, input.Email)
+	if err != nil {
 		return nil, err
 	}
 
-	//phone number dublicate exist checking validation is added. But commented twilio is free tier only access verified number
-
-	// exist, err = us.userRepo.ExistByPhoneNum(ctx, input.PhoneNum)
-	// if err != nil {
-	// 	us.logger.Error("internal error", zap.Error(err))
-	// 	return nil, domain.NewInternalError("something went wrong", err)
-	// }
-	// if exist {
-	// 	us.logger.Warn("dublicate email", errors.New("phone number already exist"))
-	// 	return nil, domain.NewConflictError("phone number already exist")
-	// }
+	if exist {
+		return nil, domain.NewConflictError("an account with this email already exists. Please sign in or use a different email")
+	}
 
 	hashedPassword, err := us.hash.HashPassword(input.Password)
 	if err != nil {
@@ -86,10 +84,10 @@ func (us *authUsecase) InitiateUserRegistration(ctx context.Context, input *uc_d
 	us.logger.Info("otp sended to the user", "email", input.Email, "otp", otpres.Otp)
 
 	otpdata, err := us.userRepo.AddOtpData(ctx, &entity.Otp{
-		TempUserID: res.ID,
-		Otp:        otpres.Otp,
-		Type:       string(entity.Register),
-		ExpiresAt:  time.Now().Add(otpres.Expiry),
+		Email:     input.Email,
+		Otp:       otpres.Otp,
+		Type:      string(entity.Register),
+		ExpiresAt: time.Now().Add(otpres.Expiry),
 	})
 	return uc_dtos.ToRegisterResponse(res, otpdata), nil
 }
@@ -101,21 +99,28 @@ func (us *authUsecase) VerifyOtp(ctx context.Context, input *uc_dtos.VerifyOtpRe
 		return nil, err
 	}
 
-	otpRecord, err := us.userRepo.GetLatestOtpRecord(ctx, tempUser.ID)
+	otpRecord, err := us.userRepo.GetLatestOtpRecord(ctx, tempUser.Email, entity.Register)
 	if err != nil {
 		return nil, err
+	}
+
+	if otpRecord.Attempts == entity.OtpMaxAttempts {
+		return nil, domain.NewUnAuthenticatedError("OTP has reached max attempt.Resend otp")
 	}
 
 	if time.Now().After(otpRecord.ExpiresAt) {
 		return nil, domain.NewUnAuthenticatedError("OTP expired")
 	}
-	if otpRecord.Attempts == 5 {
-		return nil, domain.NewUnAuthenticatedError("OTP has reached max attempt.Resend otp")
-	}
 
 	if otpRecord.Otp != input.Otp {
+
+		if err := us.userRepo.UpdateOtpAttempts(ctx, input.Email, entity.Register); err != nil {
+			return nil, err
+		}
 		return nil, domain.NewUnAuthenticatedError("OTP has expired. Please request a new one")
 	}
+
+	us.userRepo.DeleteOtp(ctx, otpRecord.ID)
 
 	us.logger.Info("otp verified", "email", tempUser.Email)
 
@@ -148,17 +153,22 @@ func (us *authUsecase) VerifyOtp(ctx context.Context, input *uc_dtos.VerifyOtpRe
 		ID:           refreshClaims.ID,
 		UserEmail:    refreshClaims.Email,
 		RefreshToken: refreshToken,
-		IsRevoked:    false,
-		CreatedAt:    time.Now(),
-		ExpiresAt:    refreshClaims.ExpiresAt.Time,
+		IsRevoked:    strconv.FormatBool(false),
+		CreatedAt:    time.Now().Format(time.RFC3339),
+		ExpiresAt:    refreshClaims.ExpiresAt.Time.Format(time.RFC3339),
 	}); err != nil {
 		return nil, err
 	}
 
 	return &uc_dtos.VerifyOtpResponse{
-		UserId:            user.Id,
-		AccessToken:       accessToken,
-		AceessTokenExpiry: accessClaims.ExpiresAt.Time,
+		SessionId:          refreshClaims.ID,
+		UserId:             user.Id,
+		FullName:           user.FullName,
+		Email:              user.Email,
+		AccessToken:        accessToken,
+		AceessTokenExpiry:  accessClaims.ExpiresAt.Time,
+		RefreshToken:       refreshToken,
+		RefreshTokenExpiry: refreshClaims.ExpiresAt.Time,
 	}, nil
 
 }
@@ -185,53 +195,231 @@ func (us *authUsecase) Login(ctx context.Context, input *uc_dtos.LoginRequest) (
 		return nil, domain.NewInternalError("Something went wrong.Please try again later.", err)
 	}
 
-	if err := us.session.SaveSession(ctx, "session:"+refreshClaims.ID, &entity.Session{
+	key := "session:" + refreshClaims.ID
+	if err := us.session.SaveSession(ctx, key, &entity.Session{
 		ID:           refreshClaims.ID,
 		UserEmail:    refreshClaims.Email,
 		RefreshToken: refreshToken,
-		IsRevoked:    false,
-		CreatedAt:    time.Now(),
-		ExpiresAt:    refreshClaims.ExpiresAt.Time,
+		IsRevoked:    strconv.FormatBool(false),
+		CreatedAt:    time.Now().Format(time.RFC3339),
+		ExpiresAt:    refreshClaims.ExpiresAt.Time.Format(time.RFC3339),
 	}); err != nil {
 		return nil, err
 	}
 	return &uc_dtos.LoginResponse{
-		UserId:            user.Id,
-		AccessToken:       accessToken,
-		AccessTokenExpiry: accessClaims.ExpiresAt.Time,
+		SessionId:          refreshClaims.ID,
+		UserId:             user.Id,
+		FullName:           user.FullName,
+		Email:              user.Email,
+		AccessToken:        accessToken,
+		AccessTokenExpiry:  accessClaims.ExpiresAt.Time,
+		RefreshToken:       refreshToken,
+		RefreshTokenExpiry: refreshClaims.ExpiresAt.Time,
 	}, nil
 }
 
 func (us *authUsecase) ResendOtp(ctx context.Context, input *uc_dtos.ResendOtpReq) (*uc_dtos.ResendOtpResponse, error) {
-	res, err := us.userRepo.GetTempUserByEmail(ctx, input.Email)
+	switch input.OtpType {
+	case entity.Register:
+		exist, err := us.userRepo.CheckEmailExistInTempUser(ctx, input.Email)
+		if err != nil {
+			return nil, err
+		}
+		if !exist {
+			return nil, domain.NewNotFoundError("email not found. Please register first")
+		}
+
+	case entity.ForgotPassword:
+		exist, err := us.userRepo.CheckEmailExist(ctx, input.Email)
+		if err != nil {
+			return nil, err
+		}
+		if !exist {
+			return nil, domain.NewNotFoundError("email not found. Please use your registered email")
+		}
+
+	default:
+		return nil, domain.NewBadRequestError("invalid OTP type")
+	}
+
+	otpRes, err := us.email.SendOTP(input.Email)
+	if err != nil {
+		return nil, us.email.MapMailError(err)
+	}
+
+	us.logger.Info("otp resent", "email", input.Email, "type", input.OtpType)
+
+	otpData, err := us.userRepo.AddOtpData(ctx, &entity.Otp{
+		Email:     input.Email,
+		Otp:       otpRes.Otp,
+		Type:      string(input.OtpType),
+		ExpiresAt: time.Now().Add(otpRes.Expiry),
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	otpres, err := us.email.SendOTP(input.Email)
-	if err != nil {
-		return nil, us.email.MapMailError(err)
-	}
-	us.logger.Info("otp data", "data", otpres)
-
-	otpdata, err := us.userRepo.AddOtpData(ctx, &entity.Otp{
-		TempUserID: res.ID,
-		Otp:        otpres.Otp,
-		Type:       string(entity.ResendOtp),
-		ExpiresAt:  time.Now().Add(otpres.Expiry),
-	})
-
 	return &uc_dtos.ResendOtpResponse{
 		Success:   true,
-		OtpExpiry: otpdata.ExpiresAt,
+		OtpExpiry: otpData.ExpiresAt,
 	}, nil
 }
 
-func (us *authUsecase) ForgotPassword(ctx context.Context) {  
-      
+func (uc *authUsecase) ForgotPassword(ctx context.Context, input *uc_dtos.ForgotPasswordReq) (*uc_dtos.ForgotPasswordRes, error) {
+	exist, err := uc.userRepo.CheckEmailExist(ctx, input.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	if !exist {
+		return nil, domain.NewNotFoundError("email not found.User registered email")
+	}
+
+	otp, err := uc.email.SendOTP(input.Email)
+	if err != nil {
+		return nil, uc.email.MapMailError(err)
+	}
+
+	otpdata, err := uc.userRepo.AddOtpData(ctx, &entity.Otp{
+		Email:    input.Email,
+		Otp:      otp.Otp,
+		Type:     string(entity.ForgotPassword),
+		Attempts: 0,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &uc_dtos.ForgotPasswordRes{
+		Success:   true,
+		ExpiresAt: otpdata.ExpiresAt,
+	}, nil
+}
+
+func (uc *authUsecase) VerifyForgotPasswordOtp(ctx context.Context, input *uc_dtos.VerifyForgotPasswordOtpReq) (*uc_dtos.VerifyForgotPasswordOtpRes, error) {
+	exist, err := uc.userRepo.CheckEmailExist(ctx, input.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	if !exist {
+		return nil, domain.NewNotFoundError("email not found.User registered email")
+	}
+
+	otpRecord, err := uc.userRepo.GetLatestOtpRecord(ctx, input.Email, entity.ForgotPassword)
+	if err != nil {
+		return nil, err
+	}
+	if otpRecord.Attempts == entity.OtpMaxAttempts {
+		return nil, domain.NewUnAuthenticatedError("OTP has reached max attempt.Resend otp")
+	}
+
+	if time.Now().After(otpRecord.ExpiresAt) {
+		return nil, domain.NewUnAuthenticatedError("OTP expired.Resent otp")
+	}
+
+	if otpRecord.Otp != input.Otp {
+
+		if err := uc.userRepo.UpdateOtpAttempts(ctx, input.Email, entity.Register); err != nil {
+			return nil, err
+		}
+		return nil, domain.NewUnAuthenticatedError("Invalid otp.")
+	}
+
+	if err := uc.userRepo.DeleteOtp(ctx, otpRecord.ID); err != nil {
+		return nil, err
+	}
+
+	uc.logger.Info("forgot password otp verified", "email", input.Email)
+
+	user, err := uc.userRepo.GetUserByEmail(ctx, input.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	token, resetTokeClaims, err := uc.token.GenerateToken(user.Id, user.Email, "reset", uc.token.ResetPasswordTokenExpirty)
+	if err != nil {
+		uc.logger.Error("failed generate token", "method", "verify forget password", "layer", "usecase")
+		return nil, domain.NewInternalError("Something went wrong. Please try again later.", err)
+	}
+
+	return &uc_dtos.VerifyForgotPasswordOtpRes{
+		Success:    true,
+		ResetToken: token,
+		ExpiresAt:  resetTokeClaims.ExpiresAt.Time,
+	}, nil
 
 }
 
-func (us *authUsecase) RevokeSession()
+func (uc *authUsecase) ResetPassword(ctx context.Context, input *uc_dtos.ResetPasswordReq) (*uc_dtos.ResetPasswordRes, error) {
+	claims, err := uc.token.VerifyToken(input.ResetToken)
+	if err != nil {
+		uc.logger.Warn("invalid reset token", "method", "ResetPassword", "error", err)
+		return nil, err
+	}
 
-// func(us *authUsecase)
+	if claims.Role != "reset" {
+		uc.logger.Warn("invalid otp", "error", "invalid role", "method", "reset password")
+		return nil, domain.NewUnAuthenticatedError("invalid otp")
+	}
+
+	hashedPassword, err := uc.hash.HashPassword(input.Password)
+	if err != nil {
+		uc.logger.Error("Failed hash password", "method", "ResetPassword", "error", err)
+		return nil, domain.NewInternalError("Something went wrong. Please try again later", err)
+	}
+
+	if err := uc.userRepo.UpdatePassword(ctx, claims.Email, hashedPassword); err != nil {
+		return nil, err
+	}
+
+	return &uc_dtos.ResetPasswordRes{
+		Success: true,
+	}, nil
+}
+
+func (uc *authUsecase) RenewAccessToken(ctx context.Context, input *uc_dtos.RenewAcccessTokenReq) (*uc_dtos.RenewAccessTokenRes, error) {
+	claims, err := uc.token.VerifyToken(input.RefreshToken)
+	if err != nil {
+		return nil, err
+	}
+
+	key := "session:" + claims.ID
+
+	sessiondata, err := uc.session.GetSession(ctx, key)
+	if err != nil {
+		return nil, err
+	}
+
+	isRevoked, _ := strconv.ParseBool(sessiondata.IsRevoked)
+	if isRevoked {
+		uc.logger.Info("invalid token", "error", "user token revoked")
+		return nil, domain.NewUnAuthenticatedError("Invalid refresh token.Please login again")
+	}
+
+	if sessiondata.UserEmail != claims.Email {
+		uc.logger.Warn("invalid token", "error", errors.New("token email mismatch"))
+		return nil, domain.NewUnAuthenticatedError("Invalid refresh token. Please login again")
+	}
+
+	accessToken, accessClaims, err := uc.token.GenerateToken(sessiondata.ID, sessiondata.UserEmail, claims.Role, uc.token.AccessTokenExpiry)
+	if err != nil {
+		return nil, err
+	}
+
+	return &uc_dtos.RenewAccessTokenRes{
+		AccessToken:       accessToken,
+		AccessTokenExpiry: accessClaims.ExpiresAt.Time,
+	}, nil
+
+}
+
+
+
+func(uc *authUsecase)Logout(ctx context.Context,input *uc_dtos.LogOutReq)(*uc_dtos.LogOutRes,error){
+     
+	claims,err:=uc.token.VerifyToken(input.RefreshToken) 
+	if err != nil{
+		return nil,err
+	}
+} 
