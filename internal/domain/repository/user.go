@@ -23,7 +23,8 @@ type UserRepository interface {
 	CheckEmailExistInTempUser(context.Context, string) (bool, error)
 	UpdateOtpAttempts(context.Context, string, entity.OtpType) error
 	UpdatePassword(context.Context, string, string) error
-	DeleteOtp(context.Context, uint) error
+	DeleteOtp(context.Context, uint) error  
+	UpdateUserType(context.Context,string,entity.UserRole)error
 }
 
 type userRepository struct {
@@ -199,7 +200,6 @@ func (ur *userRepository) UpdateOtpAttempts(ctx context.Context, email string, t
 }
 
 func (ur *userRepository) UpdatePassword(ctx context.Context, email string, password string) error {
-
 	if err := ur.db.WithContext(ctx).Where("email=?", email).Model(&entity.User{}).Update("password=?", password).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			ur.logger.Warn("user email not found", "email", email)
@@ -216,6 +216,19 @@ func (ur *userRepository) DeleteOtp(ctx context.Context, id uint) error {
 	if err := ur.db.WithContext(ctx).Delete(&entity.Otp{}, id).Error; err != nil {
 		ur.logger.Error("database error", "error", err, "method", "Delete otp")
 		return domain.NewInternalError("Something went wrong. Please try again later", err)
+	}
+	return nil
+}
+
+func (ur *userRepository) UpdateUserType(ctx context.Context, userId string, role entity.UserRole) error {
+
+	if err := ur.db.WithContext(ctx).Where("id=?", userId).Update("user_type=?", role).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			ur.logger.Warn("user email not found", "email", userId)
+			return domain.NewNotFoundError("user account not found")
+		}
+		ur.logger.Error("databser error", "error", err, "method", "UpdateOnboardingRole")
+		return domain.NewInternalError("Something went wrong. plase try again later.", err)
 	}
 	return nil
 }

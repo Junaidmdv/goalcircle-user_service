@@ -13,6 +13,7 @@ import (
 type SessionStorage interface {
 	SaveSession(context.Context, string, *entity.Session) error
 	GetSession(context.Context, string) (*entity.Session, error)
+	DeleteSession(context.Context, string) error
 }
 
 type sessionStorage struct {
@@ -51,3 +52,18 @@ func (rs *sessionStorage) GetSession(ctx context.Context, key string) (*entity.S
 	}
 	return &session, nil
 }
+
+func (rs *sessionStorage) DeleteSession(ctx context.Context, key string) error {
+	deleted, err := rs.redis.Del(ctx, key).Result()
+	if err != nil {
+		rs.logger.Error("failed to delete session", "error", err, "key", key)
+		return domain.NewInternalError("Something went wrong. Please try again later", err)
+	}
+
+	if deleted == 0 {
+		return domain.NewNotFoundError("session not found")
+	}
+
+	return nil
+}
+ 
