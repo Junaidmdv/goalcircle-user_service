@@ -150,7 +150,7 @@ func (x *RegisterResponse) GetOtpExpiresAt() *timestamppb.Timestamp {
 	return nil
 }
 
-type OtpReq struct {
+type VerifyOtpReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
 	Otp           string                 `protobuf:"bytes,3,opt,name=otp,proto3" json:"otp,omitempty"`
@@ -158,20 +158,20 @@ type OtpReq struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *OtpReq) Reset() {
-	*x = OtpReq{}
+func (x *VerifyOtpReq) Reset() {
+	*x = VerifyOtpReq{}
 	mi := &file_user_service_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *OtpReq) String() string {
+func (x *VerifyOtpReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*OtpReq) ProtoMessage() {}
+func (*VerifyOtpReq) ProtoMessage() {}
 
-func (x *OtpReq) ProtoReflect() protoreflect.Message {
+func (x *VerifyOtpReq) ProtoReflect() protoreflect.Message {
 	mi := &file_user_service_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -183,48 +183,54 @@ func (x *OtpReq) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use OtpReq.ProtoReflect.Descriptor instead.
-func (*OtpReq) Descriptor() ([]byte, []int) {
+// Deprecated: Use VerifyOtpReq.ProtoReflect.Descriptor instead.
+func (*VerifyOtpReq) Descriptor() ([]byte, []int) {
 	return file_user_service_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *OtpReq) GetEmail() string {
+func (x *VerifyOtpReq) GetEmail() string {
 	if x != nil {
 		return x.Email
 	}
 	return ""
 }
 
-func (x *OtpReq) GetOtp() string {
+func (x *VerifyOtpReq) GetOtp() string {
 	if x != nil {
 		return x.Otp
 	}
 	return ""
 }
 
-type OtpRes struct {
-	state             protoimpl.MessageState `protogen:"open.v1"`
-	UserId            string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	AccessToken       string                 `protobuf:"bytes,2,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
-	AccessTokenExpiry *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=access_token_expiry,json=accessTokenExpiry,proto3" json:"access_token_expiry,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+type VerifyOtpRes struct {
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	Success            bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	SessionId          string                 `protobuf:"bytes,2,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	UserId             string                 `protobuf:"bytes,3,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	FullName           string                 `protobuf:"bytes,4,opt,name=full_name,json=fullName,proto3" json:"full_name,omitempty"`
+	Email              string                 `protobuf:"bytes,5,opt,name=email,proto3" json:"email,omitempty"`
+	AccessToken        string                 `protobuf:"bytes,6,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
+	AccessTokenExpiry  *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=access_token_expiry,json=accessTokenExpiry,proto3" json:"access_token_expiry,omitempty"`
+	RefreshToken       string                 `protobuf:"bytes,8,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"`
+	RefreshTokenExpiry *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=refresh_token_expiry,json=refreshTokenExpiry,proto3" json:"refresh_token_expiry,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
-func (x *OtpRes) Reset() {
-	*x = OtpRes{}
+func (x *VerifyOtpRes) Reset() {
+	*x = VerifyOtpRes{}
 	mi := &file_user_service_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *OtpRes) String() string {
+func (x *VerifyOtpRes) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*OtpRes) ProtoMessage() {}
+func (*VerifyOtpRes) ProtoMessage() {}
 
-func (x *OtpRes) ProtoReflect() protoreflect.Message {
+func (x *VerifyOtpRes) ProtoReflect() protoreflect.Message {
 	mi := &file_user_service_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -236,28 +242,70 @@ func (x *OtpRes) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use OtpRes.ProtoReflect.Descriptor instead.
-func (*OtpRes) Descriptor() ([]byte, []int) {
+// Deprecated: Use VerifyOtpRes.ProtoReflect.Descriptor instead.
+func (*VerifyOtpRes) Descriptor() ([]byte, []int) {
 	return file_user_service_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *OtpRes) GetUserId() string {
+func (x *VerifyOtpRes) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *VerifyOtpRes) GetSessionId() string {
+	if x != nil {
+		return x.SessionId
+	}
+	return ""
+}
+
+func (x *VerifyOtpRes) GetUserId() string {
 	if x != nil {
 		return x.UserId
 	}
 	return ""
 }
 
-func (x *OtpRes) GetAccessToken() string {
+func (x *VerifyOtpRes) GetFullName() string {
+	if x != nil {
+		return x.FullName
+	}
+	return ""
+}
+
+func (x *VerifyOtpRes) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+func (x *VerifyOtpRes) GetAccessToken() string {
 	if x != nil {
 		return x.AccessToken
 	}
 	return ""
 }
 
-func (x *OtpRes) GetAccessTokenExpiry() *timestamppb.Timestamp {
+func (x *VerifyOtpRes) GetAccessTokenExpiry() *timestamppb.Timestamp {
 	if x != nil {
 		return x.AccessTokenExpiry
+	}
+	return nil
+}
+
+func (x *VerifyOtpRes) GetRefreshToken() string {
+	if x != nil {
+		return x.RefreshToken
+	}
+	return ""
+}
+
+func (x *VerifyOtpRes) GetRefreshTokenExpiry() *timestamppb.Timestamp {
+	if x != nil {
+		return x.RefreshTokenExpiry
 	}
 	return nil
 }
@@ -315,12 +363,17 @@ func (x *LoginRequest) GetPassword() string {
 }
 
 type LoginResponse struct {
-	state             protoimpl.MessageState `protogen:"open.v1"`
-	UserId            string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	AccessToken       string                 `protobuf:"bytes,2,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
-	AccessTokenExpiry string                 `protobuf:"bytes,3,opt,name=access_token_expiry,json=accessTokenExpiry,proto3" json:"access_token_expiry,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	SussionId          string                 `protobuf:"bytes,1,opt,name=sussion_id,json=sussionId,proto3" json:"sussion_id,omitempty"`
+	UserId             string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	FullName           string                 `protobuf:"bytes,3,opt,name=full_name,json=fullName,proto3" json:"full_name,omitempty"`
+	Email              string                 `protobuf:"bytes,4,opt,name=email,proto3" json:"email,omitempty"`
+	AccessToken        string                 `protobuf:"bytes,5,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
+	AccessTokenExpiry  *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=access_token_expiry,json=accessTokenExpiry,proto3" json:"access_token_expiry,omitempty"`
+	RefreshToken       string                 `protobuf:"bytes,7,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"`
+	RefreshTokenExpiry *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=refresh_token_expiry,json=refreshTokenExpiry,proto3" json:"refresh_token_expiry,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *LoginResponse) Reset() {
@@ -353,9 +406,30 @@ func (*LoginResponse) Descriptor() ([]byte, []int) {
 	return file_user_service_proto_rawDescGZIP(), []int{5}
 }
 
+func (x *LoginResponse) GetSussionId() string {
+	if x != nil {
+		return x.SussionId
+	}
+	return ""
+}
+
 func (x *LoginResponse) GetUserId() string {
 	if x != nil {
 		return x.UserId
+	}
+	return ""
+}
+
+func (x *LoginResponse) GetFullName() string {
+	if x != nil {
+		return x.FullName
+	}
+	return ""
+}
+
+func (x *LoginResponse) GetEmail() string {
+	if x != nil {
+		return x.Email
 	}
 	return ""
 }
@@ -367,16 +441,31 @@ func (x *LoginResponse) GetAccessToken() string {
 	return ""
 }
 
-func (x *LoginResponse) GetAccessTokenExpiry() string {
+func (x *LoginResponse) GetAccessTokenExpiry() *timestamppb.Timestamp {
 	if x != nil {
 		return x.AccessTokenExpiry
 	}
+	return nil
+}
+
+func (x *LoginResponse) GetRefreshToken() string {
+	if x != nil {
+		return x.RefreshToken
+	}
 	return ""
+}
+
+func (x *LoginResponse) GetRefreshTokenExpiry() *timestamppb.Timestamp {
+	if x != nil {
+		return x.RefreshTokenExpiry
+	}
+	return nil
 }
 
 type ResendOtpReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
+	OtpType       string                 `protobuf:"bytes,2,opt,name=otp_type,json=otpType,proto3" json:"otp_type,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -414,6 +503,13 @@ func (*ResendOtpReq) Descriptor() ([]byte, []int) {
 func (x *ResendOtpReq) GetEmail() string {
 	if x != nil {
 		return x.Email
+	}
+	return ""
+}
+
+func (x *ResendOtpReq) GetOtpType() string {
+	if x != nil {
+		return x.OtpType
 	}
 	return ""
 }
@@ -470,6 +566,606 @@ func (x *ResendOtpRes) GetOtpExpiry() *timestamppb.Timestamp {
 	return nil
 }
 
+type ForgotPasswordReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ForgotPasswordReq) Reset() {
+	*x = ForgotPasswordReq{}
+	mi := &file_user_service_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ForgotPasswordReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ForgotPasswordReq) ProtoMessage() {}
+
+func (x *ForgotPasswordReq) ProtoReflect() protoreflect.Message {
+	mi := &file_user_service_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ForgotPasswordReq.ProtoReflect.Descriptor instead.
+func (*ForgotPasswordReq) Descriptor() ([]byte, []int) {
+	return file_user_service_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *ForgotPasswordReq) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+type ForgotPasswordRes struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	OtpExpiry     *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=otp_expiry,json=otpExpiry,proto3" json:"otp_expiry,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ForgotPasswordRes) Reset() {
+	*x = ForgotPasswordRes{}
+	mi := &file_user_service_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ForgotPasswordRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ForgotPasswordRes) ProtoMessage() {}
+
+func (x *ForgotPasswordRes) ProtoReflect() protoreflect.Message {
+	mi := &file_user_service_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ForgotPasswordRes.ProtoReflect.Descriptor instead.
+func (*ForgotPasswordRes) Descriptor() ([]byte, []int) {
+	return file_user_service_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *ForgotPasswordRes) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *ForgotPasswordRes) GetOtpExpiry() *timestamppb.Timestamp {
+	if x != nil {
+		return x.OtpExpiry
+	}
+	return nil
+}
+
+type VerifyForgotPasswordReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
+	Otp           string                 `protobuf:"bytes,2,opt,name=otp,proto3" json:"otp,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *VerifyForgotPasswordReq) Reset() {
+	*x = VerifyForgotPasswordReq{}
+	mi := &file_user_service_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *VerifyForgotPasswordReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*VerifyForgotPasswordReq) ProtoMessage() {}
+
+func (x *VerifyForgotPasswordReq) ProtoReflect() protoreflect.Message {
+	mi := &file_user_service_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use VerifyForgotPasswordReq.ProtoReflect.Descriptor instead.
+func (*VerifyForgotPasswordReq) Descriptor() ([]byte, []int) {
+	return file_user_service_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *VerifyForgotPasswordReq) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+func (x *VerifyForgotPasswordReq) GetOtp() string {
+	if x != nil {
+		return x.Otp
+	}
+	return ""
+}
+
+type VerifyForgotPasswordRes struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	Success          bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	ResetToken       string                 `protobuf:"bytes,2,opt,name=reset_token,json=resetToken,proto3" json:"reset_token,omitempty"`
+	ResetTokenExpiry *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=reset_token_expiry,json=resetTokenExpiry,proto3" json:"reset_token_expiry,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *VerifyForgotPasswordRes) Reset() {
+	*x = VerifyForgotPasswordRes{}
+	mi := &file_user_service_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *VerifyForgotPasswordRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*VerifyForgotPasswordRes) ProtoMessage() {}
+
+func (x *VerifyForgotPasswordRes) ProtoReflect() protoreflect.Message {
+	mi := &file_user_service_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use VerifyForgotPasswordRes.ProtoReflect.Descriptor instead.
+func (*VerifyForgotPasswordRes) Descriptor() ([]byte, []int) {
+	return file_user_service_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *VerifyForgotPasswordRes) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *VerifyForgotPasswordRes) GetResetToken() string {
+	if x != nil {
+		return x.ResetToken
+	}
+	return ""
+}
+
+func (x *VerifyForgotPasswordRes) GetResetTokenExpiry() *timestamppb.Timestamp {
+	if x != nil {
+		return x.ResetTokenExpiry
+	}
+	return nil
+}
+
+type ResetPasswordReq struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Email           string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
+	Password        string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
+	ConfirmPassword string                 `protobuf:"bytes,3,opt,name=confirm_password,json=confirmPassword,proto3" json:"confirm_password,omitempty"`
+	ResetToken      string                 `protobuf:"bytes,4,opt,name=reset_token,json=resetToken,proto3" json:"reset_token,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *ResetPasswordReq) Reset() {
+	*x = ResetPasswordReq{}
+	mi := &file_user_service_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ResetPasswordReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ResetPasswordReq) ProtoMessage() {}
+
+func (x *ResetPasswordReq) ProtoReflect() protoreflect.Message {
+	mi := &file_user_service_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ResetPasswordReq.ProtoReflect.Descriptor instead.
+func (*ResetPasswordReq) Descriptor() ([]byte, []int) {
+	return file_user_service_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *ResetPasswordReq) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+func (x *ResetPasswordReq) GetPassword() string {
+	if x != nil {
+		return x.Password
+	}
+	return ""
+}
+
+func (x *ResetPasswordReq) GetConfirmPassword() string {
+	if x != nil {
+		return x.ConfirmPassword
+	}
+	return ""
+}
+
+func (x *ResetPasswordReq) GetResetToken() string {
+	if x != nil {
+		return x.ResetToken
+	}
+	return ""
+}
+
+type ResetPasswordRes struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ResetPasswordRes) Reset() {
+	*x = ResetPasswordRes{}
+	mi := &file_user_service_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ResetPasswordRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ResetPasswordRes) ProtoMessage() {}
+
+func (x *ResetPasswordRes) ProtoReflect() protoreflect.Message {
+	mi := &file_user_service_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ResetPasswordRes.ProtoReflect.Descriptor instead.
+func (*ResetPasswordRes) Descriptor() ([]byte, []int) {
+	return file_user_service_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *ResetPasswordRes) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+type RenewAccessTokenReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	RefreshToken  string                 `protobuf:"bytes,1,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RenewAccessTokenReq) Reset() {
+	*x = RenewAccessTokenReq{}
+	mi := &file_user_service_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RenewAccessTokenReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RenewAccessTokenReq) ProtoMessage() {}
+
+func (x *RenewAccessTokenReq) ProtoReflect() protoreflect.Message {
+	mi := &file_user_service_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RenewAccessTokenReq.ProtoReflect.Descriptor instead.
+func (*RenewAccessTokenReq) Descriptor() ([]byte, []int) {
+	return file_user_service_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *RenewAccessTokenReq) GetRefreshToken() string {
+	if x != nil {
+		return x.RefreshToken
+	}
+	return ""
+}
+
+type RenewAccessTokenRes struct {
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	AccessToken       string                 `protobuf:"bytes,1,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
+	AccessTokenExpiry string                 `protobuf:"bytes,2,opt,name=access_token_expiry,json=accessTokenExpiry,proto3" json:"access_token_expiry,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *RenewAccessTokenRes) Reset() {
+	*x = RenewAccessTokenRes{}
+	mi := &file_user_service_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RenewAccessTokenRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RenewAccessTokenRes) ProtoMessage() {}
+
+func (x *RenewAccessTokenRes) ProtoReflect() protoreflect.Message {
+	mi := &file_user_service_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RenewAccessTokenRes.ProtoReflect.Descriptor instead.
+func (*RenewAccessTokenRes) Descriptor() ([]byte, []int) {
+	return file_user_service_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *RenewAccessTokenRes) GetAccessToken() string {
+	if x != nil {
+		return x.AccessToken
+	}
+	return ""
+}
+
+func (x *RenewAccessTokenRes) GetAccessTokenExpiry() string {
+	if x != nil {
+		return x.AccessTokenExpiry
+	}
+	return ""
+}
+
+type LogOutReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	RefreshToken  string                 `protobuf:"bytes,1,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LogOutReq) Reset() {
+	*x = LogOutReq{}
+	mi := &file_user_service_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LogOutReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LogOutReq) ProtoMessage() {}
+
+func (x *LogOutReq) ProtoReflect() protoreflect.Message {
+	mi := &file_user_service_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LogOutReq.ProtoReflect.Descriptor instead.
+func (*LogOutReq) Descriptor() ([]byte, []int) {
+	return file_user_service_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *LogOutReq) GetRefreshToken() string {
+	if x != nil {
+		return x.RefreshToken
+	}
+	return ""
+}
+
+type LogOutRes struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LogOutRes) Reset() {
+	*x = LogOutRes{}
+	mi := &file_user_service_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LogOutRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LogOutRes) ProtoMessage() {}
+
+func (x *LogOutRes) ProtoReflect() protoreflect.Message {
+	mi := &file_user_service_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LogOutRes.ProtoReflect.Descriptor instead.
+func (*LogOutRes) Descriptor() ([]byte, []int) {
+	return file_user_service_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *LogOutRes) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+type OnboardingAddRoleReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Role          string                 `protobuf:"bytes,2,opt,name=role,proto3" json:"role,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *OnboardingAddRoleReq) Reset() {
+	*x = OnboardingAddRoleReq{}
+	mi := &file_user_service_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OnboardingAddRoleReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OnboardingAddRoleReq) ProtoMessage() {}
+
+func (x *OnboardingAddRoleReq) ProtoReflect() protoreflect.Message {
+	mi := &file_user_service_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OnboardingAddRoleReq.ProtoReflect.Descriptor instead.
+func (*OnboardingAddRoleReq) Descriptor() ([]byte, []int) {
+	return file_user_service_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *OnboardingAddRoleReq) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *OnboardingAddRoleReq) GetRole() string {
+	if x != nil {
+		return x.Role
+	}
+	return ""
+}
+
+type OnboardingAddRoleRes struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *OnboardingAddRoleRes) Reset() {
+	*x = OnboardingAddRoleRes{}
+	mi := &file_user_service_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OnboardingAddRoleRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OnboardingAddRoleRes) ProtoMessage() {}
+
+func (x *OnboardingAddRoleRes) ProtoReflect() protoreflect.Message {
+	mi := &file_user_service_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OnboardingAddRoleRes.ProtoReflect.Descriptor instead.
+func (*OnboardingAddRoleRes) Descriptor() ([]byte, []int) {
+	return file_user_service_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *OnboardingAddRoleRes) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
 var File_user_service_proto protoreflect.FileDescriptor
 
 const file_user_service_proto_rawDesc = "" +
@@ -485,32 +1181,88 @@ const file_user_service_proto_rawDesc = "" +
 	"\n" +
 	"otp_status\x18\x02 \x01(\bH\x00R\totpStatus\x88\x01\x01\x12@\n" +
 	"\x0eotp_expires_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\fotpExpiresAtB\r\n" +
-	"\v_otp_status\"0\n" +
-	"\x06OtpReq\x12\x14\n" +
+	"\v_otp_status\"6\n" +
+	"\fVerifyOtpReq\x12\x14\n" +
 	"\x05email\x18\x01 \x01(\tR\x05email\x12\x10\n" +
-	"\x03otp\x18\x03 \x01(\tR\x03otp\"\x90\x01\n" +
-	"\x06OtpRes\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\tR\x06userId\x12!\n" +
-	"\faccess_token\x18\x02 \x01(\tR\vaccessToken\x12J\n" +
-	"\x13access_token_expiry\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\x11accessTokenExpiry\"@\n" +
+	"\x03otp\x18\x03 \x01(\tR\x03otp\"\xf5\x02\n" +
+	"\fVerifyOtpRes\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x1d\n" +
+	"\n" +
+	"session_id\x18\x02 \x01(\tR\tsessionId\x12\x17\n" +
+	"\auser_id\x18\x03 \x01(\tR\x06userId\x12\x1b\n" +
+	"\tfull_name\x18\x04 \x01(\tR\bfullName\x12\x14\n" +
+	"\x05email\x18\x05 \x01(\tR\x05email\x12!\n" +
+	"\faccess_token\x18\x06 \x01(\tR\vaccessToken\x12J\n" +
+	"\x13access_token_expiry\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\x11accessTokenExpiry\x12#\n" +
+	"\rrefresh_token\x18\b \x01(\tR\frefreshToken\x12L\n" +
+	"\x14refresh_token_expiry\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\x12refreshTokenExpiry\"@\n" +
 	"\fLoginRequest\x12\x14\n" +
 	"\x05email\x18\x01 \x01(\tR\x05email\x12\x1a\n" +
-	"\bpassword\x18\x02 \x01(\tR\bpassword\"{\n" +
-	"\rLoginResponse\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\tR\x06userId\x12!\n" +
-	"\faccess_token\x18\x02 \x01(\tR\vaccessToken\x12.\n" +
-	"\x13access_token_expiry\x18\x03 \x01(\tR\x11accessTokenExpiry\"$\n" +
+	"\bpassword\x18\x02 \x01(\tR\bpassword\"\xdc\x02\n" +
+	"\rLoginResponse\x12\x1d\n" +
+	"\n" +
+	"sussion_id\x18\x01 \x01(\tR\tsussionId\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x1b\n" +
+	"\tfull_name\x18\x03 \x01(\tR\bfullName\x12\x14\n" +
+	"\x05email\x18\x04 \x01(\tR\x05email\x12!\n" +
+	"\faccess_token\x18\x05 \x01(\tR\vaccessToken\x12J\n" +
+	"\x13access_token_expiry\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\x11accessTokenExpiry\x12#\n" +
+	"\rrefresh_token\x18\a \x01(\tR\frefreshToken\x12L\n" +
+	"\x14refresh_token_expiry\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\x12refreshTokenExpiry\"?\n" +
 	"\fResendOtpReq\x12\x14\n" +
-	"\x05email\x18\x01 \x01(\tR\x05email\"c\n" +
+	"\x05email\x18\x01 \x01(\tR\x05email\x12\x19\n" +
+	"\botp_type\x18\x02 \x01(\tR\aotpType\"c\n" +
 	"\fResendOtpRes\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x129\n" +
 	"\n" +
-	"otp_expiry\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\totpExpiry2\xd8\x01\n" +
+	"otp_expiry\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\totpExpiry\")\n" +
+	"\x11ForgotPasswordReq\x12\x14\n" +
+	"\x05email\x18\x01 \x01(\tR\x05email\"h\n" +
+	"\x11ForgotPasswordRes\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x129\n" +
+	"\n" +
+	"otp_expiry\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\totpExpiry\"A\n" +
+	"\x17VerifyForgotPasswordReq\x12\x14\n" +
+	"\x05email\x18\x01 \x01(\tR\x05email\x12\x10\n" +
+	"\x03otp\x18\x02 \x01(\tR\x03otp\"\x9e\x01\n" +
+	"\x17VerifyForgotPasswordRes\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x1f\n" +
+	"\vreset_token\x18\x02 \x01(\tR\n" +
+	"resetToken\x12H\n" +
+	"\x12reset_token_expiry\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\x10resetTokenExpiry\"\x90\x01\n" +
+	"\x10ResetPasswordReq\x12\x14\n" +
+	"\x05email\x18\x01 \x01(\tR\x05email\x12\x1a\n" +
+	"\bpassword\x18\x02 \x01(\tR\bpassword\x12)\n" +
+	"\x10confirm_password\x18\x03 \x01(\tR\x0fconfirmPassword\x12\x1f\n" +
+	"\vreset_token\x18\x04 \x01(\tR\n" +
+	"resetToken\",\n" +
+	"\x10ResetPasswordRes\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\":\n" +
+	"\x13RenewAccessTokenReq\x12#\n" +
+	"\rrefresh_token\x18\x01 \x01(\tR\frefreshToken\"h\n" +
+	"\x13RenewAccessTokenRes\x12!\n" +
+	"\faccess_token\x18\x01 \x01(\tR\vaccessToken\x12.\n" +
+	"\x13access_token_expiry\x18\x02 \x01(\tR\x11accessTokenExpiry\"0\n" +
+	"\tLogOutReq\x12#\n" +
+	"\rrefresh_token\x18\x01 \x01(\tR\frefreshToken\"%\n" +
+	"\tLogOutRes\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\"C\n" +
+	"\x14OnboardingAddRoleReq\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x12\n" +
+	"\x04role\x18\x02 \x01(\tR\x04role\"0\n" +
+	"\x14OnboardingAddRoleRes\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess2\x82\x05\n" +
 	"\vAuthService\x129\n" +
-	"\bRegister\x12\x15.auth.RegisterRequest\x1a\x16.auth.RegisterResponse\x12'\n" +
-	"\tVerfiyOtp\x12\f.auth.OtpReq\x1a\f.auth.OtpRes\x120\n" +
+	"\bRegister\x12\x15.auth.RegisterRequest\x1a\x16.auth.RegisterResponse\x123\n" +
+	"\tVerfiyOtp\x12\x12.auth.VerifyOtpReq\x1a\x12.auth.VerifyOtpRes\x120\n" +
 	"\x05Login\x12\x12.auth.LoginRequest\x1a\x13.auth.LoginResponse\x123\n" +
-	"\tResendOtp\x12\x12.auth.ResendOtpReq\x1a\x12.auth.ResendOtpResB8Z6github.com/junaidmdv/goalcirlcle/user_service/proto/pbb\x06proto3"
+	"\tResendOtp\x12\x12.auth.ResendOtpReq\x1a\x12.auth.ResendOtpRes\x12B\n" +
+	"\x0eForgotPassword\x12\x17.auth.ForgotPasswordReq\x1a\x17.auth.ForgotPasswordRes\x12T\n" +
+	"\x14VerifyForgotPassword\x12\x1d.auth.VerifyForgotPasswordReq\x1a\x1d.auth.VerifyForgotPasswordRes\x12?\n" +
+	"\rResetPassword\x12\x16.auth.ResetPasswordReq\x1a\x16.auth.ResetPasswordRes\x12H\n" +
+	"\x10RenweAccessToken\x12\x19.auth.RenewAccessTokenReq\x1a\x19.auth.RenewAccessTokenRes\x12*\n" +
+	"\x06LogOut\x12\x0f.auth.LogOutReq\x1a\x0f.auth.LogOutRes\x12K\n" +
+	"\x11OnboardingAddRole\x12\x1a.auth.OnboardingAddRoleReq\x1a\x1a.auth.OnboardingAddRoleResB8Z6github.com/junaidmdv/goalcirlcle/user_service/proto/pbb\x06proto3"
 
 var (
 	file_user_service_proto_rawDescOnce sync.Once
@@ -524,35 +1276,64 @@ func file_user_service_proto_rawDescGZIP() []byte {
 	return file_user_service_proto_rawDescData
 }
 
-var file_user_service_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_user_service_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
 var file_user_service_proto_goTypes = []any{
-	(*RegisterRequest)(nil),       // 0: auth.RegisterRequest
-	(*RegisterResponse)(nil),      // 1: auth.RegisterResponse
-	(*OtpReq)(nil),                // 2: auth.OtpReq
-	(*OtpRes)(nil),                // 3: auth.OtpRes
-	(*LoginRequest)(nil),          // 4: auth.LoginRequest
-	(*LoginResponse)(nil),         // 5: auth.LoginResponse
-	(*ResendOtpReq)(nil),          // 6: auth.ResendOtpReq
-	(*ResendOtpRes)(nil),          // 7: auth.ResendOtpRes
-	(*timestamppb.Timestamp)(nil), // 8: google.protobuf.Timestamp
+	(*RegisterRequest)(nil),         // 0: auth.RegisterRequest
+	(*RegisterResponse)(nil),        // 1: auth.RegisterResponse
+	(*VerifyOtpReq)(nil),            // 2: auth.VerifyOtpReq
+	(*VerifyOtpRes)(nil),            // 3: auth.VerifyOtpRes
+	(*LoginRequest)(nil),            // 4: auth.LoginRequest
+	(*LoginResponse)(nil),           // 5: auth.LoginResponse
+	(*ResendOtpReq)(nil),            // 6: auth.ResendOtpReq
+	(*ResendOtpRes)(nil),            // 7: auth.ResendOtpRes
+	(*ForgotPasswordReq)(nil),       // 8: auth.ForgotPasswordReq
+	(*ForgotPasswordRes)(nil),       // 9: auth.ForgotPasswordRes
+	(*VerifyForgotPasswordReq)(nil), // 10: auth.VerifyForgotPasswordReq
+	(*VerifyForgotPasswordRes)(nil), // 11: auth.VerifyForgotPasswordRes
+	(*ResetPasswordReq)(nil),        // 12: auth.ResetPasswordReq
+	(*ResetPasswordRes)(nil),        // 13: auth.ResetPasswordRes
+	(*RenewAccessTokenReq)(nil),     // 14: auth.RenewAccessTokenReq
+	(*RenewAccessTokenRes)(nil),     // 15: auth.RenewAccessTokenRes
+	(*LogOutReq)(nil),               // 16: auth.LogOutReq
+	(*LogOutRes)(nil),               // 17: auth.LogOutRes
+	(*OnboardingAddRoleReq)(nil),    // 18: auth.OnboardingAddRoleReq
+	(*OnboardingAddRoleRes)(nil),    // 19: auth.OnboardingAddRoleRes
+	(*timestamppb.Timestamp)(nil),   // 20: google.protobuf.Timestamp
 }
 var file_user_service_proto_depIdxs = []int32{
-	8, // 0: auth.RegisterResponse.otp_expires_at:type_name -> google.protobuf.Timestamp
-	8, // 1: auth.OtpRes.access_token_expiry:type_name -> google.protobuf.Timestamp
-	8, // 2: auth.ResendOtpRes.otp_expiry:type_name -> google.protobuf.Timestamp
-	0, // 3: auth.AuthService.Register:input_type -> auth.RegisterRequest
-	2, // 4: auth.AuthService.VerfiyOtp:input_type -> auth.OtpReq
-	4, // 5: auth.AuthService.Login:input_type -> auth.LoginRequest
-	6, // 6: auth.AuthService.ResendOtp:input_type -> auth.ResendOtpReq
-	1, // 7: auth.AuthService.Register:output_type -> auth.RegisterResponse
-	3, // 8: auth.AuthService.VerfiyOtp:output_type -> auth.OtpRes
-	5, // 9: auth.AuthService.Login:output_type -> auth.LoginResponse
-	7, // 10: auth.AuthService.ResendOtp:output_type -> auth.ResendOtpRes
-	7, // [7:11] is the sub-list for method output_type
-	3, // [3:7] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	20, // 0: auth.RegisterResponse.otp_expires_at:type_name -> google.protobuf.Timestamp
+	20, // 1: auth.VerifyOtpRes.access_token_expiry:type_name -> google.protobuf.Timestamp
+	20, // 2: auth.VerifyOtpRes.refresh_token_expiry:type_name -> google.protobuf.Timestamp
+	20, // 3: auth.LoginResponse.access_token_expiry:type_name -> google.protobuf.Timestamp
+	20, // 4: auth.LoginResponse.refresh_token_expiry:type_name -> google.protobuf.Timestamp
+	20, // 5: auth.ResendOtpRes.otp_expiry:type_name -> google.protobuf.Timestamp
+	20, // 6: auth.ForgotPasswordRes.otp_expiry:type_name -> google.protobuf.Timestamp
+	20, // 7: auth.VerifyForgotPasswordRes.reset_token_expiry:type_name -> google.protobuf.Timestamp
+	0,  // 8: auth.AuthService.Register:input_type -> auth.RegisterRequest
+	2,  // 9: auth.AuthService.VerfiyOtp:input_type -> auth.VerifyOtpReq
+	4,  // 10: auth.AuthService.Login:input_type -> auth.LoginRequest
+	6,  // 11: auth.AuthService.ResendOtp:input_type -> auth.ResendOtpReq
+	8,  // 12: auth.AuthService.ForgotPassword:input_type -> auth.ForgotPasswordReq
+	10, // 13: auth.AuthService.VerifyForgotPassword:input_type -> auth.VerifyForgotPasswordReq
+	12, // 14: auth.AuthService.ResetPassword:input_type -> auth.ResetPasswordReq
+	14, // 15: auth.AuthService.RenweAccessToken:input_type -> auth.RenewAccessTokenReq
+	16, // 16: auth.AuthService.LogOut:input_type -> auth.LogOutReq
+	18, // 17: auth.AuthService.OnboardingAddRole:input_type -> auth.OnboardingAddRoleReq
+	1,  // 18: auth.AuthService.Register:output_type -> auth.RegisterResponse
+	3,  // 19: auth.AuthService.VerfiyOtp:output_type -> auth.VerifyOtpRes
+	5,  // 20: auth.AuthService.Login:output_type -> auth.LoginResponse
+	7,  // 21: auth.AuthService.ResendOtp:output_type -> auth.ResendOtpRes
+	9,  // 22: auth.AuthService.ForgotPassword:output_type -> auth.ForgotPasswordRes
+	11, // 23: auth.AuthService.VerifyForgotPassword:output_type -> auth.VerifyForgotPasswordRes
+	13, // 24: auth.AuthService.ResetPassword:output_type -> auth.ResetPasswordRes
+	15, // 25: auth.AuthService.RenweAccessToken:output_type -> auth.RenewAccessTokenRes
+	17, // 26: auth.AuthService.LogOut:output_type -> auth.LogOutRes
+	19, // 27: auth.AuthService.OnboardingAddRole:output_type -> auth.OnboardingAddRoleRes
+	18, // [18:28] is the sub-list for method output_type
+	8,  // [8:18] is the sub-list for method input_type
+	8,  // [8:8] is the sub-list for extension type_name
+	8,  // [8:8] is the sub-list for extension extendee
+	0,  // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_user_service_proto_init() }
@@ -567,7 +1348,7 @@ func file_user_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_user_service_proto_rawDesc), len(file_user_service_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   8,
+			NumMessages:   20,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

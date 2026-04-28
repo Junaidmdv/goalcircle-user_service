@@ -88,7 +88,7 @@ type ResetPasswordRes struct {
 
 type ResetPasswordReq struct {
 	Email      string
-	Password   string
+	Password   string 
 	ResetToken string
 }
 
@@ -100,14 +100,32 @@ type RenewAccessTokenRes struct {
 	AccessToken       string
 	AccessTokenExpiry time.Time
 }
- 
 
+type LogOutReq struct {
+	RefreshToken string
+}
 
-type LogOutReq struct{
-    RefreshToken string 
-} 
+type LogOutRes struct {
+	Success bool
+}
 
+type OnboardingRoleReq struct {
+	UserId string
+	Role   string
+}
 
-type LogOutRes struct{
+type OnboardingRoleRes struct {
+	Success bool
+}
 
+type OnboardingTeamDtlsReq struct {
+}
+
+type OnboardingTeamDtlsRes struct {
+}
+
+type OnboardingOrganiserDtlsReq struct {
+}
+
+type OnboardingAddOrganiserDtlsRes struct {
 }

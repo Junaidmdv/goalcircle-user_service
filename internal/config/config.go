@@ -15,6 +15,7 @@ type Config struct {
 	Redis    *RedisConfig
 	Twilio   *TwilioConfig
 	SMTP     *SMTPConfig
+	DiscStorage    *DiscStorageConfig
 }
 
 type configBuilder struct {
@@ -29,6 +30,7 @@ type ConfigBuilder interface {
 	WithRedis() ConfigBuilder
 	WithTwilio() ConfigBuilder
 	WithSMTP() ConfigBuilder
+	WithDiscStorage() ConfigBuilder
 	Build() (*Config, []error)
 }
 

@@ -23,8 +23,8 @@ type UserRepository interface {
 	CheckEmailExistInTempUser(context.Context, string) (bool, error)
 	UpdateOtpAttempts(context.Context, string, entity.OtpType) error
 	UpdatePassword(context.Context, string, string) error
-	DeleteOtp(context.Context, uint) error  
-	UpdateUserType(context.Context,string,entity.UserRole)error
+	DeleteOtp(context.Context, uint) error
+	UpdateUserType(context.Context, string,string) error
 }
 
 type userRepository struct {
@@ -220,7 +220,7 @@ func (ur *userRepository) DeleteOtp(ctx context.Context, id uint) error {
 	return nil
 }
 
-func (ur *userRepository) UpdateUserType(ctx context.Context, userId string, role entity.UserRole) error {
+func (ur *userRepository) UpdateUserType(ctx context.Context, userId string, role string) error {
 
 	if err := ur.db.WithContext(ctx).Where("id=?", userId).Update("user_type=?", role).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

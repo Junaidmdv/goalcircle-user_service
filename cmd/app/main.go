@@ -41,7 +41,8 @@ func main() {
 		WithTwilio().
 		WithJWT().
 		WithRedis().
-		WithSMTP().
+		WithSMTP(). 
+		WithDiscStorage().
 		Build()
 	logger.Info("configration is done")
 	if errs != nil {
@@ -78,7 +79,7 @@ func main() {
 	sessionStore := repository.NewSessionStorage(redisClient.Client)
 	hashingCost := 14
 	passwordHashing := bycrypt.NewBycriptHasher(hashingCost, logger)
-	token := tokens.NewTokenMaker(config.JWT)
+	token := tokens.NewTokenMaker(config.JWT,logger)
 	emailService, err := otp.NewEmailService(&cnfg.SMTPConfig{})
 	if err != nil {
 		logger.Error("failed setup otp service email", "error", err)

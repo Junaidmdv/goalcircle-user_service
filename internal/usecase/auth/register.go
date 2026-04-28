@@ -25,6 +25,11 @@ type AuthUsecase interface {
 	VerifyForgotPasswordOtp(context.Context, *uc_dtos.VerifyForgotPasswordOtpReq) (*uc_dtos.VerifyForgotPasswordOtpRes, error)
 	ForgotPassword(context.Context, *uc_dtos.ForgotPasswordReq) (*uc_dtos.ForgotPasswordRes, error)
 	ResetPassword(context.Context, *uc_dtos.ResetPasswordReq) (*uc_dtos.ResetPasswordRes, error)
+	RenewAccessToken(context.Context, *uc_dtos.RenewAcccessTokenReq) (*uc_dtos.RenewAccessTokenRes, error)
+	LogOut(context.Context, *uc_dtos.LogOutReq) (*uc_dtos.LogOutRes, error)  
+	OnboardingAddRole(context.Context,*uc_dtos.OnboardingRoleReq)(*uc_dtos.OnboardingRoleRes,error) 
+	OnboardingAddTeamDetails(context.Context,*uc_dtos.OnboardingTeamDtlsReq)(*uc_dtos.OnboardingTeamDtlsRes,error) 
+	OnboardingAddOrganiserDetails(context.Context,*uc_dtos.OnboardingOrganiserDtlsReq)(*uc_dtos.OnboardingAddOrganiserDtlsRes,error)
 }
 
 type authUsecase struct {
@@ -129,6 +134,7 @@ func (us *authUsecase) VerifyOtp(ctx context.Context, input *uc_dtos.VerifyOtpRe
 		FullName: tempUser.FullName,
 		Email:    tempUser.Email,
 		Password: tempUser.Password,
+		UserType: entity.UNSPECIFIED,
 	})
 
 	if err != nil {
@@ -414,12 +420,41 @@ func (uc *authUsecase) RenewAccessToken(ctx context.Context, input *uc_dtos.Rene
 
 }
 
+func (uc *authUsecase) LogOut(ctx context.Context, input *uc_dtos.LogOutReq) (*uc_dtos.LogOutRes, error) {
 
-
-func(uc *authUsecase)Logout(ctx context.Context,input *uc_dtos.LogOutReq)(*uc_dtos.LogOutRes,error){
-     
-	claims,err:=uc.token.VerifyToken(input.RefreshToken) 
-	if err != nil{
-		return nil,err
+	claims, err := uc.token.VerifyToken(input.RefreshToken)
+	if err != nil {
+		return nil, err
 	}
-} 
+
+	key := "session:" + claims.ID
+
+	if err := uc.session.DeleteSession(ctx, key); err != nil {
+		return nil, err
+	}
+
+	return &uc_dtos.LogOutRes{
+		Success: true,
+	}, nil
+
+}
+
+func (uc *authUsecase) OnboardingAddRole(ctx context.Context, input *uc_dtos.OnboardingRoleReq) (*uc_dtos.OnboardingRoleRes, error) {
+
+	if err := uc.userRepo.UpdateUserType(ctx, input.UserId, input.Role); err != nil {
+		return nil, err
+	}
+
+	return &uc_dtos.OnboardingRoleRes{
+		Success: true,
+	}, nil
+}
+
+
+func (uc *authUsecase) OnboardingAddTeamDetails(ctx context.Context, input *uc_dtos.OnboardingTeamDtlsReq) (*uc_dtos.OnboardingTeamDtlsRes, error) {
+	return nil, nil
+}
+
+func (uc *authUsecase) OnboardingAddOrganiserDetails(ctx context.Context, input *uc_dtos.OnboardingOrganiserDtlsReq) (*uc_dtos.OnboardingAddOrganiserDtlsRes, error) {
+	return nil, nil
+}

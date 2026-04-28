@@ -20,16 +20,23 @@ message RegisterResponse{
   google.protobuf.Timestamp otp_expires_at=3;
 } 
 
-message OtpReq {
+message VerifyOtpReq {
    string email=1;  
    string otp=3;
 
 } 
 
-message OtpRes{  
-   string user_id=1;
-   string access_token=2; 
-   google.protobuf.Timestamp access_token_expiry=3;
+message VerifyOtpRes{    
+   bool success=1; 
+   string session_id=2;
+   string user_id=3; 
+   string full_name=4; 
+   string email=5;
+   string access_token=6; 
+   google.protobuf.Timestamp access_token_expiry=7;  
+   string refresh_token=8; 
+   google.protobuf.Timestamp refresh_token_expiry=9;
+
 } 
 
 
@@ -40,14 +47,20 @@ message LoginRequest{
 
 
 message LoginResponse{
-   string user_id=1; 
-   string access_token=2; 
-   string access_token_expiry=3;
+   string sussion_id=1;
+   string user_id=2; 
+   string full_name=3; 
+   string email=4;
+   string access_token=5; 
+   google.protobuf.Timestamp access_token_expiry=6;  
+   string refresh_token=7; 
+   google.protobuf.Timestamp refresh_token_expiry=8;
 } 
 
 
 message ResendOtpReq{
-   string email=1; 
+   string email=1;  
+   string otp_type=2;
 } 
 
 message ResendOtpRes{
@@ -55,21 +68,90 @@ message ResendOtpRes{
    google.protobuf.Timestamp otp_expiry=2;
 }
 
+message ForgotPasswordReq{
+   string email=1;
+}
+
+message ForgotPasswordRes{
+     bool  success=1; 
+     google.protobuf.Timestamp otp_expiry=2;
+} 
+
+message VerifyForgotPasswordReq{ 
+   string email=1; 
+   string otp=2;
+} 
+
+message VerifyForgotPasswordRes{
+   bool success=1; 
+   string reset_token=2;
+   google.protobuf.Timestamp reset_token_expiry=3;
+}  
+
+message ResetPasswordReq{
+    string email=1;  
+    string password=2;
+    string confirm_password=3;  
+    string reset_token=4;
+
+}  
+
+message ResetPasswordRes{
+   bool success=1;
+}  
+
+message RenewAccessTokenReq{
+   string refresh_token=1;
+}
 
 
+message RenewAccessTokenRes{
+   string access_token=1; 
+   string access_token_expiry=2;
+} 
+
+
+message LogOutReq{
+   string refresh_token=1; 
+
+}  
+
+message LogOutRes{
+   bool success=1;
+} 
+
+message OnboardingAddRoleReq{
+   string user_id=1; 
+   string role=2;
+} 
+
+message OnboardingAddRoleRes{
+   bool success=1;
+}
 
 // authentication of users services
 service AuthService{
   //registeration of user account
   rpc Register(RegisterRequest)returns(RegisterResponse);     
   //verfiy otp 
-  rpc VerfiyOtp(OtpReq)returns(OtpRes);   
+  rpc VerfiyOtp(VerifyOtpReq)returns(VerifyOtpRes);
   //user login
   rpc Login(LoginRequest)returns(LoginResponse); 
   //resend otp 
-  rpc ResendOtp(ResendOtpReq) returns(ResendOtpRes);
-  
+  rpc ResendOtp(ResendOtpReq) returns(ResendOtpRes); 
 
+  rpc ForgotPassword(ForgotPasswordReq)returns(ForgotPasswordRes);  
+
+  rpc VerifyForgotPassword(VerifyForgotPasswordReq)returns(VerifyForgotPasswordRes); 
+
+  rpc ResetPassword(ResetPasswordReq)returns(ResetPasswordRes); 
+
+  rpc RenweAccessToken(RenewAccessTokenReq)returns(RenewAccessTokenRes); 
+
+  rpc LogOut(LogOutReq)returns(LogOutRes);
+
+  rpc OnboardingAddRole(OnboardingAddRoleReq)returns(OnboardingAddRoleRes); 
+  
 }
 
 

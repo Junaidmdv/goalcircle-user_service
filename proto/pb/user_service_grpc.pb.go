@@ -19,10 +19,16 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AuthService_Register_FullMethodName  = "/auth.AuthService/Register"
-	AuthService_VerfiyOtp_FullMethodName = "/auth.AuthService/VerfiyOtp"
-	AuthService_Login_FullMethodName     = "/auth.AuthService/Login"
-	AuthService_ResendOtp_FullMethodName = "/auth.AuthService/ResendOtp"
+	AuthService_Register_FullMethodName             = "/auth.AuthService/Register"
+	AuthService_VerfiyOtp_FullMethodName            = "/auth.AuthService/VerfiyOtp"
+	AuthService_Login_FullMethodName                = "/auth.AuthService/Login"
+	AuthService_ResendOtp_FullMethodName            = "/auth.AuthService/ResendOtp"
+	AuthService_ForgotPassword_FullMethodName       = "/auth.AuthService/ForgotPassword"
+	AuthService_VerifyForgotPassword_FullMethodName = "/auth.AuthService/VerifyForgotPassword"
+	AuthService_ResetPassword_FullMethodName        = "/auth.AuthService/ResetPassword"
+	AuthService_RenweAccessToken_FullMethodName     = "/auth.AuthService/RenweAccessToken"
+	AuthService_LogOut_FullMethodName               = "/auth.AuthService/LogOut"
+	AuthService_OnboardingAddRole_FullMethodName    = "/auth.AuthService/OnboardingAddRole"
 )
 
 // AuthServiceClient is the client API for AuthService service.
@@ -34,11 +40,17 @@ type AuthServiceClient interface {
 	// registeration of user account
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	// verfiy otp
-	VerfiyOtp(ctx context.Context, in *OtpReq, opts ...grpc.CallOption) (*OtpRes, error)
+	VerfiyOtp(ctx context.Context, in *VerifyOtpReq, opts ...grpc.CallOption) (*VerifyOtpRes, error)
 	// user login
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 	// resend otp
 	ResendOtp(ctx context.Context, in *ResendOtpReq, opts ...grpc.CallOption) (*ResendOtpRes, error)
+	ForgotPassword(ctx context.Context, in *ForgotPasswordReq, opts ...grpc.CallOption) (*ForgotPasswordRes, error)
+	VerifyForgotPassword(ctx context.Context, in *VerifyForgotPasswordReq, opts ...grpc.CallOption) (*VerifyForgotPasswordRes, error)
+	ResetPassword(ctx context.Context, in *ResetPasswordReq, opts ...grpc.CallOption) (*ResetPasswordRes, error)
+	RenweAccessToken(ctx context.Context, in *RenewAccessTokenReq, opts ...grpc.CallOption) (*RenewAccessTokenRes, error)
+	LogOut(ctx context.Context, in *LogOutReq, opts ...grpc.CallOption) (*LogOutRes, error)
+	OnboardingAddRole(ctx context.Context, in *OnboardingAddRoleReq, opts ...grpc.CallOption) (*OnboardingAddRoleRes, error)
 }
 
 type authServiceClient struct {
@@ -59,9 +71,9 @@ func (c *authServiceClient) Register(ctx context.Context, in *RegisterRequest, o
 	return out, nil
 }
 
-func (c *authServiceClient) VerfiyOtp(ctx context.Context, in *OtpReq, opts ...grpc.CallOption) (*OtpRes, error) {
+func (c *authServiceClient) VerfiyOtp(ctx context.Context, in *VerifyOtpReq, opts ...grpc.CallOption) (*VerifyOtpRes, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(OtpRes)
+	out := new(VerifyOtpRes)
 	err := c.cc.Invoke(ctx, AuthService_VerfiyOtp_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -89,6 +101,66 @@ func (c *authServiceClient) ResendOtp(ctx context.Context, in *ResendOtpReq, opt
 	return out, nil
 }
 
+func (c *authServiceClient) ForgotPassword(ctx context.Context, in *ForgotPasswordReq, opts ...grpc.CallOption) (*ForgotPasswordRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ForgotPasswordRes)
+	err := c.cc.Invoke(ctx, AuthService_ForgotPassword_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) VerifyForgotPassword(ctx context.Context, in *VerifyForgotPasswordReq, opts ...grpc.CallOption) (*VerifyForgotPasswordRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(VerifyForgotPasswordRes)
+	err := c.cc.Invoke(ctx, AuthService_VerifyForgotPassword_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) ResetPassword(ctx context.Context, in *ResetPasswordReq, opts ...grpc.CallOption) (*ResetPasswordRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ResetPasswordRes)
+	err := c.cc.Invoke(ctx, AuthService_ResetPassword_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) RenweAccessToken(ctx context.Context, in *RenewAccessTokenReq, opts ...grpc.CallOption) (*RenewAccessTokenRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RenewAccessTokenRes)
+	err := c.cc.Invoke(ctx, AuthService_RenweAccessToken_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) LogOut(ctx context.Context, in *LogOutReq, opts ...grpc.CallOption) (*LogOutRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LogOutRes)
+	err := c.cc.Invoke(ctx, AuthService_LogOut_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) OnboardingAddRole(ctx context.Context, in *OnboardingAddRoleReq, opts ...grpc.CallOption) (*OnboardingAddRoleRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(OnboardingAddRoleRes)
+	err := c.cc.Invoke(ctx, AuthService_OnboardingAddRole_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServiceServer is the server API for AuthService service.
 // All implementations must embed UnimplementedAuthServiceServer
 // for forward compatibility.
@@ -98,11 +170,17 @@ type AuthServiceServer interface {
 	// registeration of user account
 	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	// verfiy otp
-	VerfiyOtp(context.Context, *OtpReq) (*OtpRes, error)
+	VerfiyOtp(context.Context, *VerifyOtpReq) (*VerifyOtpRes, error)
 	// user login
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
 	// resend otp
 	ResendOtp(context.Context, *ResendOtpReq) (*ResendOtpRes, error)
+	ForgotPassword(context.Context, *ForgotPasswordReq) (*ForgotPasswordRes, error)
+	VerifyForgotPassword(context.Context, *VerifyForgotPasswordReq) (*VerifyForgotPasswordRes, error)
+	ResetPassword(context.Context, *ResetPasswordReq) (*ResetPasswordRes, error)
+	RenweAccessToken(context.Context, *RenewAccessTokenReq) (*RenewAccessTokenRes, error)
+	LogOut(context.Context, *LogOutReq) (*LogOutRes, error)
+	OnboardingAddRole(context.Context, *OnboardingAddRoleReq) (*OnboardingAddRoleRes, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
 
@@ -116,7 +194,7 @@ type UnimplementedAuthServiceServer struct{}
 func (UnimplementedAuthServiceServer) Register(context.Context, *RegisterRequest) (*RegisterResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
 }
-func (UnimplementedAuthServiceServer) VerfiyOtp(context.Context, *OtpReq) (*OtpRes, error) {
+func (UnimplementedAuthServiceServer) VerfiyOtp(context.Context, *VerifyOtpReq) (*VerifyOtpRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method VerfiyOtp not implemented")
 }
 func (UnimplementedAuthServiceServer) Login(context.Context, *LoginRequest) (*LoginResponse, error) {
@@ -124,6 +202,24 @@ func (UnimplementedAuthServiceServer) Login(context.Context, *LoginRequest) (*Lo
 }
 func (UnimplementedAuthServiceServer) ResendOtp(context.Context, *ResendOtpReq) (*ResendOtpRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ResendOtp not implemented")
+}
+func (UnimplementedAuthServiceServer) ForgotPassword(context.Context, *ForgotPasswordReq) (*ForgotPasswordRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ForgotPassword not implemented")
+}
+func (UnimplementedAuthServiceServer) VerifyForgotPassword(context.Context, *VerifyForgotPasswordReq) (*VerifyForgotPasswordRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method VerifyForgotPassword not implemented")
+}
+func (UnimplementedAuthServiceServer) ResetPassword(context.Context, *ResetPasswordReq) (*ResetPasswordRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ResetPassword not implemented")
+}
+func (UnimplementedAuthServiceServer) RenweAccessToken(context.Context, *RenewAccessTokenReq) (*RenewAccessTokenRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RenweAccessToken not implemented")
+}
+func (UnimplementedAuthServiceServer) LogOut(context.Context, *LogOutReq) (*LogOutRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LogOut not implemented")
+}
+func (UnimplementedAuthServiceServer) OnboardingAddRole(context.Context, *OnboardingAddRoleReq) (*OnboardingAddRoleRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method OnboardingAddRole not implemented")
 }
 func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
 func (UnimplementedAuthServiceServer) testEmbeddedByValue()                     {}
@@ -165,7 +261,7 @@ func _AuthService_Register_Handler(srv interface{}, ctx context.Context, dec fun
 }
 
 func _AuthService_VerfiyOtp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(OtpReq)
+	in := new(VerifyOtpReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -177,7 +273,7 @@ func _AuthService_VerfiyOtp_Handler(srv interface{}, ctx context.Context, dec fu
 		FullMethod: AuthService_VerfiyOtp_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServiceServer).VerfiyOtp(ctx, req.(*OtpReq))
+		return srv.(AuthServiceServer).VerfiyOtp(ctx, req.(*VerifyOtpReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -218,6 +314,114 @@ func _AuthService_ResendOtp_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_ForgotPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ForgotPasswordReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).ForgotPassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_ForgotPassword_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).ForgotPassword(ctx, req.(*ForgotPasswordReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_VerifyForgotPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VerifyForgotPasswordReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).VerifyForgotPassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_VerifyForgotPassword_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).VerifyForgotPassword(ctx, req.(*VerifyForgotPasswordReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_ResetPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ResetPasswordReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).ResetPassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_ResetPassword_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).ResetPassword(ctx, req.(*ResetPasswordReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_RenweAccessToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RenewAccessTokenReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).RenweAccessToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_RenweAccessToken_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).RenweAccessToken(ctx, req.(*RenewAccessTokenReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_LogOut_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LogOutReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).LogOut(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_LogOut_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).LogOut(ctx, req.(*LogOutReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_OnboardingAddRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(OnboardingAddRoleReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).OnboardingAddRole(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_OnboardingAddRole_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).OnboardingAddRole(ctx, req.(*OnboardingAddRoleReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AuthService_ServiceDesc is the grpc.ServiceDesc for AuthService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -240,6 +444,30 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ResendOtp",
 			Handler:    _AuthService_ResendOtp_Handler,
+		},
+		{
+			MethodName: "ForgotPassword",
+			Handler:    _AuthService_ForgotPassword_Handler,
+		},
+		{
+			MethodName: "VerifyForgotPassword",
+			Handler:    _AuthService_VerifyForgotPassword_Handler,
+		},
+		{
+			MethodName: "ResetPassword",
+			Handler:    _AuthService_ResetPassword_Handler,
+		},
+		{
+			MethodName: "RenweAccessToken",
+			Handler:    _AuthService_RenweAccessToken_Handler,
+		},
+		{
+			MethodName: "LogOut",
+			Handler:    _AuthService_LogOut_Handler,
+		},
+		{
+			MethodName: "OnboardingAddRole",
+			Handler:    _AuthService_OnboardingAddRole_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
