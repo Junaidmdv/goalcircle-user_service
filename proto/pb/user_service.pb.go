@@ -1166,6 +1166,118 @@ func (x *OnboardingAddRoleRes) GetSuccess() bool {
 	return false
 }
 
+type ValidateTokenReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ValidateTokenReq) Reset() {
+	*x = ValidateTokenReq{}
+	mi := &file_user_service_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ValidateTokenReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ValidateTokenReq) ProtoMessage() {}
+
+func (x *ValidateTokenReq) ProtoReflect() protoreflect.Message {
+	mi := &file_user_service_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ValidateTokenReq.ProtoReflect.Descriptor instead.
+func (*ValidateTokenReq) Descriptor() ([]byte, []int) {
+	return file_user_service_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *ValidateTokenReq) GetToken() string {
+	if x != nil {
+		return x.Token
+	}
+	return ""
+}
+
+type ValidateTokenRes struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Email         string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
+	Role          string                 `protobuf:"bytes,3,opt,name=role,proto3" json:"role,omitempty"`
+	IsValid       bool                   `protobuf:"varint,4,opt,name=is_valid,json=isValid,proto3" json:"is_valid,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ValidateTokenRes) Reset() {
+	*x = ValidateTokenRes{}
+	mi := &file_user_service_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ValidateTokenRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ValidateTokenRes) ProtoMessage() {}
+
+func (x *ValidateTokenRes) ProtoReflect() protoreflect.Message {
+	mi := &file_user_service_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ValidateTokenRes.ProtoReflect.Descriptor instead.
+func (*ValidateTokenRes) Descriptor() ([]byte, []int) {
+	return file_user_service_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *ValidateTokenRes) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *ValidateTokenRes) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+func (x *ValidateTokenRes) GetRole() string {
+	if x != nil {
+		return x.Role
+	}
+	return ""
+}
+
+func (x *ValidateTokenRes) GetIsValid() bool {
+	if x != nil {
+		return x.IsValid
+	}
+	return false
+}
+
 var File_user_service_proto protoreflect.FileDescriptor
 
 const file_user_service_proto_rawDesc = "" +
@@ -1251,8 +1363,16 @@ const file_user_service_proto_rawDesc = "" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x12\n" +
 	"\x04role\x18\x02 \x01(\tR\x04role\"0\n" +
 	"\x14OnboardingAddRoleRes\x12\x18\n" +
-	"\asuccess\x18\x01 \x01(\bR\asuccess2\x82\x05\n" +
-	"\vAuthService\x129\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\"(\n" +
+	"\x10ValidateTokenReq\x12\x14\n" +
+	"\x05token\x18\x01 \x01(\tR\x05token\"p\n" +
+	"\x10ValidateTokenRes\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x14\n" +
+	"\x05email\x18\x02 \x01(\tR\x05email\x12\x12\n" +
+	"\x04role\x18\x03 \x01(\tR\x04role\x12\x19\n" +
+	"\bis_valid\x18\x04 \x01(\bR\aisValid2\xc3\x05\n" +
+	"\vAuthService\x12?\n" +
+	"\rValidateToken\x12\x16.auth.ValidateTokenReq\x1a\x16.auth.ValidateTokenRes\x129\n" +
 	"\bRegister\x12\x15.auth.RegisterRequest\x1a\x16.auth.RegisterResponse\x123\n" +
 	"\tVerfiyOtp\x12\x12.auth.VerifyOtpReq\x1a\x12.auth.VerifyOtpRes\x120\n" +
 	"\x05Login\x12\x12.auth.LoginRequest\x1a\x13.auth.LoginResponse\x123\n" +
@@ -1276,7 +1396,7 @@ func file_user_service_proto_rawDescGZIP() []byte {
 	return file_user_service_proto_rawDescData
 }
 
-var file_user_service_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
+var file_user_service_proto_msgTypes = make([]protoimpl.MessageInfo, 22)
 var file_user_service_proto_goTypes = []any{
 	(*RegisterRequest)(nil),         // 0: auth.RegisterRequest
 	(*RegisterResponse)(nil),        // 1: auth.RegisterResponse
@@ -1298,39 +1418,43 @@ var file_user_service_proto_goTypes = []any{
 	(*LogOutRes)(nil),               // 17: auth.LogOutRes
 	(*OnboardingAddRoleReq)(nil),    // 18: auth.OnboardingAddRoleReq
 	(*OnboardingAddRoleRes)(nil),    // 19: auth.OnboardingAddRoleRes
-	(*timestamppb.Timestamp)(nil),   // 20: google.protobuf.Timestamp
+	(*ValidateTokenReq)(nil),        // 20: auth.ValidateTokenReq
+	(*ValidateTokenRes)(nil),        // 21: auth.ValidateTokenRes
+	(*timestamppb.Timestamp)(nil),   // 22: google.protobuf.Timestamp
 }
 var file_user_service_proto_depIdxs = []int32{
-	20, // 0: auth.RegisterResponse.otp_expires_at:type_name -> google.protobuf.Timestamp
-	20, // 1: auth.VerifyOtpRes.access_token_expiry:type_name -> google.protobuf.Timestamp
-	20, // 2: auth.VerifyOtpRes.refresh_token_expiry:type_name -> google.protobuf.Timestamp
-	20, // 3: auth.LoginResponse.access_token_expiry:type_name -> google.protobuf.Timestamp
-	20, // 4: auth.LoginResponse.refresh_token_expiry:type_name -> google.protobuf.Timestamp
-	20, // 5: auth.ResendOtpRes.otp_expiry:type_name -> google.protobuf.Timestamp
-	20, // 6: auth.ForgotPasswordRes.otp_expiry:type_name -> google.protobuf.Timestamp
-	20, // 7: auth.VerifyForgotPasswordRes.reset_token_expiry:type_name -> google.protobuf.Timestamp
-	0,  // 8: auth.AuthService.Register:input_type -> auth.RegisterRequest
-	2,  // 9: auth.AuthService.VerfiyOtp:input_type -> auth.VerifyOtpReq
-	4,  // 10: auth.AuthService.Login:input_type -> auth.LoginRequest
-	6,  // 11: auth.AuthService.ResendOtp:input_type -> auth.ResendOtpReq
-	8,  // 12: auth.AuthService.ForgotPassword:input_type -> auth.ForgotPasswordReq
-	10, // 13: auth.AuthService.VerifyForgotPassword:input_type -> auth.VerifyForgotPasswordReq
-	12, // 14: auth.AuthService.ResetPassword:input_type -> auth.ResetPasswordReq
-	14, // 15: auth.AuthService.RenweAccessToken:input_type -> auth.RenewAccessTokenReq
-	16, // 16: auth.AuthService.LogOut:input_type -> auth.LogOutReq
-	18, // 17: auth.AuthService.OnboardingAddRole:input_type -> auth.OnboardingAddRoleReq
-	1,  // 18: auth.AuthService.Register:output_type -> auth.RegisterResponse
-	3,  // 19: auth.AuthService.VerfiyOtp:output_type -> auth.VerifyOtpRes
-	5,  // 20: auth.AuthService.Login:output_type -> auth.LoginResponse
-	7,  // 21: auth.AuthService.ResendOtp:output_type -> auth.ResendOtpRes
-	9,  // 22: auth.AuthService.ForgotPassword:output_type -> auth.ForgotPasswordRes
-	11, // 23: auth.AuthService.VerifyForgotPassword:output_type -> auth.VerifyForgotPasswordRes
-	13, // 24: auth.AuthService.ResetPassword:output_type -> auth.ResetPasswordRes
-	15, // 25: auth.AuthService.RenweAccessToken:output_type -> auth.RenewAccessTokenRes
-	17, // 26: auth.AuthService.LogOut:output_type -> auth.LogOutRes
-	19, // 27: auth.AuthService.OnboardingAddRole:output_type -> auth.OnboardingAddRoleRes
-	18, // [18:28] is the sub-list for method output_type
-	8,  // [8:18] is the sub-list for method input_type
+	22, // 0: auth.RegisterResponse.otp_expires_at:type_name -> google.protobuf.Timestamp
+	22, // 1: auth.VerifyOtpRes.access_token_expiry:type_name -> google.protobuf.Timestamp
+	22, // 2: auth.VerifyOtpRes.refresh_token_expiry:type_name -> google.protobuf.Timestamp
+	22, // 3: auth.LoginResponse.access_token_expiry:type_name -> google.protobuf.Timestamp
+	22, // 4: auth.LoginResponse.refresh_token_expiry:type_name -> google.protobuf.Timestamp
+	22, // 5: auth.ResendOtpRes.otp_expiry:type_name -> google.protobuf.Timestamp
+	22, // 6: auth.ForgotPasswordRes.otp_expiry:type_name -> google.protobuf.Timestamp
+	22, // 7: auth.VerifyForgotPasswordRes.reset_token_expiry:type_name -> google.protobuf.Timestamp
+	20, // 8: auth.AuthService.ValidateToken:input_type -> auth.ValidateTokenReq
+	0,  // 9: auth.AuthService.Register:input_type -> auth.RegisterRequest
+	2,  // 10: auth.AuthService.VerfiyOtp:input_type -> auth.VerifyOtpReq
+	4,  // 11: auth.AuthService.Login:input_type -> auth.LoginRequest
+	6,  // 12: auth.AuthService.ResendOtp:input_type -> auth.ResendOtpReq
+	8,  // 13: auth.AuthService.ForgotPassword:input_type -> auth.ForgotPasswordReq
+	10, // 14: auth.AuthService.VerifyForgotPassword:input_type -> auth.VerifyForgotPasswordReq
+	12, // 15: auth.AuthService.ResetPassword:input_type -> auth.ResetPasswordReq
+	14, // 16: auth.AuthService.RenweAccessToken:input_type -> auth.RenewAccessTokenReq
+	16, // 17: auth.AuthService.LogOut:input_type -> auth.LogOutReq
+	18, // 18: auth.AuthService.OnboardingAddRole:input_type -> auth.OnboardingAddRoleReq
+	21, // 19: auth.AuthService.ValidateToken:output_type -> auth.ValidateTokenRes
+	1,  // 20: auth.AuthService.Register:output_type -> auth.RegisterResponse
+	3,  // 21: auth.AuthService.VerfiyOtp:output_type -> auth.VerifyOtpRes
+	5,  // 22: auth.AuthService.Login:output_type -> auth.LoginResponse
+	7,  // 23: auth.AuthService.ResendOtp:output_type -> auth.ResendOtpRes
+	9,  // 24: auth.AuthService.ForgotPassword:output_type -> auth.ForgotPasswordRes
+	11, // 25: auth.AuthService.VerifyForgotPassword:output_type -> auth.VerifyForgotPasswordRes
+	13, // 26: auth.AuthService.ResetPassword:output_type -> auth.ResetPasswordRes
+	15, // 27: auth.AuthService.RenweAccessToken:output_type -> auth.RenewAccessTokenRes
+	17, // 28: auth.AuthService.LogOut:output_type -> auth.LogOutRes
+	19, // 29: auth.AuthService.OnboardingAddRole:output_type -> auth.OnboardingAddRoleRes
+	19, // [19:30] is the sub-list for method output_type
+	8,  // [8:19] is the sub-list for method input_type
 	8,  // [8:8] is the sub-list for extension type_name
 	8,  // [8:8] is the sub-list for extension extendee
 	0,  // [0:8] is the sub-list for field type_name
@@ -1348,7 +1472,7 @@ func file_user_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_user_service_proto_rawDesc), len(file_user_service_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   20,
+			NumMessages:   22,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

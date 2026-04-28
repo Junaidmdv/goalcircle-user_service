@@ -232,3 +232,5 @@ func (ur *userRepository) UpdateUserType(ctx context.Context, userId string, rol
 	}
 	return nil
 }
+
+

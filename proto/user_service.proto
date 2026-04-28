@@ -129,8 +129,21 @@ message OnboardingAddRoleRes{
    bool success=1;
 }
 
+message ValidateTokenReq {
+  string token = 1;
+}
+
+message ValidateTokenRes {
+  string user_id    = 1;
+  string email      = 2;
+  string role       = 3;
+  bool   is_valid   = 4;
+}
+
+
 // authentication of users services
-service AuthService{
+service AuthService{ 
+  rpc ValidateToken(ValidateTokenReq) returns (ValidateTokenRes);
   //registeration of user account
   rpc Register(RegisterRequest)returns(RegisterResponse);     
   //verfiy otp 

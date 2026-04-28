@@ -26,10 +26,11 @@ type AuthUsecase interface {
 	ForgotPassword(context.Context, *uc_dtos.ForgotPasswordReq) (*uc_dtos.ForgotPasswordRes, error)
 	ResetPassword(context.Context, *uc_dtos.ResetPasswordReq) (*uc_dtos.ResetPasswordRes, error)
 	RenewAccessToken(context.Context, *uc_dtos.RenewAcccessTokenReq) (*uc_dtos.RenewAccessTokenRes, error)
-	LogOut(context.Context, *uc_dtos.LogOutReq) (*uc_dtos.LogOutRes, error)  
-	OnboardingAddRole(context.Context,*uc_dtos.OnboardingRoleReq)(*uc_dtos.OnboardingRoleRes,error) 
-	OnboardingAddTeamDetails(context.Context,*uc_dtos.OnboardingTeamDtlsReq)(*uc_dtos.OnboardingTeamDtlsRes,error) 
-	OnboardingAddOrganiserDetails(context.Context,*uc_dtos.OnboardingOrganiserDtlsReq)(*uc_dtos.OnboardingAddOrganiserDtlsRes,error)
+	LogOut(context.Context, *uc_dtos.LogOutReq) (*uc_dtos.LogOutRes, error)
+	OnboardingAddRole(context.Context, *uc_dtos.OnboardingRoleReq) (*uc_dtos.OnboardingRoleRes, error)
+	OnboardingAddTeamDetails(context.Context, *uc_dtos.OnboardingTeamDtlsReq) (*uc_dtos.OnboardingTeamDtlsRes, error)
+	OnboardingAddOrganiserDetails(context.Context, *uc_dtos.OnboardingOrganiserDtlsReq) (*uc_dtos.OnboardingAddOrganiserDtlsRes, error)
+	ValidateToken(context.Context, string) (*tokens.UserClaims, error)
 }
 
 type authUsecase struct {
@@ -439,6 +440,27 @@ func (uc *authUsecase) LogOut(ctx context.Context, input *uc_dtos.LogOutReq) (*u
 
 }
 
+func (uc *authUsecase) ValidateToken(ctx context.Context, tokenStr string) (*tokens.UserClaims, error) {
+
+	claims, err := uc.token.VerifyToken(tokenStr)
+	if err != nil {
+		return nil, err
+	}
+
+	session, err := uc.session.GetSession(ctx, "session:"+claims.ID)
+	if err != nil {
+		return nil, domain.NewUnAuthenticatedError("session not found")
+	}
+
+	isRevoked, _ := strconv.ParseBool(session.IsRevoked)
+
+	if isRevoked {
+		return nil, domain.NewUnAuthenticatedError("session has been revoked")
+	}
+
+	return claims, nil
+}
+
 func (uc *authUsecase) OnboardingAddRole(ctx context.Context, input *uc_dtos.OnboardingRoleReq) (*uc_dtos.OnboardingRoleRes, error) {
 
 	if err := uc.userRepo.UpdateUserType(ctx, input.UserId, input.Role); err != nil {
@@ -449,7 +471,6 @@ func (uc *authUsecase) OnboardingAddRole(ctx context.Context, input *uc_dtos.Onb
 		Success: true,
 	}, nil
 }
-
 
 func (uc *authUsecase) OnboardingAddTeamDetails(ctx context.Context, input *uc_dtos.OnboardingTeamDtlsReq) (*uc_dtos.OnboardingTeamDtlsRes, error) {
 	return nil, nil

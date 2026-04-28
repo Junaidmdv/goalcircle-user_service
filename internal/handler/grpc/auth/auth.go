@@ -283,3 +283,16 @@ func (uh *authHandler) OnboardingAddRole(ctx context.Context, pb *pb.OnboardingA
 	return dt.ToOnboardingRoleRes(res), nil
 
 }
+
+func (h *authHandler) ValidateToken(ctx context.Context, req *pb.ValidateTokenReq) (*pb.ValidateTokenRes, error) {
+	claims, err := h.authUseCase.ValidateToken(ctx, req.Token)
+	if err != nil {
+		return nil, domain.GRPCStatus(err)
+	}
+	return &pb.ValidateTokenRes{
+		UserId:  claims.ID,
+		Email:   claims.Email,
+		Role:    claims.Role,
+		IsValid: true,
+	}, nil
+}
