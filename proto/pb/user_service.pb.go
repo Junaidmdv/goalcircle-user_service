@@ -933,7 +933,7 @@ func (x *RenewAccessTokenReq) GetRefreshToken() string {
 type RenewAccessTokenRes struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
 	AccessToken       string                 `protobuf:"bytes,1,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
-	AccessTokenExpiry string                 `protobuf:"bytes,2,opt,name=access_token_expiry,json=accessTokenExpiry,proto3" json:"access_token_expiry,omitempty"`
+	AccessTokenExpiry *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=access_token_expiry,json=accessTokenExpiry,proto3" json:"access_token_expiry,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -975,11 +975,11 @@ func (x *RenewAccessTokenRes) GetAccessToken() string {
 	return ""
 }
 
-func (x *RenewAccessTokenRes) GetAccessTokenExpiry() string {
+func (x *RenewAccessTokenRes) GetAccessTokenExpiry() *timestamppb.Timestamp {
 	if x != nil {
 		return x.AccessTokenExpiry
 	}
-	return ""
+	return nil
 }
 
 type LogOutReq struct {
@@ -1351,10 +1351,10 @@ const file_user_service_proto_rawDesc = "" +
 	"\x10ResetPasswordRes\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\":\n" +
 	"\x13RenewAccessTokenReq\x12#\n" +
-	"\rrefresh_token\x18\x01 \x01(\tR\frefreshToken\"h\n" +
+	"\rrefresh_token\x18\x01 \x01(\tR\frefreshToken\"\x84\x01\n" +
 	"\x13RenewAccessTokenRes\x12!\n" +
-	"\faccess_token\x18\x01 \x01(\tR\vaccessToken\x12.\n" +
-	"\x13access_token_expiry\x18\x02 \x01(\tR\x11accessTokenExpiry\"0\n" +
+	"\faccess_token\x18\x01 \x01(\tR\vaccessToken\x12J\n" +
+	"\x13access_token_expiry\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\x11accessTokenExpiry\"0\n" +
 	"\tLogOutReq\x12#\n" +
 	"\rrefresh_token\x18\x01 \x01(\tR\frefreshToken\"%\n" +
 	"\tLogOutRes\x12\x18\n" +
@@ -1431,33 +1431,34 @@ var file_user_service_proto_depIdxs = []int32{
 	22, // 5: auth.ResendOtpRes.otp_expiry:type_name -> google.protobuf.Timestamp
 	22, // 6: auth.ForgotPasswordRes.otp_expiry:type_name -> google.protobuf.Timestamp
 	22, // 7: auth.VerifyForgotPasswordRes.reset_token_expiry:type_name -> google.protobuf.Timestamp
-	20, // 8: auth.AuthService.ValidateToken:input_type -> auth.ValidateTokenReq
-	0,  // 9: auth.AuthService.Register:input_type -> auth.RegisterRequest
-	2,  // 10: auth.AuthService.VerfiyOtp:input_type -> auth.VerifyOtpReq
-	4,  // 11: auth.AuthService.Login:input_type -> auth.LoginRequest
-	6,  // 12: auth.AuthService.ResendOtp:input_type -> auth.ResendOtpReq
-	8,  // 13: auth.AuthService.ForgotPassword:input_type -> auth.ForgotPasswordReq
-	10, // 14: auth.AuthService.VerifyForgotPassword:input_type -> auth.VerifyForgotPasswordReq
-	12, // 15: auth.AuthService.ResetPassword:input_type -> auth.ResetPasswordReq
-	14, // 16: auth.AuthService.RenweAccessToken:input_type -> auth.RenewAccessTokenReq
-	16, // 17: auth.AuthService.LogOut:input_type -> auth.LogOutReq
-	18, // 18: auth.AuthService.OnboardingAddRole:input_type -> auth.OnboardingAddRoleReq
-	21, // 19: auth.AuthService.ValidateToken:output_type -> auth.ValidateTokenRes
-	1,  // 20: auth.AuthService.Register:output_type -> auth.RegisterResponse
-	3,  // 21: auth.AuthService.VerfiyOtp:output_type -> auth.VerifyOtpRes
-	5,  // 22: auth.AuthService.Login:output_type -> auth.LoginResponse
-	7,  // 23: auth.AuthService.ResendOtp:output_type -> auth.ResendOtpRes
-	9,  // 24: auth.AuthService.ForgotPassword:output_type -> auth.ForgotPasswordRes
-	11, // 25: auth.AuthService.VerifyForgotPassword:output_type -> auth.VerifyForgotPasswordRes
-	13, // 26: auth.AuthService.ResetPassword:output_type -> auth.ResetPasswordRes
-	15, // 27: auth.AuthService.RenweAccessToken:output_type -> auth.RenewAccessTokenRes
-	17, // 28: auth.AuthService.LogOut:output_type -> auth.LogOutRes
-	19, // 29: auth.AuthService.OnboardingAddRole:output_type -> auth.OnboardingAddRoleRes
-	19, // [19:30] is the sub-list for method output_type
-	8,  // [8:19] is the sub-list for method input_type
-	8,  // [8:8] is the sub-list for extension type_name
-	8,  // [8:8] is the sub-list for extension extendee
-	0,  // [0:8] is the sub-list for field type_name
+	22, // 8: auth.RenewAccessTokenRes.access_token_expiry:type_name -> google.protobuf.Timestamp
+	20, // 9: auth.AuthService.ValidateToken:input_type -> auth.ValidateTokenReq
+	0,  // 10: auth.AuthService.Register:input_type -> auth.RegisterRequest
+	2,  // 11: auth.AuthService.VerfiyOtp:input_type -> auth.VerifyOtpReq
+	4,  // 12: auth.AuthService.Login:input_type -> auth.LoginRequest
+	6,  // 13: auth.AuthService.ResendOtp:input_type -> auth.ResendOtpReq
+	8,  // 14: auth.AuthService.ForgotPassword:input_type -> auth.ForgotPasswordReq
+	10, // 15: auth.AuthService.VerifyForgotPassword:input_type -> auth.VerifyForgotPasswordReq
+	12, // 16: auth.AuthService.ResetPassword:input_type -> auth.ResetPasswordReq
+	14, // 17: auth.AuthService.RenweAccessToken:input_type -> auth.RenewAccessTokenReq
+	16, // 18: auth.AuthService.LogOut:input_type -> auth.LogOutReq
+	18, // 19: auth.AuthService.OnboardingAddRole:input_type -> auth.OnboardingAddRoleReq
+	21, // 20: auth.AuthService.ValidateToken:output_type -> auth.ValidateTokenRes
+	1,  // 21: auth.AuthService.Register:output_type -> auth.RegisterResponse
+	3,  // 22: auth.AuthService.VerfiyOtp:output_type -> auth.VerifyOtpRes
+	5,  // 23: auth.AuthService.Login:output_type -> auth.LoginResponse
+	7,  // 24: auth.AuthService.ResendOtp:output_type -> auth.ResendOtpRes
+	9,  // 25: auth.AuthService.ForgotPassword:output_type -> auth.ForgotPasswordRes
+	11, // 26: auth.AuthService.VerifyForgotPassword:output_type -> auth.VerifyForgotPasswordRes
+	13, // 27: auth.AuthService.ResetPassword:output_type -> auth.ResetPasswordRes
+	15, // 28: auth.AuthService.RenweAccessToken:output_type -> auth.RenewAccessTokenRes
+	17, // 29: auth.AuthService.LogOut:output_type -> auth.LogOutRes
+	19, // 30: auth.AuthService.OnboardingAddRole:output_type -> auth.OnboardingAddRoleRes
+	20, // [20:31] is the sub-list for method output_type
+	9,  // [9:20] is the sub-list for method input_type
+	9,  // [9:9] is the sub-list for extension type_name
+	9,  // [9:9] is the sub-list for extension extendee
+	0,  // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_user_service_proto_init() }
