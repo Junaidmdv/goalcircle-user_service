@@ -5,7 +5,6 @@ import "github.com/Junaidmdv/goalcircle-user_service/internal/domain/entity"
 type RegisterRequest struct {
 	FullName        string `json:"full_name" validate:"required,min=3,max=32"`
 	Email           string `json:"email" validate:"required,email"`
-	PhoneNum        string `json:"phone_num" validate:"required,phone"`
 	Password        string `json:"password" validate:"required"`
 	ConfirmPassword string `json:"confirm_password" validate:"required,eqfield=Password"`
 }
@@ -49,9 +48,7 @@ type ResetPasswordReq struct {
 
 type RenewAcccessTokenReq struct {
 	RefreshToken string `json:"refresh_token" validate:"required"`
-}  
-
-
+}
 
 type LogOutReq struct {
 	RefreshToken string `json:"refresh_token" validate:"required"`

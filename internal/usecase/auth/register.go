@@ -126,7 +126,9 @@ func (us *authUsecase) VerifyOtp(ctx context.Context, input *uc_dtos.VerifyOtpRe
 		return nil, domain.NewUnAuthenticatedError("OTP has expired. Please request a new one")
 	}
 
-	us.userRepo.DeleteOtp(ctx, otpRecord.ID)
+	if err := us.userRepo.DeleteOtp(ctx, otpRecord.ID); err != nil {
+		return nil, err
+	}
 
 	us.logger.Info("otp verified", "email", tempUser.Email)
 
@@ -473,6 +475,7 @@ func (uc *authUsecase) OnboardingAddRole(ctx context.Context, input *uc_dtos.Onb
 }
 
 func (uc *authUsecase) OnboardingAddTeamDetails(ctx context.Context, input *uc_dtos.OnboardingTeamDtlsReq) (*uc_dtos.OnboardingTeamDtlsRes, error) {
+
 	return nil, nil
 }
 
