@@ -107,7 +107,7 @@ message RenewAccessTokenReq{
 
 message RenewAccessTokenRes{
    string access_token=1; 
-   string access_token_expiry=2;
+   google.protobuf.Timestamp access_token_expiry=2;
 } 
 
 

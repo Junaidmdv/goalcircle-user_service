@@ -48,7 +48,7 @@ func (cb *configBuilder) WithJWT() ConfigBuilder {
 	}
 	jc.RefreshTokenExp = refreshDuration
 
-	resetPasswordTokenExpStr := os.Getenv("REFRESH_TOKEN_EXPIRYTIME")
+	resetPasswordTokenExpStr := os.Getenv("RESET_TOKEN_EXPIRY")
 	if refreshTokenExpStr == "" {
 		log.Printf("REFRESH_TOKEN_EXPIRYTIME not set, using default: 5m")
 		resetPasswordTokenExpStr = "5m"

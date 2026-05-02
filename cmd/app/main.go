@@ -42,7 +42,7 @@ func main() {
 		WithJWT().
 		WithRedis().
 		WithSMTP(). 
-		WithDiscStorage().
+		//WithDiscStorage().
 		Build()
 	logger.Info("configration is done")
 	if errs != nil {

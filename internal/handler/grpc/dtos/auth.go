@@ -49,7 +49,9 @@ type ResetPasswordReq struct {
 
 type RenewAcccessTokenReq struct {
 	RefreshToken string `json:"refresh_token" validate:"required"`
-}
+}  
+
+
 
 type LogOutReq struct {
 	RefreshToken string `json:"refresh_token" validate:"required"`
@@ -57,5 +59,5 @@ type LogOutReq struct {
 
 type OnboardRoleReq struct {
 	UserId   string `json:"user_id" validate:"required"`
-	UserRole string 
+	UserRole string `json:"user_role"`
 }
