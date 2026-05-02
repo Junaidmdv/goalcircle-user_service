@@ -128,7 +128,7 @@ func ToRenewAccessTokenReq(req *pb.RenewAccessTokenReq) *RenewAcccessTokenReq {
 func ToRenewAccessTokenRes(res *dtos.RenewAccessTokenRes) *pb.RenewAccessTokenRes {
 	return &pb.RenewAccessTokenRes{
 		AccessToken:       res.AccessToken,
-		AccessTokenExpiry: res.AccessToken,
+		AccessTokenExpiry: timestamppb.New(res.AccessTokenExpiry),
 	}
 }
 
@@ -156,6 +156,3 @@ func ToOnboardingRoleRes(res *dtos.OnboardingRoleRes) *pb.OnboardingAddRoleRes {
 		Success: res.Success,
 	}
 }
-  
-
-
