@@ -64,11 +64,11 @@ func (ur *userRepository) CheckEmailExist(ctx context.Context, email string) (bo
 
 func (ur *userRepository) CreateOrUpdateTempUser(ctx context.Context, tempUser *entity.TempUser) (*entity.TempUser, error) {
 	if err := ur.db.WithContext(ctx).Raw(`INSERT INTO temp_users(full_name,email,password,deleted_at)
-	       VALUES(?,?,?,?,NULL)  
+	       VALUES(?,?,?,NULL)  
 		   ON CONFLICT(email) WHERE deleted_at IS NULL
 		   DO UPDATE SET 
 		     full_name=EXCLUDED.full_name,
-		     password=EXCLUDED.password, 
+		     password=EXCLUDED.password
 		   RETURNING *
 		   `, tempUser.FullName, tempUser.Email, tempUser.Password).Scan(&tempUser).Error; err != nil {
 		return nil, domain.NewInternalError("Something went wrong. Please try again later.", err)
