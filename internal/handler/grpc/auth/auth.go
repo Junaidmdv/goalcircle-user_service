@@ -38,7 +38,6 @@ func (uh *authHandler) Register(ctx context.Context, req *pb.RegisterRequest) (*
 
 	request := dt.ToRegisterReq(req)
 
-	uh.logger.Info("register data", "data", request)
 
 	if validationErrs := uh.validater.Validation(request); validationErrs != nil {
 		stWithDetails, err := ValidationError(validationErrs)

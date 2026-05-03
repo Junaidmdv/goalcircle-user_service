@@ -41,7 +41,7 @@ func main() {
 		WithTwilio().
 		WithJWT().
 		WithRedis().
-		WithSMTP(). 
+		WithSMTP().
 		//WithDiscStorage().
 		Build()
 	logger.Info("configration is done")
@@ -72,15 +72,17 @@ func main() {
 		return
 	}
 
-	userRepo := repository.NewUserRepository(datbaseConnectin.DB, logger)
+	
+
+	userRepo := repository.NewUserRepository(datbaseConnectin.DB, logger, config.GRPC.TimeOut)
 	uidGenerater := uid.NewUUIDGenerater()
 	//otpService := otp.NewSMSOtpService(config.Twilio)
 	redisClient := redis.NewRedisClient(config.Redis)
 	sessionStore := repository.NewSessionStorage(redisClient.Client)
 	hashingCost := 14
 	passwordHashing := bycrypt.NewBycriptHasher(hashingCost, logger)
-	token := tokens.NewTokenMaker(config.JWT,logger)
-	emailService, err := otp.NewEmailService(&cnfg.SMTPConfig{})
+	token := tokens.NewTokenMaker(config.JWT, logger)
+	emailService, err := otp.NewEmailService(config.SMTP)
 	if err != nil {
 		logger.Error("failed setup otp service email", "error", err)
 		os.Exit(1)

@@ -53,6 +53,7 @@ func NewAuthUsecase(ur repository.UserRepository, logger logger.Logger, time *ti
 		hash:         hash,
 		token:        token,
 		session:      session,
+		email:        email,
 	}
 }
 
@@ -85,6 +86,7 @@ func (us *authUsecase) InitiateUserRegistration(ctx context.Context, input *uc_d
 
 	otpres, err := us.email.SendOTP(input.Email)
 	if err != nil {
+		us.logger.Warn("use case error", "error", err)
 		return nil, us.email.MapMailError(err)
 	}
 	us.logger.Info("otp sended to the user", "email", input.Email, "otp", otpres.Otp)
@@ -95,6 +97,10 @@ func (us *authUsecase) InitiateUserRegistration(ctx context.Context, input *uc_d
 		Type:      string(entity.Register),
 		ExpiresAt: time.Now().Add(otpres.Expiry),
 	})
+
+	if err != nil {
+		return nil, err
+	}
 	return uc_dtos.ToRegisterResponse(res, otpdata), nil
 }
 

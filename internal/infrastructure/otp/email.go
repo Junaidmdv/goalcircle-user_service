@@ -3,6 +3,7 @@ package otp
 import (
 	"crypto/rand"
 	"fmt"
+	"log"
 	"math/big"
 	"time"
 
@@ -11,8 +12,10 @@ import (
 )
 
 type EmailService struct {
-	server gomail.Dialer
-	config *config.SMTPConfig
+	*gomail.Dialer
+	// config *config.SMTPConfig
+	OtpExpiry  time.Duration
+	MaxAttempt uint
 }
 
 type OtpResponse struct {
@@ -22,12 +25,16 @@ type OtpResponse struct {
 
 // Constructor
 func NewEmailService(cfg *config.SMTPConfig) (*EmailService, error) {
-
-	dialer := gomail.NewDialer(cfg.ServerURL, cfg.Port, cfg.FromEmail, cfg.Password)
-
 	return &EmailService{
-		server: *dialer,
-		config: cfg,
+		Dialer: &gomail.Dialer{
+			Host:     cfg.ServerURL,
+			Port:     cfg.Port,
+			Username: cfg.FromEmail,
+			Password: cfg.Password,
+			SSL:      cfg.Port == 465,
+		},
+		OtpExpiry:  cfg.OtpExpiry,
+		MaxAttempt: uint(cfg.MaxAttempt),
 	}, nil
 }
 
@@ -48,9 +55,10 @@ func (e *EmailService) SendOTP(toEmail string) (*OtpResponse, error) {
 	if err != nil {
 		return nil, err
 	}
+	log.Printf("%v username", e.Username)
 
 	m := gomail.NewMessage()
-	m.SetHeader("From", e.server.Username)
+	m.SetHeader("From", e.Username)
 	m.SetHeader("To", toEmail)
 	m.SetHeader("Subject", "Your OTP Verification Code")
 	m.SetBody("text/html", fmt.Sprintf(`
@@ -148,17 +156,12 @@ func (e *EmailService) SendOTP(toEmail string) (*OtpResponse, error) {
 </html>
 	`, otp))
 
-	if err := e.server.DialAndSend(m); err != nil {
+	if err := e.DialAndSend(m); err != nil {
 		return nil, err
 	}
 
 	return &OtpResponse{
-     Otp: otp, 
-     Expiry: e.config.OtpExpiry,
-  },nil
+		Otp:    otp,
+		Expiry: e.OtpExpiry,
+	}, nil
 }
-
-
-
-
-

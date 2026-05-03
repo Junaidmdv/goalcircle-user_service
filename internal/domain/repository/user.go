@@ -24,22 +24,25 @@ type UserRepository interface {
 	UpdateOtpAttempts(context.Context, string, entity.OtpType) error
 	UpdatePassword(context.Context, string, string) error
 	DeleteOtp(context.Context, uint) error
-	UpdateUserType(context.Context, string,string) error
+	UpdateUserType(context.Context, string, string) error
 }
 
 type userRepository struct {
-	db     *gorm.DB
-	logger logger.Logger
+	db      *gorm.DB
+	logger  logger.Logger
+	timeout time.Duration
 }
 
-func NewUserRepository(db *gorm.DB, logger logger.Logger) UserRepository {
+func NewUserRepository(db *gorm.DB, logger logger.Logger, timeout time.Duration) UserRepository {
 	return &userRepository{
-		db:     db,
-		logger: logger,
+		db:      db,
+		logger:  logger,
+		timeout: timeout,
 	}
 }
 
 func (ur *userRepository) CheckEmailExist(ctx context.Context, email string) (bool, error) {
+
 	var exists bool
 
 	err := ur.db.WithContext(ctx).
@@ -52,7 +55,7 @@ func (ur *userRepository) CheckEmailExist(ctx context.Context, email string) (bo
 
 	if err != nil {
 		ur.logger.Error("databse error", "error", err)
-		return false, domain.NewInternalError("Something went wrong. Please try again later. ", err)
+		return false, domain.NewInternalError("Something went wrong. Please try again later.", err)
 	}
 
 	if exists {
@@ -63,6 +66,7 @@ func (ur *userRepository) CheckEmailExist(ctx context.Context, email string) (bo
 }
 
 func (ur *userRepository) CreateOrUpdateTempUser(ctx context.Context, tempUser *entity.TempUser) (*entity.TempUser, error) {
+
 	if err := ur.db.WithContext(ctx).Raw(`INSERT INTO temp_users(full_name,email,password,deleted_at)
 	       VALUES(?,?,?,NULL)  
 		   ON CONFLICT(email) WHERE deleted_at IS NULL
@@ -70,7 +74,7 @@ func (ur *userRepository) CreateOrUpdateTempUser(ctx context.Context, tempUser *
 		     full_name=EXCLUDED.full_name,
 		     password=EXCLUDED.password
 		   RETURNING *
-		   `, tempUser.FullName, tempUser.Email, tempUser.Password).Scan(&tempUser).Error; err != nil {
+		   `, tempUser.FullName, tempUser.Email, tempUser.Password).Scan(tempUser).Error; err != nil {
 		return nil, domain.NewInternalError("Something went wrong. Please try again later.", err)
 	}
 	return tempUser, nil
@@ -80,15 +84,15 @@ func (ur *userRepository) AddOtpData(ctx context.Context, otp *entity.Otp) (*ent
 
 	now := time.Now()
 
-	err := ur.db.WithContext(ctx).Raw(`
-        INSERT INTO otp (email, otp, type, attempts, expires_at, created_at, deleted_at)
+	if err := ur.db.WithContext(ctx).Raw(`
+        INSERT INTO otps (email, otp, type, attempts, expires_at, created_at, deleted_at)
         VALUES (?, ?, ?, ?, ?, ?, NULL)
         ON CONFLICT (email, type) WHERE deleted_at IS NULL
         DO UPDATE SET  
             otp        = EXCLUDED.otp,
             attempts   = 0,
             expires_at = EXCLUDED.expires_at,
-            updated_at = NOW(),
+            updated_at = NOW()
         RETURNING *`,
 		otp.Email,
 		otp.Otp,
@@ -96,10 +100,8 @@ func (ur *userRepository) AddOtpData(ctx context.Context, otp *entity.Otp) (*ent
 		0,
 		otp.ExpiresAt,
 		now,
-	).Scan(otp).Error
-
-	if err != nil {
-		ur.logger.Error("database error", "method", "add otp data", "error", err)
+	).Scan(otp).Error; err != nil {
+		//ur.logger.Error("database error", "method", "add otp data", "error", err)
 		return nil, domain.NewInternalError("Something went wrong. Please try again later.", err)
 	}
 
@@ -108,6 +110,7 @@ func (ur *userRepository) AddOtpData(ctx context.Context, otp *entity.Otp) (*ent
 }
 
 func (ur *userRepository) GetTempUserByEmail(ctx context.Context, email string) (*entity.TempUser, error) {
+
 	var user entity.TempUser
 
 	if err := ur.db.WithContext(ctx).
@@ -124,6 +127,7 @@ func (ur *userRepository) GetTempUserByEmail(ctx context.Context, email string) 
 }
 
 func (ur *userRepository) GetLatestOtpRecord(ctx context.Context, email string, otpType entity.OtpType) (*entity.Otp, error) {
+
 	var otpRec entity.Otp
 
 	err := ur.db.WithContext(ctx).
@@ -142,8 +146,10 @@ func (ur *userRepository) GetLatestOtpRecord(ctx context.Context, email string, 
 	return &otpRec, nil
 }
 func (ur *userRepository) CreateUser(ctx context.Context, user *entity.User) (*entity.User, error) {
+	context, cancel := context.WithTimeout(context.Background(), ur.timeout)
+	defer cancel()
 
-	if err := ur.db.WithContext(ctx).Create(user).Error; err != nil {
+	if err := ur.db.WithContext(context).Create(user).Error; err != nil {
 		ur.logger.Error("database error", "error", fmt.Errorf("falied to create user data:%v", err), "data", user)
 		return nil, domain.NewInternalError("Something went wrong.Please try again later.", fmt.Errorf("failed to add user data:%v", err))
 	}
@@ -152,7 +158,6 @@ func (ur *userRepository) CreateUser(ctx context.Context, user *entity.User) (*e
 }
 
 func (ur *userRepository) GetUserByEmail(ctx context.Context, email string) (*entity.User, error) {
-
 	var user entity.User
 	if err := ur.db.WithContext(ctx).
 		Where("email=?", email).
@@ -169,7 +174,6 @@ func (ur *userRepository) GetUserByEmail(ctx context.Context, email string) (*en
 }
 
 func (ur *userRepository) CheckEmailExistInTempUser(ctx context.Context, email string) (bool, error) {
-
 	var count int64
 	if err := ur.db.WithContext(ctx).
 		Where("email = ?", email).
@@ -221,7 +225,6 @@ func (ur *userRepository) DeleteOtp(ctx context.Context, id uint) error {
 }
 
 func (ur *userRepository) UpdateUserType(ctx context.Context, userId string, role string) error {
-
 	if err := ur.db.WithContext(ctx).Where("id=?", userId).Update("user_type=?", role).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			ur.logger.Warn("user email not found", "email", userId)
@@ -232,5 +235,3 @@ func (ur *userRepository) UpdateUserType(ctx context.Context, userId string, rol
 	}
 	return nil
 }
-
-
