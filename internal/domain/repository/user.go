@@ -202,20 +202,24 @@ func (ur *userRepository) UpdateOtpAttempts(ctx context.Context, email string, t
 	}
 	return nil
 }
-
 func (ur *userRepository) UpdatePassword(ctx context.Context, email string, password string) error {
-	if err := ur.db.WithContext(ctx).Where("email=?", email).Model(&entity.User{}).Update("password=?", password).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			ur.logger.Warn("user email not found", "email", email)
-			return domain.NewNotFoundError("Email not found")
-		}
-		ur.logger.Error("database error", "method", "UpdatePassword", "error", err)
-		return domain.NewInternalError("Something went wrong. Please try again later.", err)
+	result := ur.db.WithContext(ctx).
+		Model(&entity.User{}).
+		Where("email = ?", email).
+		Update("password", password)
+
+	if result.Error != nil {
+		ur.logger.Error("database error", "method", "UpdatePassword", "error", result.Error)
+		return domain.NewInternalError("Something went wrong. Please try again later.", result.Error)
+	}
+
+	if result.RowsAffected == 0 {
+		ur.logger.Warn("user email not found", "email", email)
+		return domain.NewNotFoundError("Email not found")
 	}
 
 	return nil
 }
-
 func (ur *userRepository) DeleteOtp(ctx context.Context, id uint) error {
 	if err := ur.db.WithContext(ctx).Delete(&entity.Otp{}, id).Error; err != nil {
 		ur.logger.Error("database error", "error", err, "method", "Delete otp")

@@ -13,7 +13,6 @@ import (
 
 type EmailService struct {
 	*gomail.Dialer
-	// config *config.SMTPConfig
 	OtpExpiry  time.Duration
 	MaxAttempt uint
 }

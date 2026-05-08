@@ -36,7 +36,7 @@ func (b *bycriptHasher) ComparePassword(hashedpassword string, password string) 
 	err := bcrypt.CompareHashAndPassword([]byte(hashedpassword), []byte(password))
 	if err != nil {
 		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
-			b.logger.Warn("invalid password", err, fmt.Errorf("invalid password entered %v", err))
+			b.logger.Warn("invalid password", "error", fmt.Errorf("invalid password entered %v", err))
 			return domain.NewUnAuthenticatedError("Invalid password. Please try again.")
 		}
 		b.logger.Error("internal error", "error", err)

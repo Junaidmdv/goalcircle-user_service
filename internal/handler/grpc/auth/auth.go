@@ -38,7 +38,6 @@ func (uh *authHandler) Register(ctx context.Context, req *pb.RegisterRequest) (*
 
 	request := dt.ToRegisterReq(req)
 
-
 	if validationErrs := uh.validater.Validation(request); validationErrs != nil {
 		stWithDetails, err := ValidationError(validationErrs)
 		if err != nil {
@@ -61,7 +60,7 @@ func (uh *authHandler) Register(ctx context.Context, req *pb.RegisterRequest) (*
 	return dt.ToRegisterResponse(response), nil
 }
 
-func (uh *authHandler) VerifyOtp(ctx context.Context, req *pb.VerifyOtpReq) (*pb.VerifyOtpRes, error) {
+func (uh *authHandler) VerfiyOtp(ctx context.Context, req *pb.VerifyOtpReq) (*pb.VerifyOtpRes, error) {
 	ctx, cancel := context.WithTimeout(ctx, *uh.timeout)
 	defer cancel()
 
@@ -201,9 +200,12 @@ func (uh *authHandler) ResetPassword(ctx context.Context, pb *pb.ResetPasswordRe
 		return nil, stWithDetails.Err()
 	}
 
+	uh.logger.Info("reset token data", "data", request, "token", request.ResetToken)
+
 	res, err := uh.authUseCase.ResetPassword(ctx, &ucdtos.ResetPasswordReq{
-		Email:    request.Email,
-		Password: request.Password,
+		Email:      request.Email,
+		Password:   request.Password,
+		ResetToken: request.ResetToken,
 	})
 
 	if err != nil {
@@ -212,7 +214,7 @@ func (uh *authHandler) ResetPassword(ctx context.Context, pb *pb.ResetPasswordRe
 	return dt.ToResetPasswordRes(res), nil
 }
 
-func (uh *authHandler) RenewAcccessToken(ctx context.Context, pb *pb.RenewAccessTokenReq) (*pb.RenewAccessTokenRes, error) {
+func (uh *authHandler) RenweAccessToken(ctx context.Context, pb *pb.RenewAccessTokenReq) (*pb.RenewAccessTokenRes, error) {
 	ctx, cancel := context.WithTimeout(ctx, *uh.timeout)
 	defer cancel()
 

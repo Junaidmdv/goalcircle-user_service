@@ -5,8 +5,7 @@ type OtpType string
 const (
 	Register       OtpType = "register"
 	ResetPassword  OtpType = "reset_pasword"
-	ResendOtp      OtpType = "resended_otp"
-	ForgotPassword OtpType = "forgot password"
+	ForgotPassword OtpType = "forgot_password" 
 	OtpMaxAttempts         = 5
 )
 

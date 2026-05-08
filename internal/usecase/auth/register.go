@@ -101,6 +101,7 @@ func (us *authUsecase) InitiateUserRegistration(ctx context.Context, input *uc_d
 	if err != nil {
 		return nil, err
 	}
+
 	return uc_dtos.ToRegisterResponse(res, otpdata), nil
 }
 
@@ -116,6 +117,8 @@ func (us *authUsecase) VerifyOtp(ctx context.Context, input *uc_dtos.VerifyOtpRe
 		return nil, err
 	}
 
+	us.logger.Info("otp data", "time", time.Now(), "data", otpRecord)
+
 	if otpRecord.Attempts == entity.OtpMaxAttempts {
 		return nil, domain.NewUnAuthenticatedError("OTP has reached max attempt.Resend otp")
 	}
@@ -129,7 +132,7 @@ func (us *authUsecase) VerifyOtp(ctx context.Context, input *uc_dtos.VerifyOtpRe
 		if err := us.userRepo.UpdateOtpAttempts(ctx, input.Email, entity.Register); err != nil {
 			return nil, err
 		}
-		return nil, domain.NewUnAuthenticatedError("OTP has expired. Please request a new one")
+		return nil, domain.NewUnAuthenticatedError("Invalid otp.Try again. ")
 	}
 
 	if err := us.userRepo.DeleteOtp(ctx, otpRecord.ID); err != nil {
@@ -295,19 +298,24 @@ func (uc *authUsecase) ForgotPassword(ctx context.Context, input *uc_dtos.Forgot
 		return nil, uc.email.MapMailError(err)
 	}
 
+	otpExpiredAt := time.Now().Add(otp.Expiry)
+
 	otpdata, err := uc.userRepo.AddOtpData(ctx, &entity.Otp{
-		Email:    input.Email,
-		Otp:      otp.Otp,
-		Type:     string(entity.ForgotPassword),
-		Attempts: 0,
+		Email:     input.Email,
+		Otp:       otp.Otp,
+		Type:      string(entity.ForgotPassword),
+		Attempts:  0,
+		ExpiresAt: otpExpiredAt,
 	})
 	if err != nil {
 		return nil, err
 	}
 
+	uc.logger.Info("otp data added in db", "data", otpdata)
+
 	return &uc_dtos.ForgotPasswordRes{
 		Success:   true,
-		ExpiresAt: otpdata.ExpiresAt,
+		ExpiresAt: otpExpiredAt,
 	}, nil
 }
 
@@ -367,6 +375,9 @@ func (uc *authUsecase) VerifyForgotPasswordOtp(ctx context.Context, input *uc_dt
 }
 
 func (uc *authUsecase) ResetPassword(ctx context.Context, input *uc_dtos.ResetPasswordReq) (*uc_dtos.ResetPasswordRes, error) {
+
+	
+
 	claims, err := uc.token.VerifyToken(input.ResetToken)
 	if err != nil {
 		uc.logger.Warn("invalid reset token", "method", "ResetPassword", "error", err)

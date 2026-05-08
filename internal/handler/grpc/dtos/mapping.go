@@ -110,6 +110,7 @@ func ToResetPasswordReq(req *pb.ResetPasswordReq) *ResetPasswordReq {
 		Email:           req.Email,
 		Password:        req.Password,
 		ConfirmPassword: req.ConfirmPassword,
+		ResetToken:      req.ResetToken,
 	}
 }
 

@@ -16,9 +16,8 @@ type RegisterResponse struct {
 }
 
 type VerifyOtpReq struct {
-	Email    string `json:"email" validate:"required,email"`
-	PhoneNum string `json:"phone_num" validate:"phone"`
-	Otp      string `json:"otp" validate:"required,len=6"`
+	Email string `json:"email" validate:"required,email"`
+	Otp   string `json:"otp" validate:"required,len=6"`
 }
 
 type LoginReq struct {
@@ -28,7 +27,7 @@ type LoginReq struct {
 
 type ResendOtpReq struct {
 	Email   string         `json:"email" validate:"required,email"`
-	OtpType entity.OtpType `json:"otp-type" validate:"required"`
+	OtpType entity.OtpType `json:"otp_type" validate:"required,oneof=reset_pasword register forgot_password"`
 }
 
 type ForgotPasswordReq struct {
@@ -44,6 +43,7 @@ type ResetPasswordReq struct {
 	Email           string `json:"email" validate:"required,email"`
 	Password        string `json:"password" validate:"required"`
 	ConfirmPassword string `json:"confirm_password" validate:"required"`
+	ResetToken      string `json:"reset_token"`
 }
 
 type RenewAcccessTokenReq struct {
