@@ -8,6 +8,7 @@ import (
 type GoogleAuthConfig struct {
 	ClientId     string
 	ClientSecret string
+	RedirectUrl  string
 }
 
 func (cb *configBuilder) WithGoogleAuth() ConfigBuilder {
@@ -16,19 +17,25 @@ func (cb *configBuilder) WithGoogleAuth() ConfigBuilder {
 		cb.errors = append(cb.errors, errors.New("missing google client id"))
 	}
 
-	clientSecrete := os.Getenv("GOOGLE_CLIENT_SECRETE")
-	if clientSecrete == "" {
+	clientSecret := os.Getenv("GOOGLE_CLIENT_SECRETE")
+	if clientSecret == "" {
 		cb.errors = append(cb.errors, errors.New("missing google client secrete"))
+	}
+
+	redirectUrl := os.Getenv("GOOGLE_REDIRECT_URL")
+
+	if redirectUrl == "" {
+		cb.errors = append(cb.errors, errors.New("missing redirect url"))
+
 	}
 
 	if len(cb.errors) > 0 {
 		return cb
 	}
 
-
 	cb.config.GoogleAuthConfig = &GoogleAuthConfig{
 		ClientId:     clientId,
-		ClientSecret: clientSecrete,
+		ClientSecret: clientSecret,
 	}
 
 	return cb

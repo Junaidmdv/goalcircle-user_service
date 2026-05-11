@@ -42,6 +42,7 @@ func main() {
 		WithJWT().
 		WithRedis().
 		WithSMTP().
+		WithGoogleAuth().
 		//WithDiscStorage().
 		Build()
 	logger.Info("configration is done")
@@ -71,8 +72,6 @@ func main() {
 		logger.Error("database migration error", "error", err)
 		return
 	}
-
-	
 
 	userRepo := repository.NewUserRepository(datbaseConnectin.DB, logger, config.GRPC.TimeOut)
 	uidGenerater := uid.NewUUIDGenerater()
