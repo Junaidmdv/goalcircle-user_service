@@ -16,6 +16,7 @@ type Config struct {
 	Twilio   *TwilioConfig
 	SMTP     *SMTPConfig
 	DiscStorage    *DiscStorageConfig
+	GoogleAuthConfig *GoogleAuthConfig
 }
 
 type configBuilder struct {
@@ -30,7 +31,8 @@ type ConfigBuilder interface {
 	WithRedis() ConfigBuilder
 	WithTwilio() ConfigBuilder
 	WithSMTP() ConfigBuilder
-	WithDiscStorage() ConfigBuilder
+	WithDiscStorage() ConfigBuilder  
+	WithGoogleAuth()ConfigBuilder
 	Build() (*Config, []error)
 }
 
