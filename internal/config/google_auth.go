@@ -25,12 +25,11 @@ func (cb *configBuilder) WithGoogleAuth() ConfigBuilder {
 		return cb
 	}
 
-	googlecnfig := &GoogleAuthConfig{
+
+	cb.config.GoogleAuthConfig = &GoogleAuthConfig{
 		ClientId:     clientId,
 		ClientSecret: clientSecrete,
 	}
-
-	cb.config.GoogleAuthConfig = googlecnfig
 
 	return cb
 }
