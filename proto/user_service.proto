@@ -47,7 +47,7 @@ message LoginRequest{
 
 
 message LoginResponse{
-   string sussion_id=1;
+   string session_id=1;
    string user_id=2; 
    string full_name=3; 
    string email=4;
@@ -159,7 +159,14 @@ message GoogleCallbackReq{
 }
 
 message GoogleCallbackRes{
-  
+   string session_id=1;
+   string user_id=2; 
+   string full_name=3; 
+   string email=4;
+   string access_token=5; 
+   google.protobuf.Timestamp access_token_expiry=6;  
+   string refresh_token=7; 
+   google.protobuf.Timestamp refresh_token_expiry=8;
 }
 
 // authentication of users services

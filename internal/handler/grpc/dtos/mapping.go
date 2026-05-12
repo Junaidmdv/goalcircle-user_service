@@ -57,7 +57,7 @@ func ToLoginRes(res *dtos.LoginResponse) *pb.LoginResponse {
 		UserId:             res.UserId,
 		FullName:           res.FullName,
 		Email:              res.Email,
-		SussionId:          res.SessionId,
+		SessionId:          res.SessionId,
 		AccessToken:        res.AccessToken,
 		AccessTokenExpiry:  timestamppb.New(res.AccessTokenExpiry),
 		RefreshToken:       res.RefreshToken,

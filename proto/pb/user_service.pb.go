@@ -364,7 +364,7 @@ func (x *LoginRequest) GetPassword() string {
 
 type LoginResponse struct {
 	state              protoimpl.MessageState `protogen:"open.v1"`
-	SussionId          string                 `protobuf:"bytes,1,opt,name=sussion_id,json=sussionId,proto3" json:"sussion_id,omitempty"`
+	SessionId          string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
 	UserId             string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	FullName           string                 `protobuf:"bytes,3,opt,name=full_name,json=fullName,proto3" json:"full_name,omitempty"`
 	Email              string                 `protobuf:"bytes,4,opt,name=email,proto3" json:"email,omitempty"`
@@ -406,9 +406,9 @@ func (*LoginResponse) Descriptor() ([]byte, []int) {
 	return file_user_service_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *LoginResponse) GetSussionId() string {
+func (x *LoginResponse) GetSessionId() string {
 	if x != nil {
-		return x.SussionId
+		return x.SessionId
 	}
 	return ""
 }
@@ -1427,9 +1427,17 @@ func (x *GoogleCallbackReq) GetCallbackCode() string {
 }
 
 type GoogleCallbackRes struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	SessionId          string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	UserId             string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	FullName           string                 `protobuf:"bytes,3,opt,name=full_name,json=fullName,proto3" json:"full_name,omitempty"`
+	Email              string                 `protobuf:"bytes,4,opt,name=email,proto3" json:"email,omitempty"`
+	AccessToken        string                 `protobuf:"bytes,5,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
+	AccessTokenExpiry  *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=access_token_expiry,json=accessTokenExpiry,proto3" json:"access_token_expiry,omitempty"`
+	RefreshToken       string                 `protobuf:"bytes,7,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"`
+	RefreshTokenExpiry *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=refresh_token_expiry,json=refreshTokenExpiry,proto3" json:"refresh_token_expiry,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *GoogleCallbackRes) Reset() {
@@ -1460,6 +1468,62 @@ func (x *GoogleCallbackRes) ProtoReflect() protoreflect.Message {
 // Deprecated: Use GoogleCallbackRes.ProtoReflect.Descriptor instead.
 func (*GoogleCallbackRes) Descriptor() ([]byte, []int) {
 	return file_user_service_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *GoogleCallbackRes) GetSessionId() string {
+	if x != nil {
+		return x.SessionId
+	}
+	return ""
+}
+
+func (x *GoogleCallbackRes) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *GoogleCallbackRes) GetFullName() string {
+	if x != nil {
+		return x.FullName
+	}
+	return ""
+}
+
+func (x *GoogleCallbackRes) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+func (x *GoogleCallbackRes) GetAccessToken() string {
+	if x != nil {
+		return x.AccessToken
+	}
+	return ""
+}
+
+func (x *GoogleCallbackRes) GetAccessTokenExpiry() *timestamppb.Timestamp {
+	if x != nil {
+		return x.AccessTokenExpiry
+	}
+	return nil
+}
+
+func (x *GoogleCallbackRes) GetRefreshToken() string {
+	if x != nil {
+		return x.RefreshToken
+	}
+	return ""
+}
+
+func (x *GoogleCallbackRes) GetRefreshTokenExpiry() *timestamppb.Timestamp {
+	if x != nil {
+		return x.RefreshTokenExpiry
+	}
+	return nil
 }
 
 var File_user_service_proto protoreflect.FileDescriptor
@@ -1497,7 +1561,7 @@ const file_user_service_proto_rawDesc = "" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\"\xdc\x02\n" +
 	"\rLoginResponse\x12\x1d\n" +
 	"\n" +
-	"sussion_id\x18\x01 \x01(\tR\tsussionId\x12\x17\n" +
+	"session_id\x18\x01 \x01(\tR\tsessionId\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x1b\n" +
 	"\tfull_name\x18\x03 \x01(\tR\bfullName\x12\x14\n" +
 	"\x05email\x18\x04 \x01(\tR\x05email\x12!\n" +
@@ -1564,8 +1628,17 @@ const file_user_service_proto_rawDesc = "" +
 	"\n" +
 	"expires_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\"8\n" +
 	"\x11GoogleCallbackReq\x12#\n" +
-	"\rcallback_code\x18\x01 \x01(\tR\fcallbackCode\"\x13\n" +
-	"\x11GoogleCallbackRes2\xc3\x06\n" +
+	"\rcallback_code\x18\x01 \x01(\tR\fcallbackCode\"\xe0\x02\n" +
+	"\x11GoogleCallbackRes\x12\x1d\n" +
+	"\n" +
+	"session_id\x18\x01 \x01(\tR\tsessionId\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x1b\n" +
+	"\tfull_name\x18\x03 \x01(\tR\bfullName\x12\x14\n" +
+	"\x05email\x18\x04 \x01(\tR\x05email\x12!\n" +
+	"\faccess_token\x18\x05 \x01(\tR\vaccessToken\x12J\n" +
+	"\x13access_token_expiry\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\x11accessTokenExpiry\x12#\n" +
+	"\rrefresh_token\x18\a \x01(\tR\frefreshToken\x12L\n" +
+	"\x14refresh_token_expiry\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\x12refreshTokenExpiry2\xc3\x06\n" +
 	"\vAuthService\x12?\n" +
 	"\rValidateToken\x12\x16.auth.ValidateTokenReq\x1a\x16.auth.ValidateTokenRes\x129\n" +
 	"\bRegister\x12\x15.auth.RegisterRequest\x1a\x16.auth.RegisterResponse\x123\n" +
@@ -1635,37 +1708,39 @@ var file_user_service_proto_depIdxs = []int32{
 	26, // 7: auth.VerifyForgotPasswordRes.reset_token_expiry:type_name -> google.protobuf.Timestamp
 	26, // 8: auth.RenewAccessTokenRes.access_token_expiry:type_name -> google.protobuf.Timestamp
 	26, // 9: auth.GoogleAuthRes.expires_at:type_name -> google.protobuf.Timestamp
-	20, // 10: auth.AuthService.ValidateToken:input_type -> auth.ValidateTokenReq
-	0,  // 11: auth.AuthService.Register:input_type -> auth.RegisterRequest
-	2,  // 12: auth.AuthService.VerfiyOtp:input_type -> auth.VerifyOtpReq
-	4,  // 13: auth.AuthService.Login:input_type -> auth.LoginRequest
-	6,  // 14: auth.AuthService.ResendOtp:input_type -> auth.ResendOtpReq
-	8,  // 15: auth.AuthService.ForgotPassword:input_type -> auth.ForgotPasswordReq
-	10, // 16: auth.AuthService.VerifyForgotPassword:input_type -> auth.VerifyForgotPasswordReq
-	12, // 17: auth.AuthService.ResetPassword:input_type -> auth.ResetPasswordReq
-	14, // 18: auth.AuthService.RenweAccessToken:input_type -> auth.RenewAccessTokenReq
-	16, // 19: auth.AuthService.LogOut:input_type -> auth.LogOutReq
-	18, // 20: auth.AuthService.OnboardingAddRole:input_type -> auth.OnboardingAddRoleReq
-	22, // 21: auth.AuthService.GoogleAuth:input_type -> auth.GoogleAuthReq
-	24, // 22: auth.AuthService.GoogleAuthCallback:input_type -> auth.GoogleCallbackReq
-	21, // 23: auth.AuthService.ValidateToken:output_type -> auth.ValidateTokenRes
-	1,  // 24: auth.AuthService.Register:output_type -> auth.RegisterResponse
-	3,  // 25: auth.AuthService.VerfiyOtp:output_type -> auth.VerifyOtpRes
-	5,  // 26: auth.AuthService.Login:output_type -> auth.LoginResponse
-	7,  // 27: auth.AuthService.ResendOtp:output_type -> auth.ResendOtpRes
-	9,  // 28: auth.AuthService.ForgotPassword:output_type -> auth.ForgotPasswordRes
-	11, // 29: auth.AuthService.VerifyForgotPassword:output_type -> auth.VerifyForgotPasswordRes
-	13, // 30: auth.AuthService.ResetPassword:output_type -> auth.ResetPasswordRes
-	15, // 31: auth.AuthService.RenweAccessToken:output_type -> auth.RenewAccessTokenRes
-	17, // 32: auth.AuthService.LogOut:output_type -> auth.LogOutRes
-	19, // 33: auth.AuthService.OnboardingAddRole:output_type -> auth.OnboardingAddRoleRes
-	23, // 34: auth.AuthService.GoogleAuth:output_type -> auth.GoogleAuthRes
-	25, // 35: auth.AuthService.GoogleAuthCallback:output_type -> auth.GoogleCallbackRes
-	23, // [23:36] is the sub-list for method output_type
-	10, // [10:23] is the sub-list for method input_type
-	10, // [10:10] is the sub-list for extension type_name
-	10, // [10:10] is the sub-list for extension extendee
-	0,  // [0:10] is the sub-list for field type_name
+	26, // 10: auth.GoogleCallbackRes.access_token_expiry:type_name -> google.protobuf.Timestamp
+	26, // 11: auth.GoogleCallbackRes.refresh_token_expiry:type_name -> google.protobuf.Timestamp
+	20, // 12: auth.AuthService.ValidateToken:input_type -> auth.ValidateTokenReq
+	0,  // 13: auth.AuthService.Register:input_type -> auth.RegisterRequest
+	2,  // 14: auth.AuthService.VerfiyOtp:input_type -> auth.VerifyOtpReq
+	4,  // 15: auth.AuthService.Login:input_type -> auth.LoginRequest
+	6,  // 16: auth.AuthService.ResendOtp:input_type -> auth.ResendOtpReq
+	8,  // 17: auth.AuthService.ForgotPassword:input_type -> auth.ForgotPasswordReq
+	10, // 18: auth.AuthService.VerifyForgotPassword:input_type -> auth.VerifyForgotPasswordReq
+	12, // 19: auth.AuthService.ResetPassword:input_type -> auth.ResetPasswordReq
+	14, // 20: auth.AuthService.RenweAccessToken:input_type -> auth.RenewAccessTokenReq
+	16, // 21: auth.AuthService.LogOut:input_type -> auth.LogOutReq
+	18, // 22: auth.AuthService.OnboardingAddRole:input_type -> auth.OnboardingAddRoleReq
+	22, // 23: auth.AuthService.GoogleAuth:input_type -> auth.GoogleAuthReq
+	24, // 24: auth.AuthService.GoogleAuthCallback:input_type -> auth.GoogleCallbackReq
+	21, // 25: auth.AuthService.ValidateToken:output_type -> auth.ValidateTokenRes
+	1,  // 26: auth.AuthService.Register:output_type -> auth.RegisterResponse
+	3,  // 27: auth.AuthService.VerfiyOtp:output_type -> auth.VerifyOtpRes
+	5,  // 28: auth.AuthService.Login:output_type -> auth.LoginResponse
+	7,  // 29: auth.AuthService.ResendOtp:output_type -> auth.ResendOtpRes
+	9,  // 30: auth.AuthService.ForgotPassword:output_type -> auth.ForgotPasswordRes
+	11, // 31: auth.AuthService.VerifyForgotPassword:output_type -> auth.VerifyForgotPasswordRes
+	13, // 32: auth.AuthService.ResetPassword:output_type -> auth.ResetPasswordRes
+	15, // 33: auth.AuthService.RenweAccessToken:output_type -> auth.RenewAccessTokenRes
+	17, // 34: auth.AuthService.LogOut:output_type -> auth.LogOutRes
+	19, // 35: auth.AuthService.OnboardingAddRole:output_type -> auth.OnboardingAddRoleRes
+	23, // 36: auth.AuthService.GoogleAuth:output_type -> auth.GoogleAuthRes
+	25, // 37: auth.AuthService.GoogleAuthCallback:output_type -> auth.GoogleCallbackRes
+	25, // [25:38] is the sub-list for method output_type
+	12, // [12:25] is the sub-list for method input_type
+	12, // [12:12] is the sub-list for extension type_name
+	12, // [12:12] is the sub-list for extension extendee
+	0,  // [0:12] is the sub-list for field type_name
 }
 
 func init() { file_user_service_proto_init() }

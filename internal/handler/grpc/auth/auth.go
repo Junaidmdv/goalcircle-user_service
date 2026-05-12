@@ -315,11 +315,23 @@ func (h *authHandler) GoogleOauth(ctx context.Context, req *pb.GoogleAuthReq) (*
 	}, nil
 }
 
-
-
-func(uh *authHandler)GoogleOauthCallback(ctx context.Context,req *pb.GoogleCallbackReq)(*pb.GoogleCallbackRes,error){
-	uh.authUseCase.GoogleOauthCallback(ctx,&ucdtos.GoogleCallbackReq{
-          Code: req.CallbackCode,
+func (uh *authHandler) GoogleOauthCallback(ctx context.Context, req *pb.GoogleCallbackReq) (*pb.GoogleCallbackRes, error) {
+	res, err := uh.authUseCase.GoogleOauthCallback(ctx, &ucdtos.GoogleCallbackReq{
+		Code: req.CallbackCode,
 	})
-   return nil,nil
+
+	if err != nil {
+		return nil, domain.GRPCStatus(err)
+	}
+
+	return &pb.GoogleCallbackRes{
+		SessionId:          res.SessionId,
+		UserId:             res.UserId,
+		FullName:           res.FullName,
+		Email:              res.Email,
+		AccessToken:        res.AccessToken,
+		AccessTokenExpiry:  timestamppb.New(res.AccessTokenExpiry),
+		RefreshToken:       res.RefreshToken,
+		RefreshTokenExpiry: timestamppb.New(res.RefreshTokenExpiry),
+	}, nil
 }
