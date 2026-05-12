@@ -149,10 +149,18 @@ message GoogleAuthReq{
 
 message GoogleAuthRes{
    string redirect_url=1;
-   string state=2;
+   string state=2; 
+   google.protobuf.Timestamp expires_at=3;
 }  
 
 
+message GoogleCallbackReq{
+   string callback_code=1;
+}
+
+message GoogleCallbackRes{
+  
+}
 
 // authentication of users services
 service AuthService{ 
@@ -178,7 +186,9 @@ service AuthService{
 
   rpc OnboardingAddRole(OnboardingAddRoleReq)returns(OnboardingAddRoleRes);  
 
-  rpc GoogleAuth(GoogleAuthReq)returns(GoogleAuthRes);
+  rpc GoogleAuth(GoogleAuthReq)returns(GoogleAuthRes);  
+
+  rpc GoogleAuthCallback(GoogleCallbackReq)returns(GoogleCallbackRes);
   
 }
 

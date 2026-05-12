@@ -4,11 +4,12 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"strconv"
 	"time"
 
-	"github.com/Junaidmdv/goalcircle-user_service/internal/config"
 	"github.com/Junaidmdv/goalcircle-user_service/internal/domain"
 	"github.com/Junaidmdv/goalcircle-user_service/internal/domain/entity"
 	"github.com/Junaidmdv/goalcircle-user_service/internal/domain/repository"
@@ -19,6 +20,7 @@ import (
 	uc_dtos "github.com/Junaidmdv/goalcircle-user_service/internal/usecase/dtos"
 	"github.com/Junaidmdv/goalcircle-user_service/pkg/logger"
 	"github.com/Junaidmdv/goalcircle-user_service/pkg/tokens"
+	"golang.org/x/oauth2"
 )
 
 type AuthUsecase interface {
@@ -36,31 +38,32 @@ type AuthUsecase interface {
 	OnboardingAddOrganiserDetails(context.Context, *uc_dtos.OnboardingOrganiserDtlsReq) (*uc_dtos.OnboardingAddOrganiserDtlsRes, error)
 	ValidateToken(context.Context, string) (*tokens.UserClaims, error)
 	GoogleOauth(context.Context, *uc_dtos.GoogleOauthReq) (*uc_dtos.GoogleOauthRes, error)
+	GoogleOauthCallback(context.Context, *uc_dtos.GoogleCallbackReq) (*uc_dtos.GoogleCallbackRes, error)
 }
 
 type authUsecase struct {
-	userRepo          repository.UserRepository
-	logger            logger.Logger
-	timeout           *time.Duration
-	uidGenerater      uid.UuidGenerater
-	hash              bycrypt.PasswordHasher
-	token             *tokens.JwtMaker
-	session           repository.SessionStorage
-	email             *otp.EmailService
-	googleOauthConfig *config.GoogleAuthConfig
+	userRepo     repository.UserRepository
+	logger       logger.Logger
+	timeout      *time.Duration
+	uidGenerater uid.UuidGenerater
+	hash         bycrypt.PasswordHasher
+	token        *tokens.JwtMaker
+	session      repository.SessionStorage
+	email        *otp.EmailService
+	googleOauth  *oauth.GoogleOauth
 }
 
-func NewAuthUsecase(ur repository.UserRepository, logger logger.Logger, time *time.Duration, uidgen uid.UuidGenerater, hash bycrypt.PasswordHasher, token *tokens.JwtMaker, session repository.SessionStorage, email *otp.EmailService, googleOauth *config.GoogleAuthConfig) AuthUsecase {
+func NewAuthUsecase(ur repository.UserRepository, logger logger.Logger, time *time.Duration, uidgen uid.UuidGenerater, hash bycrypt.PasswordHasher, token *tokens.JwtMaker, session repository.SessionStorage, email *otp.EmailService, googleOauth *oauth.GoogleOauth) AuthUsecase {
 	return &authUsecase{
-		userRepo:          ur,
-		logger:            logger,
-		timeout:           time,
-		uidGenerater:      uidgen,
-		hash:              hash,
-		token:             token,
-		session:           session,
-		email:             email,
-		googleOauthConfig: googleOauth,
+		userRepo:     ur,
+		logger:       logger,
+		timeout:      time,
+		uidGenerater: uidgen,
+		hash:         hash,
+		token:        token,
+		session:      session,
+		email:        email,
+		googleOauth:  googleOauth,
 	}
 }
 
@@ -518,18 +521,111 @@ func generateState() (string, error) {
 }
 
 func (uc *authUsecase) GoogleOauth(ctx context.Context, input *uc_dtos.GoogleOauthReq) (*uc_dtos.GoogleOauthRes, error) {
-	googleAuth := oauth.NewGoogleOauth(uc.googleOauthConfig)
+	goauth := uc.googleOauth.Config
 	state, err := generateState()
 	if err != nil {
 		uc.logger.Error("failed generate state", "error", err)
 		return nil, domain.NewInternalError("Something went wrong. Please try again later", err)
 	}
 
-	url := googleAuth.AuthCodeURL(state)
+	url := goauth.AuthCodeURL(state)
 
 	return &uc_dtos.GoogleOauthRes{
 		RedirectUrl: url,
 		State:       state,
+		ExpireAt:    time.Now().Add(uc.googleOauth.TimeOut),
 	}, nil
 
+}
+
+func (uc *authUsecase) GoogleOauthCallback(ctx context.Context, input *uc_dtos.GoogleCallbackReq) (*uc_dtos.GoogleCallbackRes, error) {
+	goauth := uc.googleOauth.Config
+
+	token, err := goauth.Exchange(ctx, input.Code)
+	if err != nil {
+		var retrieveErr *oauth2.RetrieveError
+		if errors.As(err, &retrieveErr) {
+			switch retrieveErr.Response.StatusCode {
+			case 400:
+				return nil, domain.NewBadRequestError("Authorization code is invalid or expired")
+			case 401:
+				return nil, domain.NewUnAuthenticatedError("OAuth authentication failed")
+			case 500, 503:
+				return nil, domain.NewInternalError("Google service unavailable", err)
+			default:
+				return nil, domain.NewInternalError("Something went wrong", err)
+			}
+		}
+		return nil, domain.NewInternalError("Something went wrong", err)
+	}
+	client := goauth.Client(context.Background(), token)
+	resp, err := client.Get("https://www.googleapis.com/oauth2/v2/userinfo")
+	if err != nil {
+		uc.logger.Error("failed google api call", "error", err)
+		return nil, domain.NewInternalError("Something went wrong. Please try again later.", err)
+	}
+	defer resp.Body.Close()
+
+	var userInfo uc_dtos.GoogleUserInfo
+	if err := json.NewDecoder(resp.Body).Decode(&userInfo); err != nil {
+		uc.logger.Error("failed unmarshall", "error", err)
+		return nil, domain.NewInternalError("Something went wrong", fmt.Errorf("failed to unmarshall user data"))
+	}
+
+	exist, err := uc.userRepo.CheckEmailExist(ctx, userInfo.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	if exist {
+		return nil, domain.NewConflictError("email already exist")
+	}
+
+	user, err := uc.userRepo.CreateUser(ctx, &entity.User{
+		Id:           uc.uidGenerater.Generate(),
+		FullName:     userInfo.Name,
+		Email:        userInfo.Email,
+		GoogleAuthId: userInfo.ID,
+		UserType:     entity.UNSPECIFIED,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	uc.logger.Info("user created", "id", user.Id, "email", user.Email)
+
+	accessToken, accessClaims, err := uc.token.GenerateToken(user.Id, user.Email, "user", uc.token.AccessTokenExpiry)
+	if err != nil {
+		uc.logger.Error("failed to generater token", "error", err)
+		return nil, domain.NewInternalError("Something went wrong.Please try again later.", err)
+	}
+
+	refreshToken, refreshClaims, err := uc.token.GenerateToken(user.Id, user.Email, "user", uc.token.RefreshTokenExpiry)
+	if err != nil {
+		uc.logger.Error("failed to generater token", "error", err)
+		return nil, domain.NewInternalError("Something went wrong.Please try again later.", err)
+	}
+
+	if err := uc.session.SaveSession(ctx, "session:"+refreshClaims.ID, &entity.Session{
+		ID:           refreshClaims.ID,
+		UserEmail:    refreshClaims.Email,
+		RefreshToken: refreshToken,
+		IsRevoked:    strconv.FormatBool(false),
+		CreatedAt:    time.Now().Format(time.RFC3339),
+		ExpiresAt:    refreshClaims.ExpiresAt.Time.Format(time.RFC3339),
+	}); err != nil {
+		return nil, err
+	}
+
+	return &uc_dtos.GoogleCallbackRes{
+		SessionId:          refreshClaims.ID,
+		UserId:             user.Id,
+		FullName:           user.FullName,
+		Email:              user.Email,
+		AccessToken:        accessToken,
+		AccessTokenExpiry:  accessClaims.ExpiresAt.Time,
+		RefreshToken:       refreshToken,
+		RefreshTokenExpiry: refreshClaims.ExpiresAt.Time,
+	}, nil
 }

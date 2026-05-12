@@ -13,6 +13,7 @@ import (
 	"github.com/Junaidmdv/goalcircle-user_service/proto/pb"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type authHandler struct {
@@ -310,5 +311,15 @@ func (h *authHandler) GoogleOauth(ctx context.Context, req *pb.GoogleAuthReq) (*
 	return &pb.GoogleAuthRes{
 		State:       res.State,
 		RedirectUrl: res.RedirectUrl,
+		ExpiresAt:   timestamppb.New(res.ExpireAt),
 	}, nil
+}
+
+
+
+func(uh *authHandler)GoogleOauthCallback(ctx context.Context,req *pb.GoogleCallbackReq)(*pb.GoogleCallbackRes,error){
+	uh.authUseCase.GoogleOauthCallback(ctx,&ucdtos.GoogleCallbackReq{
+          Code: req.CallbackCode,
+	})
+   return nil,nil
 }

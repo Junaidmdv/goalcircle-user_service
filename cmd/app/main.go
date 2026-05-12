@@ -11,6 +11,7 @@ import (
 	"github.com/Junaidmdv/goalcircle-user_service/internal/domain/repository"
 	authHandler "github.com/Junaidmdv/goalcircle-user_service/internal/handler/grpc/auth"
 	"github.com/Junaidmdv/goalcircle-user_service/internal/infrastructure/bycrypt"
+	"github.com/Junaidmdv/goalcircle-user_service/internal/infrastructure/oauth"
 	"github.com/Junaidmdv/goalcircle-user_service/internal/infrastructure/otp"
 	psql "github.com/Junaidmdv/goalcircle-user_service/internal/infrastructure/persistence/postgres"
 	"github.com/Junaidmdv/goalcircle-user_service/internal/infrastructure/redis"
@@ -86,7 +87,9 @@ func main() {
 		logger.Error("failed setup otp service email", "error", err)
 		os.Exit(1)
 	}
-	authusecase := at.NewAuthUsecase(userRepo, logger, &config.GRPC.TimeOut, uidGenerater, passwordHashing, token, sessionStore, emailService, config.GoogleAuthConfig)
+
+	googleOauthSetup := oauth.NewGoogleOauth(config.GoogleAuthConfig)
+	authusecase := at.NewAuthUsecase(userRepo, logger, &config.GRPC.TimeOut, uidGenerater, passwordHashing, token, sessionStore, emailService, googleOauthSetup)
 
 	auth_handler := authHandler.NewAuthHandler(authusecase, logger, validater, &config.GRPC.TimeOut)
 	server := sr.NewGrpcServer()

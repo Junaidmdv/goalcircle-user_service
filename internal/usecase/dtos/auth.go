@@ -88,7 +88,7 @@ type ResetPasswordRes struct {
 
 type ResetPasswordReq struct {
 	Email      string
-	Password   string 
+	Password   string
 	ResetToken string
 }
 
@@ -130,13 +130,35 @@ type OnboardingOrganiserDtlsReq struct {
 type OnboardingAddOrganiserDtlsRes struct {
 }
 
-
-type GoogleOauthReq struct{
-	SessionId string 
+type GoogleOauthReq struct {
+	SessionId string
 }
 
+type GoogleOauthRes struct {
+	State       string
+	RedirectUrl string
+	ExpireAt    time.Time
+}
 
-type GoogleOauthRes struct{ 
-	State string 
-	RedirectUrl string 
+type GoogleCallbackReq struct {
+	Code string
+}
+
+type GoogleCallbackRes struct {
+	SessionId          string
+	UserId             string
+	Email              string
+	FullName           string
+	AccessToken        string
+	AccessTokenExpiry  time.Time
+	RefreshToken       string
+	RefreshTokenExpiry time.Time
+}
+
+type GoogleUserInfo struct {
+	ID       string `json:"id"`
+	Email    string `json:"email"`
+	Name     string `json:"name"`
+	Picture  string `json:"picture"`
+	Verified bool   `json:"verified_email"`
 }
