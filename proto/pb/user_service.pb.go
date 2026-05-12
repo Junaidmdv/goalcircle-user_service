@@ -1278,6 +1278,102 @@ func (x *ValidateTokenRes) GetIsValid() bool {
 	return false
 }
 
+type GoogleAuthReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SessionId     string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GoogleAuthReq) Reset() {
+	*x = GoogleAuthReq{}
+	mi := &file_user_service_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GoogleAuthReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GoogleAuthReq) ProtoMessage() {}
+
+func (x *GoogleAuthReq) ProtoReflect() protoreflect.Message {
+	mi := &file_user_service_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GoogleAuthReq.ProtoReflect.Descriptor instead.
+func (*GoogleAuthReq) Descriptor() ([]byte, []int) {
+	return file_user_service_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *GoogleAuthReq) GetSessionId() string {
+	if x != nil {
+		return x.SessionId
+	}
+	return ""
+}
+
+type GoogleAuthRes struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	RedirectUrl   string                 `protobuf:"bytes,1,opt,name=redirect_url,json=redirectUrl,proto3" json:"redirect_url,omitempty"`
+	State         string                 `protobuf:"bytes,2,opt,name=state,proto3" json:"state,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GoogleAuthRes) Reset() {
+	*x = GoogleAuthRes{}
+	mi := &file_user_service_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GoogleAuthRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GoogleAuthRes) ProtoMessage() {}
+
+func (x *GoogleAuthRes) ProtoReflect() protoreflect.Message {
+	mi := &file_user_service_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GoogleAuthRes.ProtoReflect.Descriptor instead.
+func (*GoogleAuthRes) Descriptor() ([]byte, []int) {
+	return file_user_service_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *GoogleAuthRes) GetRedirectUrl() string {
+	if x != nil {
+		return x.RedirectUrl
+	}
+	return ""
+}
+
+func (x *GoogleAuthRes) GetState() string {
+	if x != nil {
+		return x.State
+	}
+	return ""
+}
+
 var File_user_service_proto protoreflect.FileDescriptor
 
 const file_user_service_proto_rawDesc = "" +
@@ -1370,7 +1466,13 @@ const file_user_service_proto_rawDesc = "" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x14\n" +
 	"\x05email\x18\x02 \x01(\tR\x05email\x12\x12\n" +
 	"\x04role\x18\x03 \x01(\tR\x04role\x12\x19\n" +
-	"\bis_valid\x18\x04 \x01(\bR\aisValid2\xc3\x05\n" +
+	"\bis_valid\x18\x04 \x01(\bR\aisValid\".\n" +
+	"\rGoogleAuthReq\x12\x1d\n" +
+	"\n" +
+	"session_id\x18\x01 \x01(\tR\tsessionId\"H\n" +
+	"\rGoogleAuthRes\x12!\n" +
+	"\fredirect_url\x18\x01 \x01(\tR\vredirectUrl\x12\x14\n" +
+	"\x05state\x18\x02 \x01(\tR\x05state2\xfb\x05\n" +
 	"\vAuthService\x12?\n" +
 	"\rValidateToken\x12\x16.auth.ValidateTokenReq\x1a\x16.auth.ValidateTokenRes\x129\n" +
 	"\bRegister\x12\x15.auth.RegisterRequest\x1a\x16.auth.RegisterResponse\x123\n" +
@@ -1382,7 +1484,9 @@ const file_user_service_proto_rawDesc = "" +
 	"\rResetPassword\x12\x16.auth.ResetPasswordReq\x1a\x16.auth.ResetPasswordRes\x12H\n" +
 	"\x10RenweAccessToken\x12\x19.auth.RenewAccessTokenReq\x1a\x19.auth.RenewAccessTokenRes\x12*\n" +
 	"\x06LogOut\x12\x0f.auth.LogOutReq\x1a\x0f.auth.LogOutRes\x12K\n" +
-	"\x11OnboardingAddRole\x12\x1a.auth.OnboardingAddRoleReq\x1a\x1a.auth.OnboardingAddRoleResB8Z6github.com/junaidmdv/goalcirlcle/user_service/proto/pbb\x06proto3"
+	"\x11OnboardingAddRole\x12\x1a.auth.OnboardingAddRoleReq\x1a\x1a.auth.OnboardingAddRoleRes\x126\n" +
+	"\n" +
+	"GoogleAuth\x12\x13.auth.GoogleAuthReq\x1a\x13.auth.GoogleAuthResB8Z6github.com/junaidmdv/goalcirlcle/user_service/proto/pbb\x06proto3"
 
 var (
 	file_user_service_proto_rawDescOnce sync.Once
@@ -1396,7 +1500,7 @@ func file_user_service_proto_rawDescGZIP() []byte {
 	return file_user_service_proto_rawDescData
 }
 
-var file_user_service_proto_msgTypes = make([]protoimpl.MessageInfo, 22)
+var file_user_service_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
 var file_user_service_proto_goTypes = []any{
 	(*RegisterRequest)(nil),         // 0: auth.RegisterRequest
 	(*RegisterResponse)(nil),        // 1: auth.RegisterResponse
@@ -1420,18 +1524,20 @@ var file_user_service_proto_goTypes = []any{
 	(*OnboardingAddRoleRes)(nil),    // 19: auth.OnboardingAddRoleRes
 	(*ValidateTokenReq)(nil),        // 20: auth.ValidateTokenReq
 	(*ValidateTokenRes)(nil),        // 21: auth.ValidateTokenRes
-	(*timestamppb.Timestamp)(nil),   // 22: google.protobuf.Timestamp
+	(*GoogleAuthReq)(nil),           // 22: auth.GoogleAuthReq
+	(*GoogleAuthRes)(nil),           // 23: auth.GoogleAuthRes
+	(*timestamppb.Timestamp)(nil),   // 24: google.protobuf.Timestamp
 }
 var file_user_service_proto_depIdxs = []int32{
-	22, // 0: auth.RegisterResponse.otp_expires_at:type_name -> google.protobuf.Timestamp
-	22, // 1: auth.VerifyOtpRes.access_token_expiry:type_name -> google.protobuf.Timestamp
-	22, // 2: auth.VerifyOtpRes.refresh_token_expiry:type_name -> google.protobuf.Timestamp
-	22, // 3: auth.LoginResponse.access_token_expiry:type_name -> google.protobuf.Timestamp
-	22, // 4: auth.LoginResponse.refresh_token_expiry:type_name -> google.protobuf.Timestamp
-	22, // 5: auth.ResendOtpRes.otp_expiry:type_name -> google.protobuf.Timestamp
-	22, // 6: auth.ForgotPasswordRes.otp_expiry:type_name -> google.protobuf.Timestamp
-	22, // 7: auth.VerifyForgotPasswordRes.reset_token_expiry:type_name -> google.protobuf.Timestamp
-	22, // 8: auth.RenewAccessTokenRes.access_token_expiry:type_name -> google.protobuf.Timestamp
+	24, // 0: auth.RegisterResponse.otp_expires_at:type_name -> google.protobuf.Timestamp
+	24, // 1: auth.VerifyOtpRes.access_token_expiry:type_name -> google.protobuf.Timestamp
+	24, // 2: auth.VerifyOtpRes.refresh_token_expiry:type_name -> google.protobuf.Timestamp
+	24, // 3: auth.LoginResponse.access_token_expiry:type_name -> google.protobuf.Timestamp
+	24, // 4: auth.LoginResponse.refresh_token_expiry:type_name -> google.protobuf.Timestamp
+	24, // 5: auth.ResendOtpRes.otp_expiry:type_name -> google.protobuf.Timestamp
+	24, // 6: auth.ForgotPasswordRes.otp_expiry:type_name -> google.protobuf.Timestamp
+	24, // 7: auth.VerifyForgotPasswordRes.reset_token_expiry:type_name -> google.protobuf.Timestamp
+	24, // 8: auth.RenewAccessTokenRes.access_token_expiry:type_name -> google.protobuf.Timestamp
 	20, // 9: auth.AuthService.ValidateToken:input_type -> auth.ValidateTokenReq
 	0,  // 10: auth.AuthService.Register:input_type -> auth.RegisterRequest
 	2,  // 11: auth.AuthService.VerfiyOtp:input_type -> auth.VerifyOtpReq
@@ -1443,19 +1549,21 @@ var file_user_service_proto_depIdxs = []int32{
 	14, // 17: auth.AuthService.RenweAccessToken:input_type -> auth.RenewAccessTokenReq
 	16, // 18: auth.AuthService.LogOut:input_type -> auth.LogOutReq
 	18, // 19: auth.AuthService.OnboardingAddRole:input_type -> auth.OnboardingAddRoleReq
-	21, // 20: auth.AuthService.ValidateToken:output_type -> auth.ValidateTokenRes
-	1,  // 21: auth.AuthService.Register:output_type -> auth.RegisterResponse
-	3,  // 22: auth.AuthService.VerfiyOtp:output_type -> auth.VerifyOtpRes
-	5,  // 23: auth.AuthService.Login:output_type -> auth.LoginResponse
-	7,  // 24: auth.AuthService.ResendOtp:output_type -> auth.ResendOtpRes
-	9,  // 25: auth.AuthService.ForgotPassword:output_type -> auth.ForgotPasswordRes
-	11, // 26: auth.AuthService.VerifyForgotPassword:output_type -> auth.VerifyForgotPasswordRes
-	13, // 27: auth.AuthService.ResetPassword:output_type -> auth.ResetPasswordRes
-	15, // 28: auth.AuthService.RenweAccessToken:output_type -> auth.RenewAccessTokenRes
-	17, // 29: auth.AuthService.LogOut:output_type -> auth.LogOutRes
-	19, // 30: auth.AuthService.OnboardingAddRole:output_type -> auth.OnboardingAddRoleRes
-	20, // [20:31] is the sub-list for method output_type
-	9,  // [9:20] is the sub-list for method input_type
+	22, // 20: auth.AuthService.GoogleAuth:input_type -> auth.GoogleAuthReq
+	21, // 21: auth.AuthService.ValidateToken:output_type -> auth.ValidateTokenRes
+	1,  // 22: auth.AuthService.Register:output_type -> auth.RegisterResponse
+	3,  // 23: auth.AuthService.VerfiyOtp:output_type -> auth.VerifyOtpRes
+	5,  // 24: auth.AuthService.Login:output_type -> auth.LoginResponse
+	7,  // 25: auth.AuthService.ResendOtp:output_type -> auth.ResendOtpRes
+	9,  // 26: auth.AuthService.ForgotPassword:output_type -> auth.ForgotPasswordRes
+	11, // 27: auth.AuthService.VerifyForgotPassword:output_type -> auth.VerifyForgotPasswordRes
+	13, // 28: auth.AuthService.ResetPassword:output_type -> auth.ResetPasswordRes
+	15, // 29: auth.AuthService.RenweAccessToken:output_type -> auth.RenewAccessTokenRes
+	17, // 30: auth.AuthService.LogOut:output_type -> auth.LogOutRes
+	19, // 31: auth.AuthService.OnboardingAddRole:output_type -> auth.OnboardingAddRoleRes
+	23, // 32: auth.AuthService.GoogleAuth:output_type -> auth.GoogleAuthRes
+	21, // [21:33] is the sub-list for method output_type
+	9,  // [9:21] is the sub-list for method input_type
 	9,  // [9:9] is the sub-list for extension type_name
 	9,  // [9:9] is the sub-list for extension extendee
 	0,  // [0:9] is the sub-list for field type_name
@@ -1473,7 +1581,7 @@ func file_user_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_user_service_proto_rawDesc), len(file_user_service_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   22,
+			NumMessages:   24,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

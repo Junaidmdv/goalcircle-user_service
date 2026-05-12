@@ -141,6 +141,19 @@ message ValidateTokenRes {
 }
 
 
+message GoogleAuthReq{
+    string session_id=1; 
+
+} 
+
+
+message GoogleAuthRes{
+   string redirect_url=1;
+   string state=2;
+}  
+
+
+
 // authentication of users services
 service AuthService{ 
   rpc ValidateToken(ValidateTokenReq) returns (ValidateTokenRes);
@@ -163,7 +176,9 @@ service AuthService{
 
   rpc LogOut(LogOutReq)returns(LogOutRes);
 
-  rpc OnboardingAddRole(OnboardingAddRoleReq)returns(OnboardingAddRoleRes); 
+  rpc OnboardingAddRole(OnboardingAddRoleReq)returns(OnboardingAddRoleRes);  
+
+  rpc GoogleAuth(GoogleAuthReq)returns(GoogleAuthRes);
   
 }
 

@@ -2,13 +2,16 @@ package config
 
 import (
 	"errors"
+	"fmt"
 	"os"
+	"time"
 )
 
 type GoogleAuthConfig struct {
 	ClientId     string
 	ClientSecret string
 	RedirectUrl  string
+	TimeOut      time.Duration
 }
 
 func (cb *configBuilder) WithGoogleAuth() ConfigBuilder {
@@ -29,6 +32,18 @@ func (cb *configBuilder) WithGoogleAuth() ConfigBuilder {
 
 	}
 
+	oauthSessionTimeOutStr := os.Getenv("GOOGLE_SESSION_TIMEOUT")
+
+	oauthSessionTimeout := 10 * time.Minute // default
+	if oauthSessionTimeOutStr != "" {
+		var err error
+		oauthSessionTimeout, err = time.ParseDuration(oauthSessionTimeOutStr)
+		if err != nil {
+			cb.errors = append(cb.errors, fmt.Errorf("GOOGLE_SESSION_TIMEOUT must be a valid duration (e.g. 5m, 10m): %w", err))
+			return cb
+		}
+	}
+
 	if len(cb.errors) > 0 {
 		return cb
 	}
@@ -36,6 +51,7 @@ func (cb *configBuilder) WithGoogleAuth() ConfigBuilder {
 	cb.config.GoogleAuthConfig = &GoogleAuthConfig{
 		ClientId:     clientId,
 		ClientSecret: clientSecret,
+		TimeOut:      oauthSessionTimeout,
 	}
 
 	return cb

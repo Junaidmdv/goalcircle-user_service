@@ -86,7 +86,7 @@ func main() {
 		logger.Error("failed setup otp service email", "error", err)
 		os.Exit(1)
 	}
-	authusecase := at.NewAuthUsecase(userRepo, logger, &config.GRPC.TimeOut, uidGenerater, passwordHashing, token, sessionStore, emailService)
+	authusecase := at.NewAuthUsecase(userRepo, logger, &config.GRPC.TimeOut, uidGenerater, passwordHashing, token, sessionStore, emailService, config.GoogleAuthConfig)
 
 	auth_handler := authHandler.NewAuthHandler(authusecase, logger, validater, &config.GRPC.TimeOut)
 	server := sr.NewGrpcServer()

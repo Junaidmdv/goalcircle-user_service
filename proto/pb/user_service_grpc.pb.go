@@ -30,6 +30,7 @@ const (
 	AuthService_RenweAccessToken_FullMethodName     = "/auth.AuthService/RenweAccessToken"
 	AuthService_LogOut_FullMethodName               = "/auth.AuthService/LogOut"
 	AuthService_OnboardingAddRole_FullMethodName    = "/auth.AuthService/OnboardingAddRole"
+	AuthService_GoogleAuth_FullMethodName           = "/auth.AuthService/GoogleAuth"
 )
 
 // AuthServiceClient is the client API for AuthService service.
@@ -53,6 +54,7 @@ type AuthServiceClient interface {
 	RenweAccessToken(ctx context.Context, in *RenewAccessTokenReq, opts ...grpc.CallOption) (*RenewAccessTokenRes, error)
 	LogOut(ctx context.Context, in *LogOutReq, opts ...grpc.CallOption) (*LogOutRes, error)
 	OnboardingAddRole(ctx context.Context, in *OnboardingAddRoleReq, opts ...grpc.CallOption) (*OnboardingAddRoleRes, error)
+	GoogleAuth(ctx context.Context, in *GoogleAuthReq, opts ...grpc.CallOption) (*GoogleAuthRes, error)
 }
 
 type authServiceClient struct {
@@ -173,6 +175,16 @@ func (c *authServiceClient) OnboardingAddRole(ctx context.Context, in *Onboardin
 	return out, nil
 }
 
+func (c *authServiceClient) GoogleAuth(ctx context.Context, in *GoogleAuthReq, opts ...grpc.CallOption) (*GoogleAuthRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GoogleAuthRes)
+	err := c.cc.Invoke(ctx, AuthService_GoogleAuth_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServiceServer is the server API for AuthService service.
 // All implementations must embed UnimplementedAuthServiceServer
 // for forward compatibility.
@@ -194,6 +206,7 @@ type AuthServiceServer interface {
 	RenweAccessToken(context.Context, *RenewAccessTokenReq) (*RenewAccessTokenRes, error)
 	LogOut(context.Context, *LogOutReq) (*LogOutRes, error)
 	OnboardingAddRole(context.Context, *OnboardingAddRoleReq) (*OnboardingAddRoleRes, error)
+	GoogleAuth(context.Context, *GoogleAuthReq) (*GoogleAuthRes, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
 
@@ -236,6 +249,9 @@ func (UnimplementedAuthServiceServer) LogOut(context.Context, *LogOutReq) (*LogO
 }
 func (UnimplementedAuthServiceServer) OnboardingAddRole(context.Context, *OnboardingAddRoleReq) (*OnboardingAddRoleRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method OnboardingAddRole not implemented")
+}
+func (UnimplementedAuthServiceServer) GoogleAuth(context.Context, *GoogleAuthReq) (*GoogleAuthRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GoogleAuth not implemented")
 }
 func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
 func (UnimplementedAuthServiceServer) testEmbeddedByValue()                     {}
@@ -456,6 +472,24 @@ func _AuthService_OnboardingAddRole_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_GoogleAuth_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GoogleAuthReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).GoogleAuth(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_GoogleAuth_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).GoogleAuth(ctx, req.(*GoogleAuthReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AuthService_ServiceDesc is the grpc.ServiceDesc for AuthService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -506,6 +540,10 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "OnboardingAddRole",
 			Handler:    _AuthService_OnboardingAddRole_Handler,
+		},
+		{
+			MethodName: "GoogleAuth",
+			Handler:    _AuthService_GoogleAuth_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

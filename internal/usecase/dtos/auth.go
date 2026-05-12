@@ -129,3 +129,14 @@ type OnboardingOrganiserDtlsReq struct {
 
 type OnboardingAddOrganiserDtlsRes struct {
 }
+
+
+type GoogleOauthReq struct{
+	SessionId string 
+}
+
+
+type GoogleOauthRes struct{ 
+	State string 
+	RedirectUrl string 
+}

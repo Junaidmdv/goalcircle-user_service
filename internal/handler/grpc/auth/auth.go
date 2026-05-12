@@ -299,3 +299,16 @@ func (h *authHandler) ValidateToken(ctx context.Context, req *pb.ValidateTokenRe
 		IsValid: true,
 	}, nil
 }
+
+func (h *authHandler) GoogleOauth(ctx context.Context, req *pb.GoogleAuthReq) (*pb.GoogleAuthRes, error) {
+	res, err := h.authUseCase.GoogleOauth(ctx, &ucdtos.GoogleOauthReq{
+		SessionId: req.SessionId,
+	})
+	if err != nil {
+		return nil, domain.GRPCStatus(err)
+	}
+	return &pb.GoogleAuthRes{
+		State:       res.State,
+		RedirectUrl: res.RedirectUrl,
+	}, nil
+}

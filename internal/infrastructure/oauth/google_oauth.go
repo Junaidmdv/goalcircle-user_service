@@ -20,5 +20,3 @@ func NewGoogleOauth(cnfg *config.GoogleAuthConfig) *oauth2.Config {
 		Endpoint: google.Endpoint,
 	}
 }
-
-

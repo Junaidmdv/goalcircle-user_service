@@ -2,14 +2,18 @@ package usecase
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/hex"
 	"errors"
 	"strconv"
 	"time"
 
+	"github.com/Junaidmdv/goalcircle-user_service/internal/config"
 	"github.com/Junaidmdv/goalcircle-user_service/internal/domain"
 	"github.com/Junaidmdv/goalcircle-user_service/internal/domain/entity"
 	"github.com/Junaidmdv/goalcircle-user_service/internal/domain/repository"
 	"github.com/Junaidmdv/goalcircle-user_service/internal/infrastructure/bycrypt"
+	"github.com/Junaidmdv/goalcircle-user_service/internal/infrastructure/oauth"
 	"github.com/Junaidmdv/goalcircle-user_service/internal/infrastructure/otp"
 	"github.com/Junaidmdv/goalcircle-user_service/internal/infrastructure/uid"
 	uc_dtos "github.com/Junaidmdv/goalcircle-user_service/internal/usecase/dtos"
@@ -31,29 +35,32 @@ type AuthUsecase interface {
 	OnboardingAddTeamDetails(context.Context, *uc_dtos.OnboardingTeamDtlsReq) (*uc_dtos.OnboardingTeamDtlsRes, error)
 	OnboardingAddOrganiserDetails(context.Context, *uc_dtos.OnboardingOrganiserDtlsReq) (*uc_dtos.OnboardingAddOrganiserDtlsRes, error)
 	ValidateToken(context.Context, string) (*tokens.UserClaims, error)
+	GoogleOauth(context.Context, *uc_dtos.GoogleOauthReq) (*uc_dtos.GoogleOauthRes, error)
 }
 
 type authUsecase struct {
-	userRepo     repository.UserRepository
-	logger       logger.Logger
-	timeout      *time.Duration
-	uidGenerater uid.UuidGenerater
-	hash         bycrypt.PasswordHasher
-	token        *tokens.JwtMaker
-	session      repository.SessionStorage
-	email        *otp.EmailService
+	userRepo          repository.UserRepository
+	logger            logger.Logger
+	timeout           *time.Duration
+	uidGenerater      uid.UuidGenerater
+	hash              bycrypt.PasswordHasher
+	token             *tokens.JwtMaker
+	session           repository.SessionStorage
+	email             *otp.EmailService
+	googleOauthConfig *config.GoogleAuthConfig
 }
 
-func NewAuthUsecase(ur repository.UserRepository, logger logger.Logger, time *time.Duration, uidgen uid.UuidGenerater, hash bycrypt.PasswordHasher, token *tokens.JwtMaker, session repository.SessionStorage, email *otp.EmailService) AuthUsecase {
+func NewAuthUsecase(ur repository.UserRepository, logger logger.Logger, time *time.Duration, uidgen uid.UuidGenerater, hash bycrypt.PasswordHasher, token *tokens.JwtMaker, session repository.SessionStorage, email *otp.EmailService, googleOauth *config.GoogleAuthConfig) AuthUsecase {
 	return &authUsecase{
-		userRepo:     ur,
-		logger:       logger,
-		timeout:      time,
-		uidGenerater: uidgen,
-		hash:         hash,
-		token:        token,
-		session:      session,
-		email:        email,
+		userRepo:          ur,
+		logger:            logger,
+		timeout:           time,
+		uidGenerater:      uidgen,
+		hash:              hash,
+		token:             token,
+		session:           session,
+		email:             email,
+		googleOauthConfig: googleOauth,
 	}
 }
 
@@ -102,7 +109,11 @@ func (us *authUsecase) InitiateUserRegistration(ctx context.Context, input *uc_d
 		return nil, err
 	}
 
-	return uc_dtos.ToRegisterResponse(res, otpdata), nil
+	return &uc_dtos.RegisterResponse{
+		Email:     res.Email,
+		OtpStatus: otpdata != nil,
+		OtpExpiry: otpdata.ExpiresAt,
+	}, nil
 }
 
 func (us *authUsecase) VerifyOtp(ctx context.Context, input *uc_dtos.VerifyOtpRequest) (*uc_dtos.VerifyOtpResponse, error) {
@@ -376,8 +387,6 @@ func (uc *authUsecase) VerifyForgotPasswordOtp(ctx context.Context, input *uc_dt
 
 func (uc *authUsecase) ResetPassword(ctx context.Context, input *uc_dtos.ResetPasswordReq) (*uc_dtos.ResetPasswordRes, error) {
 
-	
-
 	claims, err := uc.token.VerifyToken(input.ResetToken)
 	if err != nil {
 		uc.logger.Warn("invalid reset token", "method", "ResetPassword", "error", err)
@@ -498,4 +507,29 @@ func (uc *authUsecase) OnboardingAddTeamDetails(ctx context.Context, input *uc_d
 
 func (uc *authUsecase) OnboardingAddOrganiserDetails(ctx context.Context, input *uc_dtos.OnboardingOrganiserDtlsReq) (*uc_dtos.OnboardingAddOrganiserDtlsRes, error) {
 	return nil, nil
+}
+
+func generateState() (string, error) {
+	bytes := make([]byte, 32)
+	if _, err := rand.Read(bytes); err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(bytes), nil
+}
+
+func (uc *authUsecase) GoogleOauth(ctx context.Context, input *uc_dtos.GoogleOauthReq) (*uc_dtos.GoogleOauthRes, error) {
+	googleAuth := oauth.NewGoogleOauth(uc.googleOauthConfig)
+	state, err := generateState()
+	if err != nil {
+		uc.logger.Error("failed generate state", "error", err)
+		return nil, domain.NewInternalError("Something went wrong. Please try again later", err)
+	}
+
+	url := googleAuth.AuthCodeURL(state)
+
+	return &uc_dtos.GoogleOauthRes{
+		RedirectUrl: url,
+		State:       state,
+	}, nil
+
 }

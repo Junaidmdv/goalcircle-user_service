@@ -9,3 +9,8 @@ type Session struct {
 	ExpiresAt    string `redis:"expires_at"`
 }
 
+type OAuthSession struct {
+	ID        string `redis:"session_id"`
+	State     string `redis:"state"`
+	ExpiresAt string `redis:"expires_at"`
+}
