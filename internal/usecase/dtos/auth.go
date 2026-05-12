@@ -155,10 +155,3 @@ type GoogleCallbackRes struct {
 	RefreshTokenExpiry time.Time
 }
 
-type GoogleUserInfo struct {
-	ID       string `json:"id"`
-	Email    string `json:"email"`
-	Name     string `json:"name"`
-	Picture  string `json:"picture"`
-	Verified bool   `json:"verified_email"`
-}

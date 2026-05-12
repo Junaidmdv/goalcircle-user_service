@@ -4,9 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/hex"
-	"encoding/json"
 	"errors"
-	"fmt"
 	"strconv"
 	"time"
 
@@ -20,7 +18,6 @@ import (
 	uc_dtos "github.com/Junaidmdv/goalcircle-user_service/internal/usecase/dtos"
 	"github.com/Junaidmdv/goalcircle-user_service/pkg/logger"
 	"github.com/Junaidmdv/goalcircle-user_service/pkg/tokens"
-	"golang.org/x/oauth2"
 )
 
 type AuthUsecase interface {
@@ -539,40 +536,17 @@ func (uc *authUsecase) GoogleOauth(ctx context.Context, input *uc_dtos.GoogleOau
 }
 
 func (uc *authUsecase) GoogleOauthCallback(ctx context.Context, input *uc_dtos.GoogleCallbackReq) (*uc_dtos.GoogleCallbackRes, error) {
-	goauth := uc.googleOauth.Config
-
-	token, err := goauth.Exchange(ctx, input.Code)
+	token, err := uc.googleOauth.Exchange(ctx, input.Code)
 	if err != nil {
-		var retrieveErr *oauth2.RetrieveError
-		if errors.As(err, &retrieveErr) {
-			switch retrieveErr.Response.StatusCode {
-			case 400:
-				return nil, domain.NewBadRequestError("Authorization code is invalid or expired")
-			case 401:
-				return nil, domain.NewUnAuthenticatedError("OAuth authentication failed")
-			case 500, 503:
-				return nil, domain.NewInternalError("Google service unavailable", err)
-			default:
-				return nil, domain.NewInternalError("Something went wrong", err)
-			}
-		}
-		return nil, domain.NewInternalError("Something went wrong", err)
+		return nil, err
 	}
-	client := goauth.Client(context.Background(), token)
-	resp, err := client.Get("https://www.googleapis.com/oauth2/v2/userinfo")
+
+	authdata, err := uc.googleOauth.GetUserData(ctx, token)
 	if err != nil {
-		uc.logger.Error("failed google api call", "error", err)
-		return nil, domain.NewInternalError("Something went wrong. Please try again later.", err)
-	}
-	defer resp.Body.Close()
-
-	var userInfo uc_dtos.GoogleUserInfo
-	if err := json.NewDecoder(resp.Body).Decode(&userInfo); err != nil {
-		uc.logger.Error("failed unmarshall", "error", err)
-		return nil, domain.NewInternalError("Something went wrong", fmt.Errorf("failed to unmarshall user data"))
+		return nil, err
 	}
 
-	exist, err := uc.userRepo.CheckEmailExist(ctx, userInfo.Email)
+	exist, err := uc.userRepo.CheckEmailExist(ctx, authdata.Email)
 	if err != nil {
 		return nil, err
 	}
@@ -583,9 +557,9 @@ func (uc *authUsecase) GoogleOauthCallback(ctx context.Context, input *uc_dtos.G
 
 	user, err := uc.userRepo.CreateUser(ctx, &entity.User{
 		Id:           uc.uidGenerater.Generate(),
-		FullName:     userInfo.Name,
-		Email:        userInfo.Email,
-		GoogleAuthId: userInfo.ID,
+		FullName:     authdata.Name,
+		Email:        authdata.Email,
+		GoogleAuthId: authdata.ID,
 		UserType:     entity.UNSPECIFIED,
 	})
 
