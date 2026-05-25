@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/Junaidmdv/goalcircle-user_service/internal/config"
@@ -19,6 +20,7 @@ type GoogleOauth struct {
 }
 
 func NewGoogleOauth(cnfg *config.GoogleAuthConfig) *GoogleOauth {
+	log.Println(cnfg.RedirectUrl)
 	googleConfig := &oauth2.Config{
 		ClientID:     cnfg.ClientId,
 		ClientSecret: cnfg.ClientSecret,

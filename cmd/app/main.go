@@ -6,22 +6,9 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-
 	cnfg "github.com/Junaidmdv/goalcircle-user_service/internal/config"
-	"github.com/Junaidmdv/goalcircle-user_service/internal/domain/repository"
-	authHandler "github.com/Junaidmdv/goalcircle-user_service/internal/handler/grpc/auth"
-	"github.com/Junaidmdv/goalcircle-user_service/internal/infrastructure/bycrypt"
-	"github.com/Junaidmdv/goalcircle-user_service/internal/infrastructure/oauth"
-	"github.com/Junaidmdv/goalcircle-user_service/internal/infrastructure/otp"
-	psql "github.com/Junaidmdv/goalcircle-user_service/internal/infrastructure/persistence/postgres"
-	"github.com/Junaidmdv/goalcircle-user_service/internal/infrastructure/redis"
 	sr "github.com/Junaidmdv/goalcircle-user_service/internal/infrastructure/server"
-	"github.com/Junaidmdv/goalcircle-user_service/internal/infrastructure/uid"
-	at "github.com/Junaidmdv/goalcircle-user_service/internal/usecase/auth"
 	logger "github.com/Junaidmdv/goalcircle-user_service/pkg/logger"
-	"github.com/Junaidmdv/goalcircle-user_service/pkg/tokens"
-	vl "github.com/Junaidmdv/goalcircle-user_service/pkg/validater"
-	auth_pb "github.com/Junaidmdv/goalcircle-user_service/proto/pb"
 )
 
 func main() {
@@ -44,7 +31,7 @@ func main() {
 		WithRedis().
 		WithSMTP().
 		WithGoogleAuth().
-		//WithDiscStorage().
+		WithDiscStorage().
 		Build()
 	logger.Info("configration is done")
 	if errs != nil {
@@ -55,46 +42,10 @@ func main() {
 		return
 	}
 
-	validater, err := vl.NewValidater()
-	if err != nil {
-		logger.Error("validation package initilisation error", "error", err)
-		return
-	}
-
-	//user authentication
-
-	//postgres connection
-	datbaseConnectin, err := psql.NewDatabase(config.Postgres)
-	if err != nil {
-		logger.Error("database initilisation error", "error", err)
-		return
-	}
-	if err = datbaseConnectin.Migration(); err != nil {
-		logger.Error("database migration error", "error", err)
-		return
-	}
-
-	userRepo := repository.NewUserRepository(datbaseConnectin.DB, logger, config.GRPC.TimeOut)
-	uidGenerater := uid.NewUUIDGenerater()
-	//otpService := otp.NewSMSOtpService(config.Twilio)
-	redisClient := redis.NewRedisClient(config.Redis)
-	sessionStore := repository.NewSessionStorage(redisClient.Client)
-	hashingCost := 14
-	passwordHashing := bycrypt.NewBycriptHasher(hashingCost, logger)
-	token := tokens.NewTokenMaker(config.JWT, logger)
-	emailService, err := otp.NewEmailService(config.SMTP)
-	if err != nil {
-		logger.Error("failed setup otp service email", "error", err)
+	server := sr.NewGrpcServer(logger, config)
+	if err := server.BootStrapSetup(); err != nil {
 		os.Exit(1)
 	}
-
-	googleOauthSetup := oauth.NewGoogleOauth(config.GoogleAuthConfig)
-	authusecase := at.NewAuthUsecase(userRepo, logger, &config.GRPC.TimeOut, uidGenerater, passwordHashing, token, sessionStore, emailService, googleOauthSetup)
-
-	auth_handler := authHandler.NewAuthHandler(authusecase, logger, validater, &config.GRPC.TimeOut)
-	server := sr.NewGrpcServer()
-	auth_pb.RegisterAuthServiceServer(server.Server, auth_handler)
-
 	go func() {
 		logger.Info("server running", "port", config.GRPC.Port)
 		if err := server.Run(config.GRPC.Port); err != nil {

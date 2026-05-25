@@ -20,7 +20,7 @@ func (cb *configBuilder) WithGoogleAuth() ConfigBuilder {
 		cb.errors = append(cb.errors, errors.New("missing google client id"))
 	}
 
-	clientSecret := os.Getenv("GOOGLE_CLIENT_SECRETE")
+	clientSecret := os.Getenv("GOOGLE_CLIENT_SECRET")
 	if clientSecret == "" {
 		cb.errors = append(cb.errors, errors.New("missing google client secrete"))
 	}
@@ -51,6 +51,7 @@ func (cb *configBuilder) WithGoogleAuth() ConfigBuilder {
 	cb.config.GoogleAuthConfig = &GoogleAuthConfig{
 		ClientId:     clientId,
 		ClientSecret: clientSecret,
+		RedirectUrl:  redirectUrl,
 		TimeOut:      oauthSessionTimeout,
 	}
 

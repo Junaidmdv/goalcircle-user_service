@@ -8,6 +8,12 @@ import (
 	dt "github.com/Junaidmdv/goalcircle-user_service/internal/handler/grpc/dtos"
 	uc "github.com/Junaidmdv/goalcircle-user_service/internal/usecase/auth"
 	ucdtos "github.com/Junaidmdv/goalcircle-user_service/internal/usecase/dtos"
+	"github.com/Junaidmdv/goalcircle-user_service/internal/usecase/oauth"
+	ouc "github.com/Junaidmdv/goalcircle-user_service/internal/usecase/otp"
+
+	"github.com/Junaidmdv/goalcircle-user_service/internal/usecase/onboarding"
+	"github.com/Junaidmdv/goalcircle-user_service/internal/usecase/password"
+	"github.com/Junaidmdv/goalcircle-user_service/internal/usecase/register"
 	"github.com/Junaidmdv/goalcircle-user_service/pkg/logger"
 	vl "github.com/Junaidmdv/goalcircle-user_service/pkg/validater"
 	"github.com/Junaidmdv/goalcircle-user_service/proto/pb"
@@ -18,18 +24,37 @@ import (
 
 type authHandler struct {
 	pb.UnimplementedAuthServiceServer
-	authUseCase uc.AuthUsecase
-	logger      logger.Logger
-	validater   *vl.Validater
-	timeout     *time.Duration
+	authUsecase       uc.AuthUsecase
+	oauthUsecase      oauth.OauthUsecase
+	onboardingUsecase onboarding.OnboardingUsecase
+	passwordUsecase   password.PasswordUsecase
+	registerUsecase   register.RegistrationUsecase
+	otpUsecase        ouc.OtpUsecase
+	logger            logger.Logger
+	validater         *vl.Validater
+	timeout           *time.Duration
 }
 
-func NewAuthHandler(aus uc.AuthUsecase, logger logger.Logger, validate *vl.Validater, time *time.Duration) *authHandler {
+func NewAuthHandler(
+	aus uc.AuthUsecase,
+	oauthUsecase oauth.OauthUsecase,
+	onboardingUc onboarding.OnboardingUsecase,
+	passwordUc password.PasswordUsecase,
+	registerUc register.RegistrationUsecase,
+	otpUc ouc.OtpUsecase,
+	logger logger.Logger, validate *vl.Validater,
+	time *time.Duration) *authHandler {
+
 	return &authHandler{
-		authUseCase: aus,
-		logger:      logger,
-		validater:   validate,
-		timeout:     time,
+		logger:            logger,
+		validater:         validate,
+		timeout:           time,
+		authUsecase:       aus,
+		oauthUsecase:      oauthUsecase,
+		onboardingUsecase: onboardingUc,
+		passwordUsecase:   passwordUc,
+		registerUsecase:   registerUc,
+		otpUsecase:        otpUc,
 	}
 }
 
@@ -47,7 +72,7 @@ func (uh *authHandler) Register(ctx context.Context, req *pb.RegisterRequest) (*
 		return nil, stWithDetails.Err()
 	}
 
-	response, err := uh.authUseCase.InitiateUserRegistration(context, &ucdtos.RegisterRequest{
+	response, err := uh.registerUsecase.InitiateUserRegistration(context, &ucdtos.RegisterRequest{
 		FullName:        request.FullName,
 		Email:           request.Email,
 		Password:        request.Password,
@@ -74,7 +99,7 @@ func (uh *authHandler) VerfiyOtp(ctx context.Context, req *pb.VerifyOtpReq) (*pb
 		return nil, stWithDetails.Err()
 	}
 
-	res, err := uh.authUseCase.VerifyOtp(ctx, &ucdtos.VerifyOtpRequest{
+	res, err := uh.otpUsecase.VerifyOtp(ctx, &ucdtos.VerifyOtpRequest{
 		Email: request.Email,
 		Otp:   request.Otp,
 	})
@@ -100,7 +125,7 @@ func (uh *authHandler) Login(ctx context.Context, req *pb.LoginRequest) (*pb.Log
 		return nil, stWithDetails.Err()
 	}
 
-	res, err := uh.authUseCase.Login(ctx, &ucdtos.LoginRequest{
+	res, err := uh.authUsecase.Login(ctx, &ucdtos.LoginRequest{
 		Email:    req.Email,
 		Password: req.Password,
 	})
@@ -126,7 +151,7 @@ func (uh *authHandler) ResendOtp(ctx context.Context, pb *pb.ResendOtpReq) (*pb.
 		return nil, stWithDetails.Err()
 	}
 
-	res, err := uh.authUseCase.ResendOtp(ctx, &ucdtos.ResendOtpReq{
+	res, err := uh.otpUsecase.ResendOtp(ctx, &ucdtos.ResendOtpReq{
 		Email:   request.Email,
 		OtpType: request.OtpType,
 	})
@@ -151,7 +176,7 @@ func (uh *authHandler) ForgotPassword(ctx context.Context, pb *pb.ForgotPassword
 		return nil, stWithDetails.Err()
 	}
 
-	res, err := uh.authUseCase.ForgotPassword(ctx, &ucdtos.ForgotPasswordReq{
+	res, err := uh.passwordUsecase.ForgotPassword(ctx, &ucdtos.ForgotPasswordReq{
 		Email: request.Email,
 	})
 	if err != nil {
@@ -175,7 +200,7 @@ func (uh *authHandler) VerifyForgotPassword(ctx context.Context, pb *pb.VerifyFo
 		return nil, stWithDetails.Err()
 	}
 
-	res, err := uh.authUseCase.VerifyForgotPasswordOtp(ctx, &ucdtos.VerifyForgotPasswordOtpReq{
+	res, err := uh.passwordUsecase.VerifyForgotPasswordOtp(ctx, &ucdtos.VerifyForgotPasswordOtpReq{
 		Email: request.Email,
 		Otp:   request.Otp,
 	})
@@ -203,7 +228,7 @@ func (uh *authHandler) ResetPassword(ctx context.Context, pb *pb.ResetPasswordRe
 
 	uh.logger.Info("reset token data", "data", request, "token", request.ResetToken)
 
-	res, err := uh.authUseCase.ResetPassword(ctx, &ucdtos.ResetPasswordReq{
+	res, err := uh.passwordUsecase.ResetPassword(ctx, &ucdtos.ResetPasswordReq{
 		Email:      request.Email,
 		Password:   request.Password,
 		ResetToken: request.ResetToken,
@@ -229,7 +254,7 @@ func (uh *authHandler) RenweAccessToken(ctx context.Context, pb *pb.RenewAccessT
 		return nil, stWithDetails.Err()
 	}
 
-	res, err := uh.authUseCase.RenewAccessToken(ctx, &ucdtos.RenewAcccessTokenReq{
+	res, err := uh.authUsecase.RenewAccessToken(ctx, &ucdtos.RenewAcccessTokenReq{
 		RefreshToken: request.RefreshToken,
 	})
 	if err != nil {
@@ -251,7 +276,7 @@ func (uh *authHandler) LogOut(ctx context.Context, pb *pb.LogOutReq) (*pb.LogOut
 		}
 		return nil, stWithDetails.Err()
 	}
-	res, err := uh.authUseCase.LogOut(ctx, &ucdtos.LogOutReq{
+	res, err := uh.authUsecase.LogOut(ctx, &ucdtos.LogOutReq{
 		RefreshToken: request.RefreshToken,
 	})
 	if err != nil {
@@ -275,7 +300,7 @@ func (uh *authHandler) OnboardingAddRole(ctx context.Context, pb *pb.OnboardingA
 		return nil, stWithDetails.Err()
 	}
 
-	res, err := uh.authUseCase.OnboardingAddRole(ctx, &ucdtos.OnboardingRoleReq{
+	res, err := uh.onboardingUsecase.OnboardingAddRole(ctx, &ucdtos.OnboardingRoleReq{
 		UserId: request.UserId,
 		Role:   request.UserRole,
 	})
@@ -289,7 +314,7 @@ func (uh *authHandler) OnboardingAddRole(ctx context.Context, pb *pb.OnboardingA
 }
 
 func (h *authHandler) ValidateToken(ctx context.Context, req *pb.ValidateTokenReq) (*pb.ValidateTokenRes, error) {
-	claims, err := h.authUseCase.ValidateToken(ctx, req.Token)
+	claims, err := h.authUsecase.ValidateToken(ctx, req.Token)
 	if err != nil {
 		return nil, domain.GRPCStatus(err)
 	}
@@ -301,8 +326,8 @@ func (h *authHandler) ValidateToken(ctx context.Context, req *pb.ValidateTokenRe
 	}, nil
 }
 
-func (h *authHandler) GoogleOauth(ctx context.Context, req *pb.GoogleAuthReq) (*pb.GoogleAuthRes, error) {
-	res, err := h.authUseCase.GoogleOauth(ctx, &ucdtos.GoogleOauthReq{
+func (h *authHandler) GoogleAuth(ctx context.Context, req *pb.GoogleAuthReq) (*pb.GoogleAuthRes, error) {
+	res, err := h.oauthUsecase.GoogleOauth(ctx, &ucdtos.GoogleOauthReq{
 		SessionId: req.SessionId,
 	})
 	if err != nil {
@@ -315,8 +340,8 @@ func (h *authHandler) GoogleOauth(ctx context.Context, req *pb.GoogleAuthReq) (*
 	}, nil
 }
 
-func (uh *authHandler) GoogleOauthCallback(ctx context.Context, req *pb.GoogleCallbackReq) (*pb.GoogleCallbackRes, error) {
-	res, err := uh.authUseCase.GoogleOauthCallback(ctx, &ucdtos.GoogleCallbackReq{
+func (uh *authHandler) GoogleAuthCallback(ctx context.Context, req *pb.GoogleCallbackReq) (*pb.GoogleCallbackRes, error) {
+	res, err := uh.oauthUsecase.GoogleOauthCallback(ctx, &ucdtos.GoogleCallbackReq{
 		Code: req.CallbackCode,
 	})
 

@@ -124,7 +124,13 @@ type OnboardingTeamDtlsReq struct {
 type OnboardingTeamDtlsRes struct {
 }
 
-type OnboardingOrganiserDtlsReq struct {
+type OnboardingOrganiserDtlsReq struct {  
+	UserID string 
+	Name   string 
+	City   string 
+	PhoneNum string 
+	Website string 
+	LogoUrl string 
 }
 
 type OnboardingAddOrganiserDtlsRes struct {

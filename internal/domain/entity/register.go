@@ -23,5 +23,5 @@ type Otp struct {
 	ExpiresAt time.Time
 	CreatedAt time.Time
 	DeletedAt time.Time
-	UpdatedAt time.Time
+	UpdatedAt time.Time  
 }
