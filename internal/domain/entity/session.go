@@ -2,7 +2,8 @@ package entity
 
 type Session struct {
 	ID           string `redis:"session_id"`
-	UserEmail    string `redis:"email"`
+	Email        string `redis:"email"`
+	Role         string `redis:"role"`
 	RefreshToken string `redis:"refresh_token"`
 	IsRevoked    string `redis:"is_revoked"`
 	CreatedAt    string `redis:"created_at"`

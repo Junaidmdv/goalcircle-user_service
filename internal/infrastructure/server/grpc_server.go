@@ -81,7 +81,7 @@ func (s *GRPCServer) BootStrapSetup() error {
 		s.logger.Error("failed setup otp service email", "error", err)
 		return err
 	}
-	diskStorage, err := disk.NewDiskStorage(s.config.DiscStorage, s.logger)
+	diskStorage, err := disk.NewDiskStorage(s.config.DiscStorage, s.logger, uidGenerater)
 	if err != nil {
 		s.logger.Error("failed setup disk storage", "error", err)
 		return err
@@ -108,6 +108,5 @@ func (s *GRPCServer) Run(port int) error {
 	if err != nil {
 		return err
 	}
-
 	return s.Server.Serve(lis)
 }

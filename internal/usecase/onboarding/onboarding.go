@@ -42,3 +42,5 @@ func (uc *onboardingUsecase) OnboardingAddTeamDetails(ctx context.Context, input
 func (uc *onboardingUsecase) OnboardingAddOrganiserDetails(ctx context.Context, input *uc_dtos.OnboardingOrganiserDtlsReq) (*uc_dtos.OnboardingAddOrganiserDtlsRes, error) {
 	return nil, nil
 }
+
+

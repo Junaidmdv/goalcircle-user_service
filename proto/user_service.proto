@@ -200,3 +200,37 @@ service AuthService{
 }
 
 
+message AdminRegisterRequest{
+    string full_name=1;   
+    string email =2; 
+    string password=3; 
+    string confirm_password=4;
+}
+
+message AdminRegisterResponse{
+   string email=1; 
+} 
+
+
+message  AdminLoginRequest{  
+   string email=1; 
+   string password=2; 
+} 
+
+message AdminLoginResponse{
+   string session_id=1;
+   string user_id=2; 
+   string full_name=3; 
+   string email=4;
+   string access_token=5; 
+   google.protobuf.Timestamp access_token_expiry=6;  
+   string refresh_token=7; 
+   google.protobuf.Timestamp refresh_token_expiry=8;
+} 
+
+
+
+service AdminAuthService{
+     rpc AdminRegister(AdminRegisterRequest)returns(AdminRegisterResponse); 
+     rpc AdminLogin(AdminLoginRequest)returns(AdminLoginResponse); 
+}

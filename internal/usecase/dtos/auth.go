@@ -124,13 +124,13 @@ type OnboardingTeamDtlsReq struct {
 type OnboardingTeamDtlsRes struct {
 }
 
-type OnboardingOrganiserDtlsReq struct {  
-	UserID string 
-	Name   string 
-	City   string 
-	PhoneNum string 
-	Website string 
-	LogoUrl string 
+type OnboardingOrganiserDtlsReq struct {
+	UserID   string
+	Name     string
+	City     string
+	PhoneNum string
+	Website  string
+	LogoUrl  string
 }
 
 type OnboardingAddOrganiserDtlsRes struct {
@@ -161,3 +161,88 @@ type GoogleCallbackRes struct {
 	RefreshTokenExpiry time.Time
 }
 
+type AdminAuthRegisterReq struct {
+	FullName        string
+	Email           string
+	Password        string
+	ConfirmPassword string
+}
+
+type AdminAuthRegisterRes struct {
+	AdminId string
+	Email   string
+}
+
+type AdminLoginReq struct {
+	Email    string
+	Password string
+}
+
+type AdminLoginRes struct {
+	SessionId          string
+	UserId             string
+	FullName           string
+	Email              string
+	AccessToken        string
+	AceessTokenExpiry  time.Time
+	RefreshToken       string
+	RefreshTokenExpiry time.Time
+}
+
+type GetUserProfileReq struct {
+	Id    string
+	Email string
+}
+
+type GetUserProfileRes struct {
+	Id       string
+	FullName string
+	Email    string
+	Phone    string
+	Street   string
+	City     string
+	State    string
+	Pincode  string
+	Country  string
+	Avatar   string
+}
+
+type UpdateUserProfileReq struct {
+	Id       string
+	FullName string
+	Phone    string
+	Street   string
+	City     string
+	State    string
+	Pincode  string
+	Country  string
+}
+
+type UpdateUserProfileRes struct {
+	Id       string
+	FullName string
+	Email    string
+	Phone    string
+	Street   string
+	City     string
+	State    string
+	Pincode  string
+	Country  string
+}
+
+type UpdateUserProfileImgReq struct {
+	Id       string
+	FileName string
+	Data     []byte
+	MimeType string
+}
+
+type UpdateUserProfileImgRes struct {
+	Url string
+}
+
+type ChangePasswordReq struct {
+}
+
+type ChangePasswordRes struct {
+}

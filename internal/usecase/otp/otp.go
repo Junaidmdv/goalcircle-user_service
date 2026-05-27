@@ -85,13 +85,13 @@ func (us *otpUsecase) VerifyOtp(ctx context.Context, input *uc_dtos.VerifyOtpReq
 
 	us.logger.Info("user created", "id", user.ID, "email", user.Email)
 
-	accessToken, accessClaims, err := us.token.GenerateToken(user.ID, user.Email, "user", us.token.AccessTokenExpiry)
+	accessToken, accessClaims, err := us.token.GenerateToken(user.ID, user.Email, entity.UNSPECIFIED, us.token.AccessTokenExpiry)
 	if err != nil {
 		us.logger.Error("failed to generater token", "error", err)
 		return nil, domain.NewInternalError("Something went wrong.Please try again later.", err)
 	}
 
-	refreshToken, refreshClaims, err := us.token.GenerateToken(user.ID, user.Email, "user", us.token.RefreshTokenExpiry)
+	refreshToken, refreshClaims, err := us.token.GenerateToken(user.ID, user.Email, entity.UNSPECIFIED, us.token.RefreshTokenExpiry)
 	if err != nil {
 		us.logger.Error("failed to generater token", "error", err)
 		return nil, domain.NewInternalError("Something went wrong.Please try again later.", err)
@@ -99,7 +99,8 @@ func (us *otpUsecase) VerifyOtp(ctx context.Context, input *uc_dtos.VerifyOtpReq
 
 	if err := us.session.SaveSession(ctx, "session:"+refreshClaims.ID, &entity.Session{
 		ID:           refreshClaims.ID,
-		UserEmail:    refreshClaims.Email,
+		Email:        refreshClaims.Email,
+		Role:         refreshClaims.Role,
 		RefreshToken: refreshToken,
 		IsRevoked:    strconv.FormatBool(false),
 		CreatedAt:    time.Now().Format(time.RFC3339),

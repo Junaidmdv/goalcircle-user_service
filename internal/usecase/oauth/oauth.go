@@ -27,16 +27,15 @@ type oauthUsecase struct {
 	session      repository.SessionStorage
 }
 
-func NewOauthUsecase(googleOauth *oauth.GoogleOauth,ur repository.UserRepository,logger logger.Logger,timeOut time.Duration,uid uid.UuidGenerater,token *tokens.JwtMaker,session repository.SessionStorage) OauthUsecase {
+func NewOauthUsecase(googleOauth *oauth.GoogleOauth, ur repository.UserRepository, logger logger.Logger, timeOut time.Duration, uid uid.UuidGenerater, token *tokens.JwtMaker, session repository.SessionStorage) OauthUsecase {
 	return &oauthUsecase{
-		googleOauth: googleOauth,  
-		userRepo: ur,  
-		logger: logger,
-		timeout: &timeOut, 
-		uidGenerater: uid,  
-		token: token, 
-		session: session,
-
+		googleOauth:  googleOauth,
+		userRepo:     ur,
+		logger:       logger,
+		timeout:      &timeOut,
+		uidGenerater: uid,
+		token:        token,
+		session:      session,
 	}
 }
 
@@ -114,7 +113,8 @@ func (uc *oauthUsecase) GoogleOauthCallback(ctx context.Context, input *uc_dtos.
 
 	if err := uc.session.SaveSession(ctx, "session:"+refreshClaims.ID, &entity.Session{
 		ID:           refreshClaims.ID,
-		UserEmail:    refreshClaims.Email,
+		Email:        refreshClaims.Email,
+		Role:         refreshClaims.Role,
 		RefreshToken: refreshToken,
 		IsRevoked:    strconv.FormatBool(false),
 		CreatedAt:    time.Now().Format(time.RFC3339),

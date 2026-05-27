@@ -6,10 +6,12 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/Junaidmdv/goalcircle-user_service/internal/config"
 	"github.com/Junaidmdv/goalcircle-user_service/internal/domain"
 	"github.com/Junaidmdv/goalcircle-user_service/internal/domain/repository"
+	"github.com/Junaidmdv/goalcircle-user_service/internal/infrastructure/uid"
 	"github.com/Junaidmdv/goalcircle-user_service/pkg/logger"
 )
 
@@ -17,18 +19,21 @@ type diskStorage struct {
 	basePath string
 	baseURL  string
 	logger   logger.Logger
+	uid      uid.UuidGenerater
 }
 
-func NewDiskStorage(config *config.DiscStorageConfig, loger logger.Logger) (repository.FileStorage, error) {
+func NewDiskStorage(config *config.DiscStorageConfig, loger logger.Logger, uid uid.UuidGenerater) (repository.FileStorage, error) {
 
 	if err := os.MkdirAll(config.BasePath, 0755); err != nil {
 		return nil, fmt.Errorf("failed to create storage dir: %w", err)
 	}
-	return &diskStorage{basePath: config.BasePath, baseURL: config.BaseUrl}, nil
+	return &diskStorage{basePath: config.BasePath, baseURL: config.BaseUrl, uid: uid}, nil
 }
 
-func (d *diskStorage) UploadFile(ctx context.Context, path string, reader io.Reader, meta *repository.FileMetadata) (string, error) {
-	fullPath := filepath.Join(d.basePath, filepath.Clean(path))
+func (d *diskStorage) UploadFile(ctx context.Context, path repository.FilePath, reader io.Reader, meta *repository.FileMetadata) (string, error) {
+	ext := strings.Split(meta.ContentType, "/")[1]
+	fileName := d.uid.Generate() + "." + ext
+	fullPath := filepath.Join(d.basePath, filepath.Clean(string(path)), fileName)
 	if err := os.MkdirAll(filepath.Dir(fullPath), 0755); err != nil {
 		d.logger.Error("failed to create directory", "error", err)
 		return "", domain.NewInternalError("Something went wrong. Please try again later", err)

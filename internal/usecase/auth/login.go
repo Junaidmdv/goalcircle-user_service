@@ -42,10 +42,6 @@ func NewAuthUsecase(ur repository.UserRepository, logger logger.Logger, time *ti
 	}
 }
 
-
-
-
-
 func (us *authUsecase) Login(ctx context.Context, input *uc_dtos.LoginRequest) (*uc_dtos.LoginResponse, error) {
 	user, err := us.userRepo.GetUserByEmail(ctx, input.Email)
 	if err != nil {
@@ -56,13 +52,13 @@ func (us *authUsecase) Login(ctx context.Context, input *uc_dtos.LoginRequest) (
 		return nil, err
 	}
 
-	accessToken, accessClaims, err := us.token.GenerateToken(user.ID, user.Email, "user", us.token.AccessTokenExpiry)
+	accessToken, accessClaims, err := us.token.GenerateToken(user.ID, user.Email,user.UserType, us.token.AccessTokenExpiry)
 	if err != nil {
 		us.logger.Error("failed to generater token", "error", err)
 		return nil, domain.NewInternalError("Something went wrong.Please try again later.", err)
 	}
 
-	refreshToken, refreshClaims, err := us.token.GenerateToken(user.ID, user.Email, "user", us.token.RefreshTokenExpiry)
+	refreshToken, refreshClaims, err := us.token.GenerateToken(user.ID, user.Email, user.UserType, us.token.RefreshTokenExpiry)
 	if err != nil {
 		us.logger.Error("failed to generater token", "error", err)
 		return nil, domain.NewInternalError("Something went wrong.Please try again later.", err)
@@ -71,7 +67,8 @@ func (us *authUsecase) Login(ctx context.Context, input *uc_dtos.LoginRequest) (
 	key := "session:" + refreshClaims.ID
 	if err := us.session.SaveSession(ctx, key, &entity.Session{
 		ID:           refreshClaims.ID,
-		UserEmail:    refreshClaims.Email,
+		Email:        refreshClaims.Email,
+		Role:         entity.UNSPECIFIED,
 		RefreshToken: refreshToken,
 		IsRevoked:    strconv.FormatBool(false),
 		CreatedAt:    time.Now().Format(time.RFC3339),
@@ -90,7 +87,6 @@ func (us *authUsecase) Login(ctx context.Context, input *uc_dtos.LoginRequest) (
 		RefreshTokenExpiry: refreshClaims.ExpiresAt.Time,
 	}, nil
 }
-
 
 func (uc *authUsecase) RenewAccessToken(ctx context.Context, input *uc_dtos.RenewAcccessTokenReq) (*uc_dtos.RenewAccessTokenRes, error) {
 	claims, err := uc.token.VerifyToken(input.RefreshToken)
@@ -111,12 +107,12 @@ func (uc *authUsecase) RenewAccessToken(ctx context.Context, input *uc_dtos.Rene
 		return nil, domain.NewUnAuthenticatedError("Invalid refresh token.Please login again")
 	}
 
-	if sessiondata.UserEmail != claims.Email {
+	if sessiondata.Email != claims.Email {
 		uc.logger.Warn("invalid token", "error", errors.New("token email mismatch"))
 		return nil, domain.NewUnAuthenticatedError("Invalid refresh token. Please login again")
 	}
 
-	accessToken, accessClaims, err := uc.token.GenerateToken(sessiondata.ID, sessiondata.UserEmail, claims.Role, uc.token.AccessTokenExpiry)
+	accessToken, accessClaims, err := uc.token.GenerateToken(sessiondata.ID, sessiondata.Email, claims.Role, uc.token.AccessTokenExpiry)
 	if err != nil {
 		return nil, err
 	}
@@ -167,4 +163,3 @@ func (uc *authUsecase) ValidateToken(ctx context.Context, tokenStr string) (*tok
 
 	return claims, nil
 }
-
