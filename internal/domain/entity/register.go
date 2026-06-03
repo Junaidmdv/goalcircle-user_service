@@ -8,7 +8,6 @@ import (
 
 type TempUser struct {
 	ID        uint `gorm:"primaryKey;autoIncrement"`
-	FullName  string
 	Email     string `gorm:"unique"`
 	Password  string
 	DeletedAt gorm.DeletedAt `gorm:"index"`

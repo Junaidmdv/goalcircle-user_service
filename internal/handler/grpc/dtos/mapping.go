@@ -9,7 +9,6 @@ import (
 
 func ToRegisterReq(res *pb.RegisterRequest) *RegisterRequest {
 	return &RegisterRequest{
-		FullName:        res.FullName,
 		Email:           res.Email,
 		Password:        res.Password,
 		ConfirmPassword: res.ConfirmPassword,
@@ -36,7 +35,6 @@ func ToVerifyOtpRes(res *dtos.VerifyOtpResponse) *pb.VerifyOtpRes {
 		Success:            true,
 		SessionId:          res.SessionId,
 		UserId:             res.UserId,
-		FullName:           res.FullName,
 		Email:              res.Email,
 		AccessToken:        res.AccessToken,
 		AccessTokenExpiry:  timestamppb.New(res.AceessTokenExpiry),
@@ -55,7 +53,6 @@ func ToLoginRequest(req *pb.LoginRequest) *LoginReq {
 func ToLoginRes(res *dtos.LoginResponse) *pb.LoginResponse {
 	return &pb.LoginResponse{
 		UserId:             res.UserId,
-		FullName:           res.FullName,
 		Email:              res.Email,
 		SessionId:          res.SessionId,
 		AccessToken:        res.AccessToken,
@@ -145,15 +142,31 @@ func ToLogoutRes(res *dtos.LogOutRes) *pb.LogOutRes {
 	}
 }
 
-func ToOnboardingRoleReq(res *pb.OnboardingAddRoleReq) *OnboardRoleReq {
-	return &OnboardRoleReq{
+func ToAddUserRoleReq(res *pb.AddUserRoleReq) *AddUserRoleReq {
+	return &AddUserRoleReq{
 		UserId:   res.UserId,
 		UserRole: res.Role,
 	}
 }
 
-func ToOnboardingRoleRes(res *dtos.OnboardingRoleRes) *pb.OnboardingAddRoleRes {
-	return &pb.OnboardingAddRoleRes{
+func ToAddUserRoleRes(res *dtos.AddUserRoleRes) *pb.AddUserRoleRes {
+	return &pb.AddUserRoleRes{
 		Success: res.Success,
+	}
+}
+
+func ToAdminRegisterReq(res *pb.AdminRegisterRequest) *AdminRegisterRequest {
+	return &AdminRegisterRequest{
+		FullName:        res.FullName,
+		Email:           res.Email,
+		Password:        res.Password,
+		ConfirmPassword: res.ConfirmPassword,
+	}
+}
+
+func ToAdminLoginReq(res *pb.AdminLoginRequest) *AdminLoginRequest {
+	return &AdminLoginRequest{
+		Email:    res.Email,
+		Password: res.Password,
 	}
 }

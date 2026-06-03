@@ -23,24 +23,14 @@ func NewOnboardingUsecase(ur repository.UserRepository, fs repository.FileStorag
 
 }
 
-func (uc *onboardingUsecase) OnboardingAddRole(ctx context.Context, input *uc_dtos.OnboardingRoleReq) (*uc_dtos.OnboardingRoleRes, error) {
+func (uc *onboardingUsecase) AddUserRole(ctx context.Context, input *uc_dtos.AddUserRoleReq) (*uc_dtos.AddUserRoleRes, error) {
 
-	if err := uc.userRepo.UpdateUserType(ctx, input.UserId, input.Role); err != nil {
+	if err := uc.userRepo.UpdateUserRole(ctx, input.UserId, input.Role); err != nil {
 		return nil, err
 	}
 
-	return &uc_dtos.OnboardingRoleRes{
+	return &uc_dtos.AddUserRoleRes{
 		Success: true,
 	}, nil
 }
-
-func (uc *onboardingUsecase) OnboardingAddTeamDetails(ctx context.Context, input *uc_dtos.OnboardingTeamDtlsReq) (*uc_dtos.OnboardingTeamDtlsRes, error) {
-
-	return nil, nil
-}
-
-func (uc *onboardingUsecase) OnboardingAddOrganiserDetails(ctx context.Context, input *uc_dtos.OnboardingOrganiserDtlsReq) (*uc_dtos.OnboardingAddOrganiserDtlsRes, error) {
-	return nil, nil
-}
-
 

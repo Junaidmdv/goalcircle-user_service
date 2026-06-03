@@ -24,10 +24,8 @@ type UserRepository interface {
 	UpdateOtpAttempts(context.Context, string, entity.OtpType) error
 	UpdatePassword(context.Context, string, string) error
 	DeleteOtp(context.Context, uint) error
-	UpdateUserType(context.Context, string, string) error
+	UpdateUserRole(context.Context, string, string) error
 	GetUserById(context.Context, string) (*entity.User, error)
-	UpdateUser(context.Context, string, map[string]interface{}) (*entity.User, error)
-	UpdateUserProfileImage(context.Context, string, string) error
 }
 
 type userRepository struct {
@@ -70,14 +68,13 @@ func (ur *userRepository) CheckEmailExist(ctx context.Context, email string) (bo
 
 func (ur *userRepository) CreateOrUpdateTempUser(ctx context.Context, tempUser *entity.TempUser) (*entity.TempUser, error) {
 
-	if err := ur.db.WithContext(ctx).Raw(`INSERT INTO temp_users(full_name,email,password,deleted_at)
-	       VALUES(?,?,?,NULL)  
+	if err := ur.db.WithContext(ctx).Raw(`INSERT INTO temp_users(email,password,deleted_at)
+	       VALUES(?,?,NULL)  
 		   ON CONFLICT(email) WHERE deleted_at IS NULL
 		   DO UPDATE SET 
-		     full_name=EXCLUDED.full_name,
 		     password=EXCLUDED.password
 		   RETURNING *
-		   `, tempUser.FullName, tempUser.Email, tempUser.Password).Scan(tempUser).Error; err != nil {
+		   `,  tempUser.Email, tempUser.Password).Scan(tempUser).Error; err != nil {
 		return nil, domain.NewInternalError("Something went wrong. Please try again later.", err)
 	}
 	return tempUser, nil
@@ -104,7 +101,7 @@ func (ur *userRepository) AddOtpData(ctx context.Context, otp *entity.Otp) (*ent
 		otp.ExpiresAt,
 		now,
 	).Scan(otp).Error; err != nil {
-		//ur.logger.Error("database error", "method", "add otp data", "error", err)
+		ur.logger.Error("database error", "method", "add otp data", "error", err)
 		return nil, domain.NewInternalError("Something went wrong. Please try again later.", err)
 	}
 
@@ -231,8 +228,8 @@ func (ur *userRepository) DeleteOtp(ctx context.Context, id uint) error {
 	return nil
 }
 
-func (ur *userRepository) UpdateUserType(ctx context.Context, userId string, role string) error {
-	if err := ur.db.WithContext(ctx).Where("id=?", userId).Update("user_type=?", role).Error; err != nil {
+func (ur *userRepository) UpdateUserRole(ctx context.Context, userId string, role string) error {
+	if err := ur.db.WithContext(ctx).Where("id=?", userId).Update("role=?", role).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			ur.logger.Warn("user email not found", "email", userId)
 			return domain.NewNotFoundError("user account not found")
@@ -256,41 +253,4 @@ func (ur *userRepository) GetUserById(ctx context.Context, id string) (*entity.U
 	return &user, nil
 }
 
-func (ur *userRepository) UpdateUser(ctx context.Context, id string, userUpdate map[string]interface{}) (*entity.User, error) {
 
-	result := ur.db.WithContext(ctx).Model(&entity.User{}).Where("id = ?", id).Updates(userUpdate)
-	if result.Error != nil {
-		ur.logger.Error("failed to update user", "method", "UpdateUser", "error", result.Error)
-		return nil, domain.NewInternalError("Something went wrong. Please try again later", result.Error)
-	}
-
-	if result.RowsAffected == 0 {
-		ur.logger.Error("user not found", "method", "UpdateUser")
-		return nil, domain.NewNotFoundError("user account not found")
-	}
-	var user entity.User
-	if err := ur.db.WithContext(ctx).Where("id = ?", id).First(&user).Error; err != nil {
-		return nil, domain.NewInternalError("Something went wrong. Please try again later", err)
-	}
-
-	return &user, nil
-}
-
-func (ur *userRepository) UpdateUserProfileImage(ctx context.Context, id string, url string) error {
-	result := ur.db.WithContext(ctx).
-		Model(&entity.User{}).
-		Where("id = ?", id).
-		Update("avatar", url)
-
-	if result.Error != nil {
-		ur.logger.Error("database error", "method", "UpdateUserProfileImage", "error", result.Error)
-		return domain.NewInternalError("Something went wrong. Please try again later.", result.Error)
-	}
-
-	if result.RowsAffected == 0 {
-		ur.logger.Warn("use not found", "metod", "UpdateUserProfile")
-		return domain.NewNotFoundError("Email not found")
-	}
-
-	return nil
-}

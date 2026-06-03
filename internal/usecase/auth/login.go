@@ -52,13 +52,13 @@ func (us *authUsecase) Login(ctx context.Context, input *uc_dtos.LoginRequest) (
 		return nil, err
 	}
 
-	accessToken, accessClaims, err := us.token.GenerateToken(user.ID, user.Email,user.UserType, us.token.AccessTokenExpiry)
+	accessToken, accessClaims, err := us.token.GenerateToken(user.ID, user.Email, user.Role, us.token.AccessTokenExpiry)
 	if err != nil {
 		us.logger.Error("failed to generater token", "error", err)
 		return nil, domain.NewInternalError("Something went wrong.Please try again later.", err)
 	}
 
-	refreshToken, refreshClaims, err := us.token.GenerateToken(user.ID, user.Email, user.UserType, us.token.RefreshTokenExpiry)
+	refreshToken, refreshClaims, err := us.token.GenerateToken(user.ID, user.Email, user.Role, us.token.RefreshTokenExpiry)
 	if err != nil {
 		us.logger.Error("failed to generater token", "error", err)
 		return nil, domain.NewInternalError("Something went wrong.Please try again later.", err)
@@ -79,7 +79,6 @@ func (us *authUsecase) Login(ctx context.Context, input *uc_dtos.LoginRequest) (
 	return &uc_dtos.LoginResponse{
 		SessionId:          refreshClaims.ID,
 		UserId:             user.ID,
-		FullName:           user.FullName,
 		Email:              user.Email,
 		AccessToken:        accessToken,
 		AccessTokenExpiry:  accessClaims.ExpiresAt.Time,
@@ -163,3 +162,34 @@ func (uc *authUsecase) ValidateToken(ctx context.Context, tokenStr string) (*tok
 
 	return claims, nil
 }
+
+func (uc *authUsecase) ChangePassword(ctx context.Context, input *uc_dtos.ChangePasswordReq) (*uc_dtos.ChangePasswordRes, error) {
+	user, err := uc.userRepo.GetUserByEmail(ctx, input.UserId)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := uc.hash.ComparePassword(user.Password, input.OldPassword); err != nil {
+		return nil, err
+	}
+
+	Hashedpassword, err := uc.hash.HashPassword(input.NewPassword)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := uc.userRepo.UpdatePassword(ctx, input.UserId, Hashedpassword); err != nil {
+		return nil, err
+	} 
+
+	return &uc_dtos.ChangePasswordRes{
+		Succcess: true,
+	},nil
+
+} 
+
+
+
+
+
+

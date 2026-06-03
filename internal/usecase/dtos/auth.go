@@ -7,7 +7,6 @@ import (
 )
 
 type RegisterRequest struct {
-	FullName        string
 	Email           string
 	Password        string
 	ConfirmPassword string
@@ -28,7 +27,6 @@ type VerifyOtpResponse struct {
 	Success            bool
 	SessionId          string
 	UserId             string
-	FullName           string
 	Email              string
 	AccessToken        string
 	AceessTokenExpiry  time.Time
@@ -109,31 +107,13 @@ type LogOutRes struct {
 	Success bool
 }
 
-type OnboardingRoleReq struct {
+type AddUserRoleReq struct {
 	UserId string
 	Role   string
 }
 
-type OnboardingRoleRes struct {
+type AddUserRoleRes struct {
 	Success bool
-}
-
-type OnboardingTeamDtlsReq struct {
-}
-
-type OnboardingTeamDtlsRes struct {
-}
-
-type OnboardingOrganiserDtlsReq struct {
-	UserID   string
-	Name     string
-	City     string
-	PhoneNum string
-	Website  string
-	LogoUrl  string
-}
-
-type OnboardingAddOrganiserDtlsRes struct {
 }
 
 type GoogleOauthReq struct {
@@ -162,10 +142,9 @@ type GoogleCallbackRes struct {
 }
 
 type AdminAuthRegisterReq struct {
-	FullName        string
-	Email           string
-	Password        string
-	ConfirmPassword string
+	FullName string
+	Email    string
+	Password string
 }
 
 type AdminAuthRegisterRes struct {
@@ -180,7 +159,7 @@ type AdminLoginReq struct {
 
 type AdminLoginRes struct {
 	SessionId          string
-	UserId             string
+	AdminId            string
 	FullName           string
 	Email              string
 	AccessToken        string
@@ -189,60 +168,36 @@ type AdminLoginRes struct {
 	RefreshTokenExpiry time.Time
 }
 
-type GetUserProfileReq struct {
-	Id    string
-	Email string
-}
-
-type GetUserProfileRes struct {
-	Id       string
-	FullName string
-	Email    string
-	Phone    string
-	Street   string
-	City     string
-	State    string
-	Pincode  string
-	Country  string
-	Avatar   string
-}
-
-type UpdateUserProfileReq struct {
-	Id       string
-	FullName string
-	Phone    string
-	Street   string
-	City     string
-	State    string
-	Pincode  string
-	Country  string
-}
-
-type UpdateUserProfileRes struct {
-	Id       string
-	FullName string
-	Email    string
-	Phone    string
-	Street   string
-	City     string
-	State    string
-	Pincode  string
-	Country  string
-}
-
-type UpdateUserProfileImgReq struct {
-	Id       string
-	FileName string
-	Data     []byte
-	MimeType string
-}
-
-type UpdateUserProfileImgRes struct {
-	Url string
-}
-
 type ChangePasswordReq struct {
+	UserId      string
+	OldPassword string
+	NewPassword string
 }
 
 type ChangePasswordRes struct {
+	Succcess bool
+}
+
+type BlockUserReq struct {
+	UserId string
+}
+
+type BlockUserRes struct {
+	Success bool
+}
+
+type UnblockUserReq struct {
+	UserId string
+}
+
+type UnblockUserRes struct {
+	Success bool
+}
+
+type GetUserRes struct {
+	UserId    string
+	Email     string
+	Role      string
+	IsBlocked bool
+	CreatedAt time.Time
 }

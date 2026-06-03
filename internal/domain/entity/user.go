@@ -6,21 +6,12 @@ import (
 
 type User struct {
 	ID           string `gorm:"primaryKey"`
-	FullName     string
 	Email        string
 	Password     string
 	GoogleAuthId string
-	UserType     string
-	Phone        *string
-	Street       *string
-	City         *string
-	PinCode      *string
-	State        *string
-	Country      *string
-	Avatar       *string
+	Role         string
+	IsBlocked      bool
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 	DeletedAt    time.Time
-	Organiser    Organiser   `gorm:"foreignKey:UserID"`
-	TeamManager  TeamManager `gorm:"foreignKey:UserID"`
 }

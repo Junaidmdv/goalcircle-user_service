@@ -25,6 +25,8 @@ func NewValidater() (*Validater, error) {
 		return nil, err
 	}
 	validater.RegisterValidation("phone", phoneValidation)
+	validater.RegisterValidation("password", passwordValidation)
+	
 	validater.RegisterTagNameFunc(func(field reflect.StructField) string {
 		name := strings.SplitN(field.Tag.Get("json"), ",", 2)[0]
 		if name != "-" {
@@ -54,6 +56,16 @@ func NewValidater() (*Validater, error) {
 		},
 	)
 
+	validater.RegisterTranslation("password", engtrans,
+		func(ut ut.Translator) error {
+			return ut.Add("password", "password must contain uppercase, lowercase, number and special character", true)
+		},
+		func(ut ut.Translator, fe validator.FieldError) string {
+			t, _ := ut.T("password", fe.Field())
+			return t
+		},
+	)
+
 	return &Validater{
 		vn: validater,
 		ut: engtrans,
@@ -70,3 +82,5 @@ func (v *Validater) Validation(input interface{}) validator.ValidationErrorsTran
 	translated := err.(validator.ValidationErrors).Translate(v.ut)
 	return translated
 }
+
+

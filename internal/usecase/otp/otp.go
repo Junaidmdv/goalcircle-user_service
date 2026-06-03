@@ -73,17 +73,14 @@ func (us *otpUsecase) VerifyOtp(ctx context.Context, input *uc_dtos.VerifyOtpReq
 
 	user, err := us.userRepo.CreateUser(ctx, &entity.User{
 		ID:       us.uidGenerater.Generate(),
-		FullName: tempUser.FullName,
 		Email:    tempUser.Email,
 		Password: tempUser.Password,
-		UserType: entity.UNSPECIFIED,
+		Role: entity.UNSPECIFIED,
 	})
 
 	if err != nil {
 		return nil, err
 	}
-
-	us.logger.Info("user created", "id", user.ID, "email", user.Email)
 
 	accessToken, accessClaims, err := us.token.GenerateToken(user.ID, user.Email, entity.UNSPECIFIED, us.token.AccessTokenExpiry)
 	if err != nil {
@@ -112,7 +109,6 @@ func (us *otpUsecase) VerifyOtp(ctx context.Context, input *uc_dtos.VerifyOtpReq
 	return &uc_dtos.VerifyOtpResponse{
 		SessionId:          refreshClaims.ID,
 		UserId:             user.ID,
-		FullName:           user.FullName,
 		Email:              user.Email,
 		AccessToken:        accessToken,
 		AceessTokenExpiry:  accessClaims.ExpiresAt.Time,
@@ -151,7 +147,6 @@ func (us *otpUsecase) ResendOtp(ctx context.Context, input *uc_dtos.ResendOtpReq
 		return nil, us.email.MapMailError(err)
 	}
 
-	us.logger.Info("otp resent", "email", input.Email, "type", input.OtpType)
 
 	otpData, err := us.userRepo.AddOtpData(ctx, &entity.Otp{
 		Email:     input.Email,

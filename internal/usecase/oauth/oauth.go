@@ -87,10 +87,9 @@ func (uc *oauthUsecase) GoogleOauthCallback(ctx context.Context, input *uc_dtos.
 
 	user, err := uc.userRepo.CreateUser(ctx, &entity.User{
 		ID:           uc.uidGenerater.Generate(),
-		FullName:     authdata.Name,
 		Email:        authdata.Email,
 		GoogleAuthId: authdata.ID,
-		UserType:     entity.UNSPECIFIED,
+		Role:     entity.UNSPECIFIED,
 	})
 
 	if err != nil {
@@ -126,7 +125,6 @@ func (uc *oauthUsecase) GoogleOauthCallback(ctx context.Context, input *uc_dtos.
 	return &uc_dtos.GoogleCallbackRes{
 		SessionId:          refreshClaims.ID,
 		UserId:             user.ID,
-		FullName:           user.FullName,
 		Email:              user.Email,
 		AccessToken:        accessToken,
 		AccessTokenExpiry:  accessClaims.ExpiresAt.Time,

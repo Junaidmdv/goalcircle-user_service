@@ -62,7 +62,7 @@ func (uh *authHandler) Register(ctx context.Context, req *pb.RegisterRequest) (*
 	context, cancel := context.WithTimeout(ctx, *uh.timeout)
 	defer cancel()
 
-	request := dt.ToRegisterReq(req)
+	request := dt.ToRegisterReq(req)  
 
 	if validationErrs := uh.validater.Validation(request); validationErrs != nil {
 		stWithDetails, err := ValidationError(validationErrs)
@@ -73,7 +73,6 @@ func (uh *authHandler) Register(ctx context.Context, req *pb.RegisterRequest) (*
 	}
 
 	response, err := uh.registerUsecase.InitiateUserRegistration(context, &ucdtos.RegisterRequest{
-		FullName:        request.FullName,
 		Email:           request.Email,
 		Password:        request.Password,
 		ConfirmPassword: request.ConfirmPassword,
@@ -286,11 +285,11 @@ func (uh *authHandler) LogOut(ctx context.Context, pb *pb.LogOutReq) (*pb.LogOut
 
 }
 
-func (uh *authHandler) OnboardingAddRole(ctx context.Context, pb *pb.OnboardingAddRoleReq) (*pb.OnboardingAddRoleRes, error) {
+func (uh *authHandler) AddUserRole(ctx context.Context, pb *pb.AddUserRoleReq) (*pb.AddUserRoleRes, error) {
 	ctx, cancel := context.WithTimeout(ctx, *uh.timeout)
 	defer cancel()
 
-	request := dt.ToOnboardingRoleReq(pb)
+	request := dt.ToAddUserRoleReq(pb)
 
 	if validationErrs := uh.validater.Validation(request); validationErrs != nil {
 		stWithDetails, err := ValidationError(validationErrs)
@@ -300,7 +299,7 @@ func (uh *authHandler) OnboardingAddRole(ctx context.Context, pb *pb.OnboardingA
 		return nil, stWithDetails.Err()
 	}
 
-	res, err := uh.onboardingUsecase.OnboardingAddRole(ctx, &ucdtos.OnboardingRoleReq{
+	res, err := uh.onboardingUsecase.AddUserRole(ctx, &ucdtos.AddUserRoleReq{
 		UserId: request.UserId,
 		Role:   request.UserRole,
 	})
@@ -309,7 +308,7 @@ func (uh *authHandler) OnboardingAddRole(ctx context.Context, pb *pb.OnboardingA
 		return nil, domain.GRPCStatus(err)
 	}
 
-	return dt.ToOnboardingRoleRes(res), nil
+	return dt.ToAddUserRoleRes(res), nil
 
 }
 

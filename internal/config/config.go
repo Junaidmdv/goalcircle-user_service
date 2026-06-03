@@ -16,7 +16,8 @@ type Config struct {
 	Twilio   *TwilioConfig
 	SMTP     *SMTPConfig
 	DiscStorage    *DiscStorageConfig
-	GoogleAuthConfig *GoogleAuthConfig
+	GoogleAuthConfig *GoogleAuthConfig 
+	Minio        *MinioConfig
 }
 
 type configBuilder struct {
@@ -32,7 +33,8 @@ type ConfigBuilder interface {
 	WithTwilio() ConfigBuilder
 	WithSMTP() ConfigBuilder
 	WithDiscStorage() ConfigBuilder  
-	WithGoogleAuth()ConfigBuilder
+	WithGoogleAuth()ConfigBuilder 
+	WithMinio()ConfigBuilder
 	Build() (*Config, []error)
 }
 

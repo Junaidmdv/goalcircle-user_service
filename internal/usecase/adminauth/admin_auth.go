@@ -15,7 +15,7 @@ import (
 	"github.com/Junaidmdv/goalcircle-user_service/pkg/tokens"
 )
 
-type adminAuth struct {
+type adminAuthUsecase struct {
 	adminRepo    repository.AdminRepository
 	logger       logger.Logger
 	hash         bycrypt.PasswordHasher
@@ -24,8 +24,8 @@ type adminAuth struct {
 	session      repository.SessionStorage
 }
 
-func NewAdminAuth(repo repository.AdminRepository, hash bycrypt.PasswordHasher, uid uid.UuidGenerater, token *tokens.JwtMaker) AdminAuth {
-	return &adminAuth{
+func NewAdminAuthUsecase(repo repository.AdminRepository, hash bycrypt.PasswordHasher, uid uid.UuidGenerater, token *tokens.JwtMaker) AdminAuthUsecase {
+	return &adminAuthUsecase{
 		adminRepo:    repo,
 		hash:         hash,
 		uidGenerater: uid,
@@ -33,7 +33,7 @@ func NewAdminAuth(repo repository.AdminRepository, hash bycrypt.PasswordHasher, 
 	}
 }
 
-func (ad *adminAuth) Register(ctx context.Context, input *uc_dtos.AdminAuthRegisterReq) (*uc_dtos.AdminAuthRegisterRes, error) {
+func (ad *adminAuthUsecase) Register(ctx context.Context, input *uc_dtos.AdminAuthRegisterReq) (*uc_dtos.AdminAuthRegisterRes, error) {
 	hashedPassword, err := ad.hash.HashPassword(input.Password)
 	if err != nil {
 		ad.logger.Error("failed to hash pasword", err)
@@ -52,7 +52,7 @@ func (ad *adminAuth) Register(ctx context.Context, input *uc_dtos.AdminAuthRegis
 	}, nil
 }
 
-func (ad *adminAuth) Login(ctx context.Context, input *uc_dtos.AdminLoginReq) (*uc_dtos.AdminLoginRes, error) {
+func (ad *adminAuthUsecase) Login(ctx context.Context, input *uc_dtos.AdminLoginReq) (*uc_dtos.AdminLoginRes, error) {
 	res, err := ad.adminRepo.GetAdminByEmail(ctx, input.Email)
 	if err != nil {
 		return nil, err
@@ -88,7 +88,7 @@ func (ad *adminAuth) Login(ctx context.Context, input *uc_dtos.AdminLoginReq) (*
 
 	return &uc_dtos.AdminLoginRes{
 		SessionId:          refreshClaims.ID,
-		UserId:             res.ID,
+		AdminId:            res.ID,
 		FullName:           res.FullName,
 		Email:              res.Email,
 		AccessToken:        accessToken,

@@ -47,7 +47,6 @@ func (us *registerUsecase) InitiateUserRegistration(ctx context.Context, input *
 	}
 
 	res, err := us.userRepo.CreateOrUpdateTempUser(ctx, &entity.TempUser{
-		FullName: input.FullName,
 		Email:    input.Email,
 		Password: hashedPassword,
 	})
@@ -61,7 +60,7 @@ func (us *registerUsecase) InitiateUserRegistration(ctx context.Context, input *
 		us.logger.Warn("use case error", "error", err)
 		return nil, us.email.MapMailError(err)
 	}
-	us.logger.Info("otp sended to the user", "email", input.Email, "otp", otpres.Otp)
+	
 
 	otpdata, err := us.userRepo.AddOtpData(ctx, &entity.Otp{
 		Email:     input.Email,

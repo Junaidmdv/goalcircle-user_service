@@ -3,15 +3,13 @@ package dtos
 import "github.com/Junaidmdv/goalcircle-user_service/internal/domain/entity"
 
 type RegisterRequest struct {
-	FullName        string `json:"full_name" validate:"required,min=3,max=32"`
 	Email           string `json:"email" validate:"required,email"`
-	Password        string `json:"password" validate:"required"`
+	Password        string `json:"password" validate:"required,password"`
 	ConfirmPassword string `json:"confirm_password" validate:"required,eqfield=Password"`
 }
 
 type RegisterResponse struct {
 	Email     string `json:"email"`
-	PhoneNum  string `json:"phone_num"`
 	OtpStatus bool   `json:"otp_status"`
 }
 
@@ -54,7 +52,8 @@ type LogOutReq struct {
 	RefreshToken string `json:"refresh_token" validate:"required"`
 }
 
-type OnboardRoleReq struct {
+type AddUserRoleReq struct {
 	UserId   string `json:"user_id" validate:"required"`
 	UserRole string `json:"user_role"`
 }
+
