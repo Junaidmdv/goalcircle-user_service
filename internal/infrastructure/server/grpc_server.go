@@ -45,8 +45,9 @@ type GRPCServer struct {
 func NewGrpcServer(logger logger.Logger, config *cnfg.Config) *GRPCServer {
 	server := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
-			grpc_zap.UnaryServerInterceptor(logger),
+			// LoggingInterceptor(logger),
 			RecoveryInterceptor(logger),
+			// grpc_zap.UnaryServerInterceptor(logger),
 		),
 	)
 

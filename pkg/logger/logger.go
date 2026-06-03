@@ -20,7 +20,7 @@ type Logger interface {
 }
 
 type ZapLogger struct {
-	sugar *zap.SugaredLogger
+	sugar *zap.SugaredLogger  
 }
 
 func NewLogger() (Logger, error) {
