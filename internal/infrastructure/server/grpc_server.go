@@ -25,16 +25,15 @@ import (
 	"github.com/Junaidmdv/goalcircle-user_service/internal/usecase/register"
 
 	"github.com/Junaidmdv/goalcircle-user_service/internal/usecase/onboarding"
-	"github.com/Junaidmdv/goalcircle-user_service/internal/usecase/password" 
+	"github.com/Junaidmdv/goalcircle-user_service/internal/usecase/password"
 
 	"github.com/Junaidmdv/goalcircle-user_service/pkg/logger"
 	"github.com/Junaidmdv/goalcircle-user_service/pkg/tokens"
 	vl "github.com/Junaidmdv/goalcircle-user_service/pkg/validater"
 	auth_pb "github.com/Junaidmdv/goalcircle-user_service/proto/pb"
-	"google.golang.org/grpc" 
+	"google.golang.org/grpc"
 
-
-	um"github.com/Junaidmdv/goalcircle-user_service/internal/handler/grpc/usermanagment"
+	um "github.com/Junaidmdv/goalcircle-user_service/internal/handler/grpc/usermanagment"
 )
 
 type GRPCServer struct {
@@ -44,7 +43,12 @@ type GRPCServer struct {
 }
 
 func NewGrpcServer(logger logger.Logger, config *cnfg.Config) *GRPCServer {
-	server := grpc.NewServer()
+	server := grpc.NewServer(
+		grpc.ChainUnaryInterceptor(
+			grpc_zap.UnaryServerInterceptor(logger),
+			RecoveryInterceptor(logger),
+		),
+	)
 
 	return &GRPCServer{
 		Server: server,
@@ -106,20 +110,19 @@ func (s *GRPCServer) BootStrapSetup() error {
 
 	auth_pb.RegisterAuthServiceServer(s.Server, auth_handler)
 
-    //admin service 
+	//admin service
 
+	AdminRepository := repository.NewAdminRepository(datbaseConnectin.DB, s.logger, s.config.GRPC.TimeOut)
+	adminAuthUsecas := adminauthuc.NewAdminAuthUsecase(AdminRepository, passwordHashing, uidGenerater, token)
+	adminAuthHandler := adminauth.NewAdminAuthHandler(adminAuthUsecas, &s.config.GRPC.TimeOut, s.logger, validater)
 
-	AdminRepository:=repository.NewAdminRepository(datbaseConnectin.DB,s.logger,s.config.GRPC.TimeOut)  
-	adminAuthUsecas:=adminauthuc.NewAdminAuthUsecase(AdminRepository,passwordHashing,uidGenerater,token) 
-	adminAuthHandler:=adminauth.NewAdminAuthHandler(adminAuthUsecas,&s.config.GRPC.TimeOut,s.logger,validater) 
+	auth_pb.RegisterAdminAuthServiceServer(s.Server, adminAuthHandler)
 
-	auth_pb.RegisterAdminAuthServiceServer(s.Server,adminAuthHandler)
-    
-   //admin user_management 
+	//admin user_management
 
-    UserManagementRepository:=repository.NewAdminUserManagementRepository(datbaseConnectin.DB,s.logger,s.config.GRPC.TimeOut)
-    UserManagementUsecase:=usermanagement.NewUserManagementUsecase(UserManagementRepository,s.logger) 
-    UserManagmentHandler:=um.NewAdminUserManagementHandler(UserManagementUsecase,&s.config.GRPC.TimeOut,s.logger,*validater) 
+	UserManagementRepository := repository.NewAdminUserManagementRepository(datbaseConnectin.DB, s.logger, s.config.GRPC.TimeOut)
+	UserManagementUsecase := usermanagement.NewUserManagementUsecase(UserManagementRepository, s.logger)
+	UserManagmentHandler := um.NewAdminUserManagementHandler(UserManagementUsecase, &s.config.GRPC.TimeOut, s.logger, *validater)
 
 	auth_pb.RegisterAdminUserManagementServiceServer(s.Server, UserManagmentHandler)
 
