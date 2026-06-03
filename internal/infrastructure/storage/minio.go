@@ -23,9 +23,8 @@ func NewMinio(config config.MinioConfig) (*Minio, error) {
 
 	if err != nil {
 		return nil, domain.NewInternalError("failed minio configration", err)
-	}  
+	}
 
-	
 	return &Minio{
 		Client: minio,
 	}, nil

@@ -27,10 +27,10 @@ type adminAuthHandler struct {
 
 func NewAdminAuthHandler(aAuth adminauth.AdminAuthUsecase, timeout *time.Duration, logger logger.Logger, validater *validater.Validater) *adminAuthHandler {
 	return &adminAuthHandler{
-		adminAuthUsecase: aAuth, 
-		timeout: timeout, 
-		logger: logger, 
-		validater: validater,
+		adminAuthUsecase: aAuth,
+		timeout:          timeout,
+		logger:           logger,
+		validater:        validater,
 	}
 }
 
