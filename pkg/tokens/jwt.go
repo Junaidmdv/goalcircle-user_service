@@ -46,7 +46,6 @@ func NewTokenMaker(jwtcnfg *config.JWTConfig, logger logger.Logger) (*JwtMaker, 
 	}
 
 	return &JwtMaker{
-		// secreteKey:                jwtcnfg.SecretKey,
 		PriveteKey:                privetekey,
 		PublicKey:                 publickey,
 		AccessTokenExpiry:         jwtcnfg.AccessTokenExp,
