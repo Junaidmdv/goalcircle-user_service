@@ -9,19 +9,29 @@ import (
 )
 
 type JWTConfig struct {
-	SecretKey       string
+	// SecretKey         string
+	PriviteKeyPath  string
+	PublicKeyPath   string
 	AccessTokenExp  time.Duration
 	RefreshTokenExp time.Duration
 	ResetTokenExp   time.Duration
 }
 
 func (cb *configBuilder) WithJWT() ConfigBuilder {
-	jc := &JWTConfig{
-		SecretKey: os.Getenv("JWT_SECRETKEY"),
-	}
-	if jc.SecretKey == "" {
+
+	// secretekey := os.Getenv("JWT_SECRETKEY")
+	// if secretekey == "" {
+	// 	cb.errors = append(cb.errors, errors.New("jwt secret key is required"))
+	// }
+
+	jwtprivetekeypath := os.Getenv("JWT_PRIVATE_KEY_PATH")
+	if jwtprivetekeypath == "" {
 		cb.errors = append(cb.errors, errors.New("jwt secret key is required"))
-		return cb
+	}
+
+	jwtpublickeypath := os.Getenv("JWT_PUBLIC_KEY_PATH")
+	if jwtpublickeypath == "" {
+		cb.errors = append(cb.errors, errors.New("jwt secret key is required"))
 	}
 
 	accessTokenExpStr := os.Getenv("ACCESS_TOKEN_EXPIRYTIME")
@@ -32,9 +42,8 @@ func (cb *configBuilder) WithJWT() ConfigBuilder {
 	accessDuration, err := time.ParseDuration(accessTokenExpStr)
 	if err != nil {
 		cb.errors = append(cb.errors, fmt.Errorf("invalid ACCESS_TOKEN_EXPIRYTIME: %w", err))
-		return cb
 	}
-	jc.AccessTokenExp = accessDuration
+	accessTokenExp := accessDuration
 
 	refreshTokenExpStr := os.Getenv("REFRESH_TOKEN_EXPIRYTIME")
 	if refreshTokenExpStr == "" {
@@ -44,9 +53,8 @@ func (cb *configBuilder) WithJWT() ConfigBuilder {
 	refreshDuration, err := time.ParseDuration(refreshTokenExpStr)
 	if err != nil {
 		cb.errors = append(cb.errors, fmt.Errorf("invalid REFRESH_TOKEN_EXPIRYTIME: %w", err))
-		return cb
 	}
-	jc.RefreshTokenExp = refreshDuration
+	refreshTokenExp := refreshDuration
 
 	resetPasswordTokenExpStr := os.Getenv("RESET_TOKEN_EXPIRY")
 	if refreshTokenExpStr == "" {
@@ -56,10 +64,20 @@ func (cb *configBuilder) WithJWT() ConfigBuilder {
 	resetPasswordTokenDuration, err := time.ParseDuration(resetPasswordTokenExpStr)
 	if err != nil {
 		cb.errors = append(cb.errors, fmt.Errorf("invalid REFRESH_TOKEN_EXPIRYTIME: %w", err))
+	}
+	resetTokenExp := resetPasswordTokenDuration
+
+	if len(cb.errors) > 0 {
 		return cb
 	}
-	jc.ResetTokenExp = resetPasswordTokenDuration
 
-	cb.config.JWT = jc
+	cb.config.JWT = &JWTConfig{
+		PriviteKeyPath:  jwtprivetekeypath,
+		PublicKeyPath:   jwtpublickeypath,
+		AccessTokenExp:  accessTokenExp,
+		RefreshTokenExp: refreshTokenExp,
+		ResetTokenExp:   resetTokenExp,
+	}
+
 	return cb
 }

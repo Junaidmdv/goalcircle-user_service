@@ -1,3 +1,5 @@
 .env 
-./uploads
-tmp 
+assets
+tmp   
+
+./assets/secrets/private.pem

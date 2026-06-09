@@ -6,13 +6,13 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+
 	cnfg "github.com/Junaidmdv/goalcircle-user_service/internal/config"
 	sr "github.com/Junaidmdv/goalcircle-user_service/internal/infrastructure/server"
 	logger "github.com/Junaidmdv/goalcircle-user_service/pkg/logger"
 )
 
 func main() {
-
 	logger, err := logger.NewLogger()
 	if err != nil {
 		log.Fatal(err)

@@ -57,3 +57,8 @@ type AddUserRoleReq struct {
 	UserRole string `json:"user_role"`
 }
 
+type ChangePasswordReq struct {
+	UserId      string `json:"user_id"`
+	OldPassword string `json:"old_password" validate:"required,password"`
+	NewPassword string `json:"new_password" validate:"new_password"`
+}

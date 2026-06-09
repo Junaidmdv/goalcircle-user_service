@@ -170,3 +170,11 @@ func ToAdminLoginReq(res *pb.AdminLoginRequest) *AdminLoginRequest {
 		Password: res.Password,
 	}
 }
+
+func ToChangePasswordReq(res *pb.ChangePasswordReq) *ChangePasswordReq {
+	return &ChangePasswordReq{
+		UserId:      res.UserId,
+		OldPassword: res.OldPassword,
+		NewPassword: res.NewPassword,
+	}
+}

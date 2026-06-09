@@ -62,7 +62,7 @@ func (uh *authHandler) Register(ctx context.Context, req *pb.RegisterRequest) (*
 	context, cancel := context.WithTimeout(ctx, *uh.timeout)
 	defer cancel()
 
-	request := dt.ToRegisterReq(req)  
+	request := dt.ToRegisterReq(req)
 
 	if validationErrs := uh.validater.Validation(request); validationErrs != nil {
 		stWithDetails, err := ValidationError(validationErrs)
@@ -358,4 +358,34 @@ func (uh *authHandler) GoogleAuthCallback(ctx context.Context, req *pb.GoogleCal
 		RefreshToken:       res.RefreshToken,
 		RefreshTokenExpiry: timestamppb.New(res.RefreshTokenExpiry),
 	}, nil
+}
+
+func (uh *authHandler) ChangePassword(ctx context.Context, input *pb.ChangePasswordReq) (*pb.ChangePasswordRes, error) {
+	ctx, cancel := context.WithTimeout(ctx, *uh.timeout)
+	defer cancel()
+
+	request := dt.ToChangePasswordReq(input)
+
+	if validationErrs := uh.validater.Validation(request); validationErrs != nil {
+		stWithDetails, err := ValidationError(validationErrs)
+		if err != nil {
+			return nil, status.Error(codes.InvalidArgument, "failed to attach details")
+		}
+		return nil, stWithDetails.Err()
+	}
+
+	res, err := uh.authUsecase.ChangePassword(ctx, &ucdtos.ChangePasswordReq{
+		UserId:      request.UserId,
+		OldPassword: request.OldPassword,
+		NewPassword: request.NewPassword,
+	})
+
+	if err != nil {
+		return nil, domain.GRPCStatus(err)
+	}
+
+	return &pb.ChangePasswordRes{
+		Success: res.Succcess,
+	}, nil
+
 }

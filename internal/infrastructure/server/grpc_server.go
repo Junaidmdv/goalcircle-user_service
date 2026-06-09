@@ -86,7 +86,11 @@ func (s *GRPCServer) BootStrapSetup() error {
 	sessionStore := repository.NewSessionStorage(redisClient.Client)
 	hashingCost := 14
 	passwordHashing := bycrypt.NewBycriptHasher(hashingCost, s.logger)
-	token := tokens.NewTokenMaker(s.config.JWT, s.logger)
+	token, err := tokens.NewTokenMaker(s.config.JWT, s.logger)
+	if err != nil {
+		s.logger.Error("failed generate jwt token", "error", err, "method", "server.BootStrapSetup")
+		return err
+	}
 	emailService, err := otp.NewEmailService(s.config.SMTP)
 	if err != nil {
 		s.logger.Error("failed setup otp service email", "error", err)
