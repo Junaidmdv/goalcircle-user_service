@@ -20,7 +20,6 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AuthService_ValidateToken_FullMethodName        = "/auth.AuthService/ValidateToken"
 	AuthService_Register_FullMethodName             = "/auth.AuthService/Register"
 	AuthService_VerfiyOtp_FullMethodName            = "/auth.AuthService/VerfiyOtp"
 	AuthService_Login_FullMethodName                = "/auth.AuthService/Login"
@@ -42,7 +41,7 @@ const (
 //
 // authentication of users services
 type AuthServiceClient interface {
-	ValidateToken(ctx context.Context, in *ValidateTokenReq, opts ...grpc.CallOption) (*ValidateTokenRes, error)
+	// rpc ValidateToken(ValidateTokenReq) returns (ValidateTokenRes);
 	// registeration of user account
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	// verfiy otp
@@ -68,16 +67,6 @@ type authServiceClient struct {
 
 func NewAuthServiceClient(cc grpc.ClientConnInterface) AuthServiceClient {
 	return &authServiceClient{cc}
-}
-
-func (c *authServiceClient) ValidateToken(ctx context.Context, in *ValidateTokenReq, opts ...grpc.CallOption) (*ValidateTokenRes, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ValidateTokenRes)
-	err := c.cc.Invoke(ctx, AuthService_ValidateToken_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
 }
 
 func (c *authServiceClient) Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error) {
@@ -216,7 +205,7 @@ func (c *authServiceClient) ChangePassword(ctx context.Context, in *ChangePasswo
 //
 // authentication of users services
 type AuthServiceServer interface {
-	ValidateToken(context.Context, *ValidateTokenReq) (*ValidateTokenRes, error)
+	// rpc ValidateToken(ValidateTokenReq) returns (ValidateTokenRes);
 	// registeration of user account
 	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	// verfiy otp
@@ -244,9 +233,6 @@ type AuthServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedAuthServiceServer struct{}
 
-func (UnimplementedAuthServiceServer) ValidateToken(context.Context, *ValidateTokenReq) (*ValidateTokenRes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ValidateToken not implemented")
-}
 func (UnimplementedAuthServiceServer) Register(context.Context, *RegisterRequest) (*RegisterResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
 }
@@ -305,24 +291,6 @@ func RegisterAuthServiceServer(s grpc.ServiceRegistrar, srv AuthServiceServer) {
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&AuthService_ServiceDesc, srv)
-}
-
-func _AuthService_ValidateToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ValidateTokenReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AuthServiceServer).ValidateToken(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AuthService_ValidateToken_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServiceServer).ValidateToken(ctx, req.(*ValidateTokenReq))
-	}
-	return interceptor(ctx, in, info, handler)
 }
 
 func _AuthService_Register_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -566,10 +534,6 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "auth.AuthService",
 	HandlerType: (*AuthServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "ValidateToken",
-			Handler:    _AuthService_ValidateToken_Handler,
-		},
 		{
 			MethodName: "Register",
 			Handler:    _AuthService_Register_Handler,

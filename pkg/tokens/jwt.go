@@ -31,7 +31,7 @@ func NewTokenMaker(jwtcnfg *config.JWTConfig, logger logger.Logger) (*JwtMaker, 
 	}
 
 	privetekey, err := jwt.ParseRSAPrivateKeyFromPEM(keyBytes)
-	if err != nil {
+	if err != nil {						
 		return nil, err
 	}
 

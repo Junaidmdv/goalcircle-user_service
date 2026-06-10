@@ -312,18 +312,6 @@ func (uh *authHandler) AddUserRole(ctx context.Context, pb *pb.AddUserRoleReq) (
 
 }
 
-func (h *authHandler) ValidateToken(ctx context.Context, req *pb.ValidateTokenReq) (*pb.ValidateTokenRes, error) {
-	claims, err := h.authUsecase.ValidateToken(ctx, req.Token)
-	if err != nil {
-		return nil, domain.GRPCStatus(err)
-	}
-	return &pb.ValidateTokenRes{
-		UserId:  claims.ID,
-		Email:   claims.Email,
-		Role:    claims.Role,
-		IsValid: true,
-	}, nil
-}
 
 func (h *authHandler) GoogleAuth(ctx context.Context, req *pb.GoogleAuthReq) (*pb.GoogleAuthRes, error) {
 	res, err := h.oauthUsecase.GoogleOauth(ctx, &ucdtos.GoogleOauthReq{
@@ -351,7 +339,6 @@ func (uh *authHandler) GoogleAuthCallback(ctx context.Context, req *pb.GoogleCal
 	return &pb.GoogleCallbackRes{
 		SessionId:          res.SessionId,
 		UserId:             res.UserId,
-		FullName:           res.FullName,
 		Email:              res.Email,
 		AccessToken:        res.AccessToken,
 		AccessTokenExpiry:  timestamppb.New(res.AccessTokenExpiry),

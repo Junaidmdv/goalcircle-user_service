@@ -126,18 +126,6 @@ message AddUserRoleRes{
    bool success=1;
 }
 
-message ValidateTokenReq {
-  string token = 1;
-}
-
-message ValidateTokenRes {
-  string user_id    = 1;
-  string email      = 2;
-  string role       = 3;
-  bool   is_valid   = 4;
-}
-
-
 message GoogleAuthReq{
     string session_id=1; 
 
@@ -178,7 +166,7 @@ message ChangePasswordRes{
 
 // authentication of users services
 service AuthService{ 
-  rpc ValidateToken(ValidateTokenReq) returns (ValidateTokenRes);
+  //rpc ValidateToken(ValidateTokenReq) returns (ValidateTokenRes);
   //registeration of user account
   rpc Register(RegisterRequest)returns(RegisterResponse);     
   //verfiy otp 
