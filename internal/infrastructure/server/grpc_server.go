@@ -30,7 +30,7 @@ import (
 	"github.com/Junaidmdv/goalcircle-user_service/pkg/logger"
 	"github.com/Junaidmdv/goalcircle-user_service/pkg/tokens"
 	vl "github.com/Junaidmdv/goalcircle-user_service/pkg/validater"
-	auth_pb "github.com/Junaidmdv/goalcircle-user_service/proto/pb"
+	auth_pb"github.com/Junaidmdv/goalcircle-protos/user/v1"
 	"google.golang.org/grpc"
 
 	um "github.com/Junaidmdv/goalcircle-user_service/internal/handler/grpc/usermanagment"

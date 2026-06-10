@@ -16,7 +16,7 @@ import (
 	"github.com/Junaidmdv/goalcircle-user_service/internal/usecase/register"
 	"github.com/Junaidmdv/goalcircle-user_service/pkg/logger"
 	vl "github.com/Junaidmdv/goalcircle-user_service/pkg/validater"
-	"github.com/Junaidmdv/goalcircle-user_service/proto/pb"
+	pb"github.com/Junaidmdv/goalcircle-protos/user/v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"

@@ -3,7 +3,7 @@ package dtos
 import (
 	"github.com/Junaidmdv/goalcircle-user_service/internal/domain/entity"
 	"github.com/Junaidmdv/goalcircle-user_service/internal/usecase/dtos"
-	"github.com/Junaidmdv/goalcircle-user_service/proto/pb"
+	pb"github.com/Junaidmdv/goalcircle-protos/user/v1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
